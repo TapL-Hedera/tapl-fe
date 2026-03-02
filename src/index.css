@@ -1,0 +1,281 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+
+@theme {
+  /* Chainlink-inspired color system */
+  --color-bn-bg: #0b0e11;
+  --color-bn-surface: #1e2329;
+  --color-bn-surface2: #2b3139;
+  --color-bn-surface3: #181a20;
+  --color-bn-border: #2b3139;
+  --color-bn-border2: #363c45;
+  --color-bn-yellow: #375bd2;
+  --color-bn-yellow-hover: #2c4ab8;
+  --color-bn-yellow-dim: #375bd220;
+  --color-bn-green: #2ebd85;
+  --color-bn-red: #f6465d;
+  --color-bn-text: #eaecef;
+  --color-bn-text-dim: #848e9c;
+  --color-bn-text-muted: #474d57;
+  --color-bn-blue: #375bd2;
+
+  /* Legacy aliases for compatibility */
+  --color-vibe-bg: #0b0e11;
+  --color-vibe-surface: #1e2329;
+  --color-vibe-surface2: #2b3139;
+  --color-vibe-grid: #2b3139;
+  --color-vibe-grid2: #363c45;
+  --color-vibe-accent: #375bd2;
+  --color-vibe-accent-hover: #2c4ab8;
+  --color-vibe-accent-dim: #375bd220;
+  --color-vibe-text: #eaecef;
+  --color-vibe-text-dim: #848e9c;
+  --color-vibe-text-muted: #474d57;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bn-bg);
+    color: var(--color-bn-text);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 14px;
+  }
+
+  /* Custom Scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-bn-border2) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-bn-border2);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-bn-text-muted);
+  }
+
+  /* Animations */
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  /* Binance-style nav glass */
+  .bn-nav {
+    background: rgba(11, 14, 17, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--color-bn-border);
+  }
+
+  /* Card surface */
+  .bn-card {
+    background: var(--color-bn-surface);
+    border: 1px solid var(--color-bn-border);
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+  }
+
+  .bn-card:hover {
+    border-color: var(--color-bn-border2);
+  }
+
+  /* Glass morphism utility */
+  .glass {
+    background: rgba(30, 35, 41, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--color-bn-border);
+  }
+
+  /* Binance primary button */
+  .btn-primary {
+    background: var(--color-bn-yellow);
+    color: #1e2329;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 4px;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-bn-yellow-hover);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.99);
+  }
+
+  .btn-secondary {
+    background: var(--color-bn-surface2);
+    color: var(--color-bn-text);
+    font-weight: 500;
+    font-size: 14px;
+    border-radius: 4px;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+    border: 1px solid var(--color-bn-border);
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-bn-border);
+    border-color: var(--color-bn-border2);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--color-bn-text);
+    font-weight: 500;
+    border-radius: 4px;
+    padding: 9px 20px;
+    transition: all 0.2s ease;
+    border: 1px solid var(--color-bn-border2);
+    cursor: pointer;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--color-bn-text-dim);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  /* Input styles */
+  .input-dark {
+    background: var(--color-bn-surface);
+    border: 1px solid var(--color-bn-border);
+    border-radius: 4px;
+    color: var(--color-bn-text);
+    transition: border-color 0.2s ease;
+    outline: none;
+    font-family: "Inter", sans-serif;
+  }
+
+  .input-dark:focus {
+    border-color: var(--color-bn-yellow);
+  }
+
+  /* Feature card */
+  .feature-card {
+    background: var(--color-bn-surface);
+    border: 1px solid var(--color-bn-border);
+    border-radius: 8px;
+    padding: 24px;
+    transition: all 0.25s ease;
+  }
+
+  .feature-card:hover {
+    border-color: var(--color-bn-border2);
+    background: var(--color-bn-surface2);
+    transform: translateY(-2px);
+  }
+
+  /* Label tag */
+  .label-tag {
+    display: inline-block;
+    background: var(--color-bn-yellow-dim);
+    color: var(--color-bn-yellow);
+    border: 1px solid rgba(252, 213, 53, 0.2);
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Active sidebar item - Binance tab indicator style */
+  .nav-active {
+    background: rgba(252, 213, 53, 0.08);
+    color: var(--color-bn-yellow);
+  }
+
+  /* Tab underline style */
+  .tab-active {
+    color: var(--color-bn-text);
+    border-bottom: 2px solid var(--color-bn-yellow);
+  }
+
+  /* Data table row hover */
+  .table-row-hover:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  /* Ticker/marquee */
+  .bn-ticker {
+    background: var(--color-bn-surface3);
+    border-bottom: 1px solid var(--color-bn-border);
+  }
+
+  /* Green/Red price colors */
+  .price-up {
+    color: var(--color-bn-green);
+  }
+  .price-down {
+    color: var(--color-bn-red);
+  }
+}
