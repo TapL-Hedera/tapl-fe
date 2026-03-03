@@ -20,7 +20,7 @@ export const Sidebar: React.FC = () => {
   const navItems = [
     { icon: AreaChart, label: "Trade", path: "/" },
     { icon: History, label: "History", path: "/history" },
-    { icon: Wallet, label: "Wallet", path: "/wallet" },
+    { icon: Wallet, label: "Trader Account", path: "/wallet" },
     { icon: TrendingUp, label: "LP", path: "/lp" },
     { icon: ShieldCheck, label: "CRE Proof", path: "/cre-proof" },
   ];
@@ -31,32 +31,24 @@ export const Sidebar: React.FC = () => {
       <aside
         className="hidden xl:flex fixed left-0 top-0 h-screen flex-col z-50 transition-all duration-300 w-[220px] 2xl:w-64"
         style={{
-          background: "#181A20",
-          borderRight: "1px solid #2B3139",
+          background: "rgba(22, 20, 42, 0.4)",
+          backdropFilter: "blur(20px)",
+          borderRight: "2px solid rgba(255, 255, 255, 0.05)",
         }}
       >
         {/* Brand */}
-        <div style={{ borderBottom: "1px solid #2B3139" }}>
-          <Link to="/" className="flex items-center gap-3 px-5 py-5">
-            <div
-              className="w-8 h-8 rounded flex items-center justify-center shrink-0"
-              style={{ background: "rgba(55,91,210,0.12)" }}
-            >
+        <div style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.05)" }}>
+          <Link to="/" className="flex items-center gap-3 px-5">
+            <div className="w-20 h-20 rounded flex items-center justify-center shrink-0">
               <img
-                src="/tapfun.png"
-                alt="tapfun logo"
-                className="w-5 h-5 object-contain"
+                src="/tapl.png"
+                alt="tapl logo"
+                className="w-20 h-20 object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
                 }}
               />
             </div>
-            <h1
-              className="text-base font-bold tracking-wider"
-              style={{ color: "#375BD2" }}
-            >
-              TAPL
-            </h1>
           </Link>
         </div>
 
@@ -78,8 +70,8 @@ export const Sidebar: React.FC = () => {
                 style={
                   isActive
                     ? {
-                        background: "rgba(55,91,210,0.08)",
-                        color: "#375BD2",
+                        background: "rgba(8, 71, 247, 0.08)",
+                        color: "#0847F7",
                       }
                     : undefined
                 }
@@ -87,18 +79,18 @@ export const Sidebar: React.FC = () => {
                 <Icon
                   size={17}
                   style={{
-                    color: isActive ? "#375BD2" : undefined,
+                    color: isActive ? "#0847F7" : undefined,
                   }}
                   className={cn(
                     "transition-colors shrink-0",
-                    !isActive && "text-[#848E9C] group-hover:text-[#EAECEF]",
+                    !isActive && "text-[#d0d0d0] group-hover:text-[#ffffff]",
                   )}
                 />
                 <span>{item.label}</span>
                 {isActive && (
                   <span
                     className="ml-auto w-0.5 h-4 rounded-full"
-                    style={{ background: "#375BD2" }}
+                    style={{ background: "#0847F7" }}
                   />
                 )}
               </Link>
@@ -110,28 +102,28 @@ export const Sidebar: React.FC = () => {
         <div
           className="m-3 rounded p-3"
           style={{
-            background: "rgba(55,91,210,0.04)",
-            border: "1px solid rgba(55,91,210,0.1)",
+            background: "rgba(8, 71, 247, 0.04)",
+            border: "1px solid rgba(8, 71, 247, 0.1)",
           }}
         >
           <p
             className="text-[10px] font-semibold uppercase tracking-widest mb-1"
-            style={{ color: "#375BD2" }}
+            style={{ color: "#0847F7" }}
           >
             Powered by
           </p>
-          <p className="text-xs" style={{ color: "#848E9C" }}>
+          <p className="text-xs" style={{ color: "#d0d0d0" }}>
             Chainlink Data Streams
           </p>
         </div>
       </aside>
 
-      {/* Mobile Bottom Navigation */}
       <nav
         className="xl:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around px-2"
         style={{
-          background: "#181A20",
-          borderTop: "1px solid #2B3139",
+          background: "rgba(22, 20, 42, 0.8)",
+          backdropFilter: "blur(20px)",
+          borderTop: "2px solid rgba(255, 255, 255, 0.05)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
           height: "56px",
         }}
@@ -144,11 +136,11 @@ export const Sidebar: React.FC = () => {
               key={idx}
               to={item.path}
               className="flex flex-col items-center gap-1 px-4 py-2 transition-all duration-150 min-w-[48px]"
-              style={{ color: isActive ? "#375BD2" : "#474D57" }}
+              style={{ color: isActive ? "#0847F7" : "#a0a0a0" }}
             >
               <Icon
                 size={20}
-                style={{ color: isActive ? "#375BD2" : "#474D57" }}
+                style={{ color: isActive ? "#0847F7" : "#a0a0a0" }}
               />
               <span className="text-[10px] font-medium">{item.label}</span>
             </Link>

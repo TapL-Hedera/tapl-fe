@@ -61,58 +61,87 @@ export const HistoryView: React.FC = () => {
 
   return (
     <div
-      className="flex h-screen w-full overflow-hidden"
+      className="flex h-screen w-full overflow-hidden relative"
       style={{
-        background: "#0B0E11",
-        color: "#EAECEF",
+        background: "#080A0C",
+        color: "#ffffff",
         fontFamily: "'Inter', sans-serif",
       }}
     >
+      {/* Subtle background glow */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-20 pointer-events-none rounded-full blur-[100px]"
+        style={{
+          background: "radial-gradient(circle, #0847F7 0%, transparent 70%)",
+        }}
+      />
       <Sidebar />
       <main className="flex-1 flex flex-col xl:pl-[220px] 2xl:pl-64 h-full relative z-10 overflow-hidden pb-14 xl:pb-0">
         <Header />
 
         <div className="flex-1 flex flex-col p-3 sm:p-5 relative min-h-0">
-          <div
-            className="flex-1 flex flex-col overflow-hidden relative z-10 min-h-0"
-            style={{
-              background: "#1E2329",
-              border: "1px solid #2B3139",
-              borderRadius: "8px",
-            }}
-          >
+          <div className="flex-1 flex flex-col overflow-hidden relative z-10 min-h-0 sci-card">
             <div
               className="flex items-center justify-between px-5 py-4"
-              style={{ borderBottom: "1px solid #2B3139" }}
+              style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.05)" }}
             >
               <h2
                 className="text-base font-semibold"
-                style={{ color: "#EAECEF" }}
+                style={{ color: "#ffffff" }}
               >
                 Trading History
               </h2>
             </div>
 
             <div className="flex-1 overflow-auto w-full">
-              <table className="w-full text-left border-collapse min-w-[500px]">
-                <thead
-                  className="sticky top-0 z-10"
-                  style={{ background: "#1E2329" }}
-                >
+              <table className="w-full text-left border-separate border-spacing-0 min-w-[500px]">
+                <thead className="z-10">
                   <tr
                     className="text-xs uppercase tracking-wider"
                     style={{
-                      borderBottom: "1px solid #2B3139",
-                      color: "#474D57",
+                      color: "#a0a0a0",
                     }}
                   >
-                    <th className="py-4 px-4 whitespace-nowrap">
+                    <th
+                      className="sticky top-0 z-20 py-4 px-4 whitespace-nowrap bg-[#080A0C]"
+                      style={{
+                        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                      }}
+                    >
                       Settled Date
                     </th>
-                    <th className="py-4 px-4">Market</th>
-                    <th className="py-4 px-4 whitespace-nowrap">Reward Rate</th>
-                    <th className="py-4 px-4 text-right">Amount</th>
-                    <th className="py-4 px-4 text-center">Status</th>
+                    <th
+                      className="sticky top-0 z-20 py-4 px-4 bg-[#080A0C]"
+                      style={{
+                        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                      }}
+                    >
+                      Market
+                    </th>
+                    <th
+                      className="sticky top-0 z-20 py-4 px-4 whitespace-nowrap bg-[#080A0C]"
+                      style={{
+                        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                      }}
+                    >
+                      Reward Rate
+                    </th>
+                    <th
+                      className="sticky top-0 z-20 py-4 px-4 text-right bg-[#080A0C]"
+                      style={{
+                        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                      }}
+                    >
+                      Amount
+                    </th>
+                    <th
+                      className="sticky top-0 z-20 py-4 px-4 text-center bg-[#080A0C]"
+                      style={{
+                        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                      }}
+                    >
+                      Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -121,7 +150,7 @@ export const HistoryView: React.FC = () => {
                       <td colSpan={5} className="py-20 text-center">
                         <Loader2
                           className="w-8 h-8 animate-spin mx-auto"
-                          style={{ color: "#375BD2" }}
+                          style={{ color: "#0847F7" }}
                         />
                       </td>
                     </tr>
@@ -139,7 +168,9 @@ export const HistoryView: React.FC = () => {
                       <tr
                         key={i}
                         className="transition-colors"
-                        style={{ borderBottom: "1px solid #2B3139" }}
+                        style={{
+                          borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                        }}
                         onMouseEnter={(e) => {
                           (e.currentTarget as HTMLElement).style.background =
                             "rgba(255,255,255,0.02)";
@@ -151,7 +182,7 @@ export const HistoryView: React.FC = () => {
                       >
                         <td
                           className="py-4 px-4 text-sm whitespace-nowrap"
-                          style={{ color: "#848E9C" }}
+                          style={{ color: "#d0d0d0" }}
                         >
                           {order.settledAt
                             ? format(
@@ -167,13 +198,13 @@ export const HistoryView: React.FC = () => {
                         </td>
                         <td
                           className="py-4 px-4 text-sm font-mono whitespace-nowrap"
-                          style={{ color: "#EAECEF" }}
+                          style={{ color: "#ffffff" }}
                         >
                           {order.marketId || "BTCUSDT"}
                         </td>
                         <td
                           className="py-4 px-4 text-sm font-mono whitespace-nowrap"
-                          style={{ color: "#EAECEF" }}
+                          style={{ color: "#ffffff" }}
                         >
                           {order.rewardRate
                             ? Number(order.rewardRate).toFixed(3) + "x"
@@ -181,7 +212,7 @@ export const HistoryView: React.FC = () => {
                         </td>
                         <td
                           className="py-4 px-4 font-bold text-right whitespace-nowrap font-mono"
-                          style={{ color: "#375BD2" }}
+                          style={{ color: "#0847F7" }}
                         >
                           $
                           {typeof order.amount === "number"
@@ -204,7 +235,7 @@ export const HistoryView: React.FC = () => {
                                   ? "#2EBD85"
                                   : order.settledWin === false
                                     ? "#F6465D"
-                                    : "#848E9C",
+                                    : "#d0d0d0",
                             }}
                           >
                             {order.settledWin === true
@@ -224,54 +255,31 @@ export const HistoryView: React.FC = () => {
             {/* Pagination Controls */}
             <div
               className="flex items-center justify-between px-5 py-4 mt-auto"
-              style={{ borderTop: "1px solid #2B3139" }}
+              style={{ borderTop: "1px solid rgba(255, 255, 255, 0.05)" }}
             >
               <button
                 disabled={page === 0 || loading}
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
-                className="flex items-center gap-1 px-4 py-2 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                style={{
-                  background: "#2B3139",
-                  border: "1px solid #363C45",
-                  color: "#EAECEF",
-                  borderRadius: "4px",
-                }}
-                onMouseEnter={(e) => {
-                  if (page > 0)
-                    (e.currentTarget as HTMLElement).style.background =
-                      "#363C45";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "#2B3139";
-                }}
+                className="bg-[#0847F7] flex items-center gap-1 px-4 py-2 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
-                <ChevronLeft size={15} /> Previous
+                <span className="relative z-10 flex items-center gap-1">
+                  <ChevronLeft size={15} /> Previous
+                </span>
               </button>
               <span
                 className="text-xs font-medium"
-                style={{ color: "#848E9C" }}
+                style={{ color: "#d0d0d0" }}
               >
                 Page {page + 1}
               </span>
               <button
                 disabled={orders.length !== 20 || loading}
                 onClick={() => setPage((p) => p + 1)}
-                className="flex items-center gap-1 px-4 py-2 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-                style={{
-                  background: "#375BD2",
-                  color: "#1E2329",
-                  borderRadius: "4px",
-                }}
-                onMouseEnter={(e) => {
-                  if (orders.length === 20)
-                    (e.currentTarget as HTMLElement).style.background =
-                      "#2C4AB8";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "#375BD2";
-                }}
+                className="bg-[#0847F7] flex items-center gap-1 px-4 py-2 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
-                Next <ChevronRight size={15} />
+                <span className="relative z-10 flex items-center gap-1">
+                  Next <ChevronRight size={15} />
+                </span>
               </button>
             </div>
           </div>

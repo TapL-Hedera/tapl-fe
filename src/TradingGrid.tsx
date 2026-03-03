@@ -226,7 +226,7 @@ export const TradingGrid: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col p-2 sm:p-3 lg:p-4 relative overflow-hidden font-mono">
       {/* Dynamic Price Y-Axis (Right side) */}
-      <div className="absolute right-0 top-2 sm:top-3 bottom-10 sm:bottom-14 w-10 sm:w-14 pointer-events-none z-10">
+      <div className="absolute right-0 top-2 sm:top-3 lg:top-4 bottom-2 sm:bottom-3 lg:bottom-4 w-10 sm:w-14 pointer-events-none z-10">
         {priceLevels.map((p) => {
           const top = getPriceY(p);
           if (top < -10 || top > 110) return null;
@@ -238,7 +238,7 @@ export const TradingGrid: React.FC = () => {
                 top: `${top}%`,
                 right: 0,
                 transform: "translateY(-50%)",
-                color: "#848E9C",
+                color: "#d0d0d0",
               }}
             >
               <span
@@ -256,8 +256,8 @@ export const TradingGrid: React.FC = () => {
         ref={containerRef}
         className="flex-1 relative overflow-hidden mr-10 sm:mr-14"
         style={{
-          background: "#0B0E11",
-          border: "1px solid #2B3139",
+          background: "#080A0C",
+          border: "1px solid rgba(255, 255, 255, 0.05)",
           borderRadius: "4px",
         }}
       >
@@ -269,7 +269,10 @@ export const TradingGrid: React.FC = () => {
             <div
               key={`hx_${p}`}
               className="absolute w-full h-px"
-              style={{ top: `${lineTop}%`, background: "#2B3139" }}
+              style={{
+                top: `${lineTop}%`,
+                background: "rgba(255, 255, 255, 0.05)",
+              }}
             />
           );
         })}
@@ -281,7 +284,7 @@ export const TradingGrid: React.FC = () => {
             className="absolute top-0 bottom-0 w-px"
             style={{
               left: `${getTimeX(t)}%`,
-              background: "#2B3139",
+              background: "rgba(255, 255, 255, 0.05)",
             }}
           />
         ))}
@@ -291,7 +294,7 @@ export const TradingGrid: React.FC = () => {
           className="absolute top-0 bottom-0 w-px z-20"
           style={{
             left: `${getTimeX(now)}%`,
-            background: "rgba(55,91,210,0.4)",
+            background: "rgba(8, 71, 247, 0.4)",
           }}
         />
 
@@ -348,10 +351,10 @@ export const TradingGrid: React.FC = () => {
                   top: `${top}%`,
                   width: `${colWidth}%`,
                   height: `${rowHeight}%`,
-                  borderColor: "#2B3139",
+                  borderColor: "rgba(255, 255, 255, 0.05)",
                   background:
                     !isPast && hasBet
-                      ? "rgba(55,91,210,0.08)"
+                      ? "rgba(8, 71, 247, 0.08)"
                       : isHit && hasAnyBet
                         ? "rgba(46,189,133,0.15)"
                         : isNext && !hasAnyBet
@@ -359,13 +362,13 @@ export const TradingGrid: React.FC = () => {
                           : undefined,
                   boxShadow:
                     !isPast && hasBet
-                      ? "inset 0 0 16px rgba(55,91,210,0.1)"
+                      ? "inset 0 0 16px rgba(8, 71, 247, 0.1)"
                       : isHit && hasAnyBet
                         ? "0 0 20px rgba(46,189,133,0.3), inset 0 0 20px rgba(46,189,133,0.15)"
                         : undefined,
                   outline:
                     !isPast && hasBet
-                      ? "1px solid rgba(55,91,210,0.3)"
+                      ? "1px solid rgba(8, 71, 247, 0.3)"
                       : isHit && hasAnyBet
                         ? "1px solid #2EBD85"
                         : undefined,
@@ -384,7 +387,7 @@ export const TradingGrid: React.FC = () => {
                   style={{
                     color:
                       hasAnyBet && !isHit
-                        ? "#375BD2"
+                        ? "#0847F7"
                         : isHit && hasAnyBet
                           ? "#2EBD85"
                           : isNext && !hasAnyBet
@@ -392,13 +395,13 @@ export const TradingGrid: React.FC = () => {
                             : cell.multiplier >= 100
                               ? "#F6465D"
                               : cell.multiplier >= 10
-                                ? "#375BD2"
-                                : "#848E9C",
+                                ? "#0847F7"
+                                : "#d0d0d0",
                     textShadow:
                       isHit && hasAnyBet
                         ? "0 0 8px rgba(46,189,133,1)"
                         : hasAnyBet
-                          ? "0 0 5px rgba(55,91,210,0.8)"
+                          ? "0 0 5px rgba(8, 71, 247, 0.8)"
                           : undefined,
                     transform: hasAnyBet || isHit ? "scale(1.1)" : undefined,
                   }}
@@ -419,12 +422,12 @@ export const TradingGrid: React.FC = () => {
                           : "",
                     )}
                     style={{
-                      borderRadius: "4px",
-                      background: isHit ? "#2EBD85" : "#375BD2",
-                      color: "#1E2329",
+                      borderRadius: "6px",
+                      background: isHit ? "#2EBD85" : "#0847F7",
+                      color: "#ffffff",
                       boxShadow: isHit
                         ? "0 0 10px #2EBD85"
-                        : "0 0 8px rgba(55,91,210,0.5)",
+                        : "0 0 8px rgba(8, 71, 247, 0.5)",
                     }}
                   >
                     ${displayBetAmount}
@@ -440,8 +443,8 @@ export const TradingGrid: React.FC = () => {
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-30">
             <defs>
               <linearGradient id="fadeLeft" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#0B0E11" stopOpacity="1" />
-                <stop offset="12%" stopColor="#0B0E11" stopOpacity="0" />
+                <stop offset="0%" stopColor="#080A0C" stopOpacity="1" />
+                <stop offset="12%" stopColor="#080A0C" stopOpacity="0" />
               </linearGradient>
             </defs>
 
@@ -474,7 +477,7 @@ export const TradingGrid: React.FC = () => {
       {/* Dynamic Time X-Axis (Bottom) */}
       <div
         className="absolute bottom-1 sm:bottom-4 left-2 sm:left-4 right-12 sm:right-16 h-5 sm:h-6 flex mt-2 text-[7px] sm:text-[9px] overflow-hidden font-bold"
-        style={{ color: "#848E9C" }}
+        style={{ color: "#d0d0d0" }}
       >
         {timeLabels.map((t) => (
           <div
@@ -482,7 +485,7 @@ export const TradingGrid: React.FC = () => {
             className="absolute flex justify-center -translate-x-1/2 whitespace-nowrap"
             style={{ left: `${getTimeX(t)}%` }}
           >
-            <span style={{ background: "#0B0E11", padding: "0 4px" }}>
+            <span style={{ background: "#080A0C", padding: "0 4px" }}>
               {isMobile
                 ? format(new Date(t), "HH:mm:ss")
                 : format(new Date(t), "HH:mm:ss a")}

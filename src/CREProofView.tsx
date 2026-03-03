@@ -79,19 +79,14 @@ const Section: React.FC<SectionProps> = ({
 }) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div
-      className="overflow-hidden shrink-0"
-      style={{
-        background: "#1E2329",
-        border: "1px solid #2B3139",
-        borderRadius: "4px",
-      }}
-    >
+    <div className="overflow-hidden shrink-0 sci-card">
       {/* Header */}
       <button
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between px-5 py-3.5 text-left"
-        style={{ borderBottom: open ? "1px solid #2B3139" : "none" }}
+        style={{
+          borderBottom: open ? "1px solid rgba(255, 255, 255, 0.05)" : "none",
+        }}
       >
         <div className="flex items-center gap-3">
           <div
@@ -101,16 +96,16 @@ const Section: React.FC<SectionProps> = ({
             <span style={{ color: accentColor }}>{icon}</span>
           </div>
           <div>
-            <p className="text-sm font-semibold" style={{ color: "#EAECEF" }}>
+            <p className="text-sm font-semibold" style={{ color: "#ffffff" }}>
               {title}
             </p>
-            <p className="text-xs" style={{ color: "#848E9C" }}>
+            <p className="text-xs" style={{ color: "#d0d0d0" }}>
               {subtitle}
             </p>
           </div>
           {badge && <div className="ml-3">{badge}</div>}
         </div>
-        <span style={{ color: "#848E9C" }}>
+        <span style={{ color: "#d0d0d0" }}>
           {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </span>
       </button>
@@ -124,14 +119,14 @@ const Section: React.FC<SectionProps> = ({
 const Loader = ({ color }: { color: string }) => (
   <div className="flex items-center justify-center py-10">
     <RefreshCw size={24} className="animate-spin" style={{ color }} />
-    <span className="ml-2 text-sm" style={{ color: "#848E9C" }}>
+    <span className="ml-2 text-sm" style={{ color: "#d0d0d0" }}>
       Loading…
     </span>
   </div>
 );
 
 const Empty = () => (
-  <p className="py-8 text-center text-sm" style={{ color: "#848E9C" }}>
+  <p className="py-8 text-center text-sm" style={{ color: "#d0d0d0" }}>
     No events found for this period.
   </p>
 );
@@ -153,7 +148,7 @@ const DataTable: React.FC<{
       <thead>
         <tr
           className="border-b text-[10px] uppercase tracking-widest font-bold"
-          style={{ borderColor: `${accentColor}22`, color: "#848E9C" }}
+          style={{ borderColor: `${accentColor}22`, color: "#d0d0d0" }}
         >
           {columns.map((c) => (
             <th
@@ -200,17 +195,10 @@ const StatChip: React.FC<{
   value: React.ReactNode;
   color: string;
 }> = ({ label, value, color }) => (
-  <div
-    className="px-4 py-3 flex flex-col gap-0.5"
-    style={{
-      background: "#1E2329",
-      border: "1px solid #2B3139",
-      borderRadius: "4px",
-    }}
-  >
+  <div className="px-5 py-4 flex flex-col gap-1 sci-card group">
     <span
       className="text-[10px] uppercase tracking-widest"
-      style={{ color: "#848E9C" }}
+      style={{ color: "#d0d0d0" }}
     >
       {label}
     </span>
@@ -222,7 +210,7 @@ const StatChip: React.FC<{
 
 // ─── Pass/Fail Badge ─────────────────────────────────────────────────────────
 const PassBadge: React.FC<{ passed?: boolean }> = ({ passed }) => {
-  if (passed == null) return <span style={{ color: "#848E9C" }}>-</span>;
+  if (passed == null) return <span style={{ color: "#d0d0d0" }}>-</span>;
   return passed ? (
     <span className="flex items-center gap-1 text-[#45ab84] font-bold">
       <CheckCircle2 size={13} /> PASS
@@ -296,9 +284,16 @@ export const CREProofView: React.FC = () => {
 
   return (
     <div
-      className="flex h-screen w-full text-vibe-text font-sans overflow-hidden"
-      style={{ background: "#0B0E11", fontFamily: "'Inter', sans-serif" }}
+      className="flex h-screen w-full text-vibe-text font-sans overflow-hidden relative"
+      style={{ background: "#080A0C", fontFamily: "'Inter', sans-serif" }}
     >
+      {/* Subtle background glow */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-20 pointer-events-none rounded-full blur-[100px]"
+        style={{
+          background: "radial-gradient(circle, #0847F7 0%, transparent 70%)",
+        }}
+      />
       <Sidebar />
       <main className="flex-1 flex flex-col xl:pl-[220px] 2xl:pl-64 h-full relative z-10 transition-all duration-300 overflow-hidden pb-[60px] xl:pb-0">
         <Header />
@@ -310,20 +305,20 @@ export const CREProofView: React.FC = () => {
               <div
                 className="w-9 h-9 flex items-center justify-center"
                 style={{
-                  background: "rgba(252,213,53,0.1)",
+                  background: "rgba(8,71,247,0.1)",
                   borderRadius: "4px",
                 }}
               >
-                <ShieldCheck size={18} style={{ color: "#FCD535" }} />
+                <ShieldCheck size={18} style={{ color: "#0847F7" }} />
               </div>
               <div>
                 <h2
                   className="text-base font-semibold"
-                  style={{ color: "#EAECEF" }}
+                  style={{ color: "#ffffff" }}
                 >
                   CRE Proof
                 </h2>
-                <p className="text-xs" style={{ color: "#848E9C" }}>
+                <p className="text-xs" style={{ color: "#d0d0d0" }}>
                   On-chain Chainlink CRE workflow events · Last 7 days
                 </p>
               </div>
@@ -334,7 +329,7 @@ export const CREProofView: React.FC = () => {
               <StatChip
                 label="Total Batches"
                 value={fmt(totalBatches)}
-                color="#FCD535"
+                color="#0847F7"
               />
               <StatChip
                 label="Passed"
@@ -359,7 +354,7 @@ export const CREProofView: React.FC = () => {
               <StatChip
                 label="Avg Score"
                 value={bpsToPercent(avgScore)}
-                color="#848E9C"
+                color="#d0d0d0"
               />
             </div>
           </div>
@@ -369,13 +364,13 @@ export const CREProofView: React.FC = () => {
             icon={<Activity size={15} />}
             title="Price Integrity Batches"
             subtitle="PriceIntegrityBatchReported events · Chainlink vs Internal OHLC"
-            accentColor="#375BD2"
+            accentColor="#0847F7"
             badge={
               <span
                 className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest"
                 style={{
-                  background: "rgba(55,91,210,0.1)",
-                  color: "#375BD2",
+                  background: "rgba(8, 71, 247, 0.1)",
+                  color: "#0847F7",
                   borderRadius: "4px",
                 }}
               >
@@ -384,12 +379,12 @@ export const CREProofView: React.FC = () => {
             }
           >
             {piLoading ? (
-              <Loader color="#375BD2" />
+              <Loader color="#0847F7" />
             ) : piRows.length === 0 ? (
               <Empty />
             ) : (
               <DataTable
-                accentColor="#375BD2"
+                accentColor="#0847F7"
                 columns={[
                   { key: "epochId", label: "Epoch ID" },
                   {
@@ -406,7 +401,7 @@ export const CREProofView: React.FC = () => {
                     key: "scoreBps",
                     label: "Score",
                     render: (r) => (
-                      <span style={{ color: "#375BD2" }}>
+                      <span style={{ color: "#0847F7" }}>
                         {bpsToPercent(r.scoreBps as number)}
                       </span>
                     ),
@@ -434,7 +429,7 @@ export const CREProofView: React.FC = () => {
                       <span
                         title={String(r.internalCandlesHash ?? "")}
                         className="font-mono text-[10px]"
-                        style={{ color: "#848E9C" }}
+                        style={{ color: "#d0d0d0" }}
                       >
                         {shortHash(r.internalCandlesHash as string)}
                       </span>
@@ -447,7 +442,7 @@ export const CREProofView: React.FC = () => {
                       <span
                         title={String(r.diffMerkleRoot ?? "")}
                         className="font-mono text-[10px]"
-                        style={{ color: "#848E9C" }}
+                        style={{ color: "#d0d0d0" }}
                       >
                         {shortHash(r.diffMerkleRoot as string)}
                       </span>
@@ -512,7 +507,7 @@ export const CREProofView: React.FC = () => {
                     render: (r) => (
                       <span
                         style={{
-                          color: r.failureFlags ? "#f87171" : "#848E9C",
+                          color: r.failureFlags ? "#f87171" : "#d0d0d0",
                         }}
                       >
                         {r.failureFlags != null
@@ -527,7 +522,7 @@ export const CREProofView: React.FC = () => {
                     render: (r) => (
                       <span
                         className="font-mono text-[10px]"
-                        style={{ color: "#848E9C" }}
+                        style={{ color: "#d0d0d0" }}
                         title={String(r.txHash ?? "")}
                       >
                         {shortHash(r.txHash as string)}
@@ -585,7 +580,7 @@ export const CREProofView: React.FC = () => {
                     render: (r) => (
                       <span
                         className="font-mono text-[10px]"
-                        style={{ color: "#848E9C" }}
+                        style={{ color: "#d0d0d0" }}
                         title={String(r.merkleRoot ?? "")}
                       >
                         {shortHash(r.merkleRoot as string)}
@@ -679,7 +674,7 @@ export const CREProofView: React.FC = () => {
                     render: (r) => {
                       const pct = Number(r.utilizationBps ?? 0) / 100;
                       const color =
-                        pct > 80 ? "#f87171" : pct > 60 ? "#375BD2" : "#45ab84";
+                        pct > 80 ? "#f87171" : pct > 60 ? "#0847F7" : "#45ab84";
                       return <span style={{ color }}>{pct.toFixed(2)}%</span>;
                     },
                   },
@@ -744,7 +739,7 @@ export const CREProofView: React.FC = () => {
                       render: (r) => (
                         <span
                           className="font-mono text-[10px]"
-                          style={{ color: "#848E9C" }}
+                          style={{ color: "#d0d0d0" }}
                           title={String(r.receiver ?? "")}
                         >
                           {shortHash(r.receiver as string)}
@@ -799,7 +794,7 @@ export const CREProofView: React.FC = () => {
                       render: (r) => (
                         <span
                           className="font-mono text-[10px]"
-                          style={{ color: "#848E9C" }}
+                          style={{ color: "#d0d0d0" }}
                           title={String(r.receiver ?? "")}
                         >
                           {shortHash(r.receiver as string)}
@@ -812,7 +807,7 @@ export const CREProofView: React.FC = () => {
                       render: (r) => (
                         <span
                           className="font-mono text-[10px]"
-                          style={{ color: "#848E9C" }}
+                          style={{ color: "#d0d0d0" }}
                           title={String(r.txHash ?? "")}
                         >
                           {shortHash(r.txHash as string)}
@@ -867,7 +862,7 @@ export const CREProofView: React.FC = () => {
                     key: "maxMultiplier",
                     label: "Max Multiplier",
                     render: (r) => (
-                      <span style={{ color: "#375BD2" }}>
+                      <span style={{ color: "#0847F7" }}>
                         {r.maxMultiplier != null
                           ? `${Number(r.maxMultiplier).toFixed(2)}x`
                           : "-"}
@@ -885,7 +880,7 @@ export const CREProofView: React.FC = () => {
                     render: (r) => (
                       <span
                         className="font-mono text-[10px]"
-                        style={{ color: "#848E9C" }}
+                        style={{ color: "#d0d0d0" }}
                         title={String(r.txHash ?? "")}
                       >
                         {shortHash(r.txHash as string)}
@@ -900,7 +895,7 @@ export const CREProofView: React.FC = () => {
 
           {/* Footer note */}
           <p className="text-center text-[10px] pb-4" style={{ color: "#444" }}>
-            Data sourced from on-chain Chainlink CRE events · Indexed by Tapfun
+            Data sourced from on-chain Chainlink CRE events · Indexed by Tapl
             worker
           </p>
         </div>

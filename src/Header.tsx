@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import {
   useAccount,
@@ -342,17 +343,18 @@ export const Header: React.FC = () => {
     <header
       className="xl:h-14 flex flex-col xl:flex-row xl:items-center xl:justify-between px-3 sm:px-4 xl:px-6 sticky top-0 z-40 gap-0"
       style={{
-        background: "#181A20",
-        borderBottom: "1px solid #2B3139",
-        fontFamily: "'Inter', sans-serif",
+        background: "rgba(22, 20, 42, 0.4)",
+        backdropFilter: "blur(20px)",
+        borderBottom: "2px solid rgba(255, 255, 255, 0.05)",
+        fontFamily: "'Manrope', sans-serif",
       }}
     >
       {/* ── Row 1 (always visible): logo + market + price + wallet ── */}
       <div className="flex items-center gap-3 h-14 xl:h-auto">
-        {/* tapfun logo — mobile only */}
+        {/* tapl logo — mobile only */}
         <img
-          src="/tapfun.png"
-          alt="tapfun"
+          src="/tapl.png"
+          alt="tapl"
           className="xl:hidden w-6 h-6 object-contain shrink-0"
           onError={(e) => {
             (e.target as HTMLImageElement).style.display = "none";
@@ -363,12 +365,12 @@ export const Header: React.FC = () => {
         <div
           className="flex items-center gap-1.5 px-3 py-1.5 shrink-0"
           style={{
-            background: "#1E2329",
-            border: "1px solid #2B3139",
+            background: "rgba(255, 255, 255, 0.03)",
+            border: "1px solid rgba(255, 255, 255, 0.05)",
             borderRadius: "4px",
           }}
         >
-          <span className="font-semibold text-xs" style={{ color: "#EAECEF" }}>
+          <span className="font-semibold text-xs" style={{ color: "#ffffff" }}>
             BTC/USD
           </span>
         </div>
@@ -397,40 +399,24 @@ export const Header: React.FC = () => {
               <button
                 onClick={startDemo}
                 disabled={isDemoLoading}
-                className="font-semibold px-3 py-1.5 active:scale-95 transition-transform text-xs whitespace-nowrap disabled:opacity-50"
-                style={{
-                  background: "#2B3139",
-                  color: "#EAECEF",
-                  borderRadius: "4px",
-                  border: "1px solid #363C45",
-                }}
+                className="px-3 py-1.5 font-bold rounded border border-[#0847F7] text-[#0847F7] active:scale-95 transition-transform text-xs whitespace-nowrap disabled:opacity-50"
               >
-                {isDemoLoading ? "Starting..." : "Demo"}
+                {isDemoLoading ? "STARTING..." : "DEMO"}
               </button>
               <button
                 onClick={() => connect({ connector: connectors[0] })}
-                className="font-semibold px-3 py-1.5 active:scale-95 transition-transform text-xs whitespace-nowrap"
-                style={{
-                  background: "#375BD2",
-                  color: "#1E2329",
-                  borderRadius: "4px",
-                }}
+                className="px-3 py-1.5 font-bold rounded bg-[#0847F7] text-white active:scale-95 transition-transform text-xs whitespace-nowrap"
               >
-                Connect
+                CONNECT
               </button>
             </>
           ) : chain?.id !== sepolia.id && !isDemoMode ? (
             <button
               onClick={() => switchChain?.({ chainId: sepolia.id })}
               disabled={isPendingSwitch}
-              className="font-semibold px-3 py-1.5 active:scale-95 transition-transform text-[11px] whitespace-nowrap disabled:opacity-50"
-              style={{
-                background: "#375BD2",
-                color: "#1E2329",
-                borderRadius: "4px",
-              }}
+              className="px-3 py-1.5 font-bold rounded bg-[#0847F7] text-white active:scale-95 transition-transform text-[11px] whitespace-nowrap disabled:opacity-50"
             >
-              {isPendingSwitch ? "Switching..." : "Switch Network"}
+              {isPendingSwitch ? "SWITCHING..." : "SWITCH NETWORK"}
             </button>
           ) : (
             <div className="relative">
@@ -445,9 +431,9 @@ export const Header: React.FC = () => {
                 onClick={() => setWalletMenuOpen((v) => !v)}
                 className="relative z-50 font-semibold px-2.5 py-1.5 active:scale-95 transition-transform flex items-center gap-1.5 text-xs"
                 style={{
-                  background: "#1E2329",
-                  border: "1px solid #2B3139",
-                  color: "#EAECEF",
+                  background: "rgba(255, 255, 255, 0.03)",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                  color: "#ffffff",
                   borderRadius: "4px",
                 }}
               >
@@ -463,7 +449,7 @@ export const Header: React.FC = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className={`opacity-60 transition-transform duration-200 ${walletMenuOpen ? "rotate-180" : ""}`}
-                  style={{ color: "#848E9C" }}
+                  style={{ color: "#d0d0d0" }}
                 >
                   <path d="m6 9 6 6 6-6" />
                 </svg>
@@ -473,27 +459,104 @@ export const Header: React.FC = () => {
                 <div
                   className="absolute right-0 top-full mt-1 w-52 shadow-2xl overflow-hidden z-50"
                   style={{
-                    background: "#1E2329",
-                    border: "1px solid #2B3139",
+                    background: "rgba(255, 255, 255, 0.03)",
+                    border: "1px solid rgba(255, 255, 255, 0.05)",
                     borderRadius: "4px",
                   }}
                 >
                   <div
                     className="px-3 pt-3 pb-2"
-                    style={{ borderBottom: "1px solid #2B3139" }}
+                    style={{
+                      borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                    }}
                   >
                     <p
                       className="text-[9px] uppercase tracking-wider font-semibold mb-1"
-                      style={{ color: "#474D57" }}
+                      style={{ color: "#a0a0a0" }}
                     >
                       {isDemoMode ? "Demo Wallet" : "Connected"}
                     </p>
-                    <p
-                      className="font-mono text-[11px] truncate"
-                      style={{ color: "#EAECEF" }}
-                    >
-                      {address?.slice(0, 10)}...{address?.slice(-6)}
-                    </p>
+                    <div className="flex items-center justify-between gap-2">
+                      <p
+                        className="font-mono text-[11px] truncate min-w-0"
+                        style={{ color: "#ffffff" }}
+                      >
+                        {address?.slice(0, 10)}...{address?.slice(-6)}
+                      </p>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          onClick={(e: React.MouseEvent) => {
+                            e.stopPropagation();
+                            if (address) {
+                              navigator.clipboard.writeText(address);
+                              toast.success("Address copied!", {
+                                id: "copy-address-mobile",
+                                style: {
+                                  background: "rgba(255, 255, 255, 0.03)",
+                                  color: "#ffffff",
+                                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                                  fontSize: "12px",
+                                },
+                                iconTheme: {
+                                  primary: "#2EBD85",
+                                  secondary: "#ffffff",
+                                },
+                              });
+                            }
+                          }}
+                          className="p-1 hover:bg-white/10 rounded transition-colors"
+                          title="Copy Address"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ color: "#d0d0d0" }}
+                          >
+                            <rect
+                              width="14"
+                              height="14"
+                              x="8"
+                              y="8"
+                              rx="2"
+                              ry="2"
+                            />
+                            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                          </svg>
+                        </button>
+                        <a
+                          href={`https://sepolia.etherscan.io/address/${address}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-1 hover:bg-white/10 rounded transition-colors"
+                          title="View on Explorer"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ color: "#d0d0d0" }}
+                          >
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
                   </div>
                   <button
                     onClick={handleDisconnect}
@@ -536,20 +599,20 @@ export const Header: React.FC = () => {
       {isConnected && (
         <div
           className="xl:hidden flex items-center gap-2 h-10 overflow-x-auto scrollbar-none"
-          style={{ borderTop: "1px solid #2B3139" }}
+          style={{ borderTop: "1px solid rgba(255, 255, 255, 0.05)" }}
         >
           {/* Bet selector */}
           <div
             className="flex px-2.5 py-1.5 items-center gap-1.5 shrink-0"
             style={{
-              background: "#1E2329",
-              border: "1px solid #2B3139",
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
               borderRadius: "4px",
             }}
           >
             <span
               className="text-[10px] font-medium"
-              style={{ color: "#848E9C" }}
+              style={{ color: "#d0d0d0" }}
             >
               Bet
             </span>
@@ -557,22 +620,22 @@ export const Header: React.FC = () => {
               value={betAmount}
               onChange={(e) => setBetAmount(Number(e.target.value))}
               className="bg-transparent font-bold font-mono text-xs outline-none cursor-pointer appearance-none pr-3"
-              style={{ color: "#375BD2" }}
+              style={{ color: "#0847F7" }}
             >
               <option
-                style={{ background: "#0B0E11", color: "#375BD2" }}
+                style={{ background: "#080A0C", color: "#0847F7" }}
                 value={10}
               >
                 $10
               </option>
               <option
-                style={{ background: "#0B0E11", color: "#375BD2" }}
+                style={{ background: "#080A0C", color: "#0847F7" }}
                 value={50}
               >
                 $50
               </option>
               <option
-                style={{ background: "#0B0E11", color: "#375BD2" }}
+                style={{ background: "#080A0C", color: "#0847F7" }}
                 value={100}
               >
                 $100
@@ -584,20 +647,20 @@ export const Header: React.FC = () => {
           <div
             className="flex px-2.5 py-1.5 items-center gap-1.5 shrink-0"
             style={{
-              background: "#1E2329",
-              border: "1px solid #2B3139",
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
               borderRadius: "4px",
             }}
           >
             <span
               className="text-[10px] font-medium"
-              style={{ color: "#848E9C" }}
+              style={{ color: "#d0d0d0" }}
             >
               Balance
             </span>
             <span
               className="font-bold font-mono text-xs"
-              style={{ color: "#EAECEF" }}
+              style={{ color: "#ffffff" }}
             >
               $
               {Number(
@@ -609,14 +672,9 @@ export const Header: React.FC = () => {
           {/* Faucet */}
           <button
             onClick={() => setIsFundModalOpen(true)}
-            className="shrink-0 font-semibold px-3 py-1.5 transition-all active:scale-95 text-xs"
-            style={{
-              background: "#375BD2",
-              color: "#1E2329",
-              borderRadius: "4px",
-            }}
+            className="shrink-0 px-3 py-1.5 font-bold rounded bg-[#0847F7] text-white transition-all text-xs"
           >
-            Faucet
+            FAUCET
           </button>
         </div>
       )}
@@ -628,14 +686,14 @@ export const Header: React.FC = () => {
             <div
               className="px-3 py-1.5 flex items-center gap-2"
               style={{
-                background: "#1E2329",
-                border: "1px solid #2B3139",
+                background: "rgba(255, 255, 255, 0.03)",
+                border: "1px solid rgba(255, 255, 255, 0.05)",
                 borderRadius: "4px",
               }}
             >
               <span
                 className="text-xs font-medium"
-                style={{ color: "#848E9C" }}
+                style={{ color: "#d0d0d0" }}
               >
                 Bet:
               </span>
@@ -643,22 +701,22 @@ export const Header: React.FC = () => {
                 value={betAmount}
                 onChange={(e) => setBetAmount(Number(e.target.value))}
                 className="bg-transparent font-bold font-mono text-sm outline-none cursor-pointer appearance-none pr-4"
-                style={{ color: "#375BD2" }}
+                style={{ color: "#0847F7" }}
               >
                 <option
-                  style={{ background: "#0B0E11", color: "#375BD2" }}
+                  style={{ background: "#080A0C", color: "#0847F7" }}
                   value={10}
                 >
                   $10
                 </option>
                 <option
-                  style={{ background: "#0B0E11", color: "#375BD2" }}
+                  style={{ background: "#080A0C", color: "#0847F7" }}
                   value={50}
                 >
                   $50
                 </option>
                 <option
-                  style={{ background: "#0B0E11", color: "#375BD2" }}
+                  style={{ background: "#080A0C", color: "#0847F7" }}
                   value={100}
                 >
                   $100
@@ -669,14 +727,14 @@ export const Header: React.FC = () => {
             <div
               className="px-4 py-1.5 flex items-center gap-2"
               style={{
-                background: "#1E2329",
-                border: "1px solid #2B3139",
+                background: "rgba(255, 255, 255, 0.03)",
+                border: "1px solid rgba(255, 255, 255, 0.05)",
                 borderRadius: "4px",
               }}
             >
               <span
                 className="text-xs font-medium"
-                style={{ color: "#848E9C" }}
+                style={{ color: "#d0d0d0" }}
               >
                 Balance
               </span>
@@ -694,21 +752,9 @@ export const Header: React.FC = () => {
 
             <button
               onClick={() => setIsFundModalOpen(true)}
-              className="font-semibold px-4 py-1.5 transition-all active:scale-95 text-sm"
-              style={{
-                background: "#2B3139",
-                color: "#EAECEF",
-                borderRadius: "4px",
-                border: "1px solid #363C45",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "#363C45";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "#2B3139";
-              }}
+              className="px-4 py-1.5 font-bold rounded bg-[#0847F7] text-white transition-all text-sm"
             >
-              Faucet
+              FAUCET
             </button>
           </>
         )}
@@ -718,23 +764,18 @@ export const Header: React.FC = () => {
             <button
               onClick={() => switchChain({ chainId: sepolia.id })}
               disabled={isPendingSwitch}
-              className="font-semibold px-4 py-2 transition-all active:scale-95 flex items-center gap-2 text-sm disabled:opacity-50"
-              style={{
-                background: "#375BD2",
-                color: "#1E2329",
-                borderRadius: "4px",
-              }}
+              className="flex items-center gap-2 px-4 py-1.5 font-bold rounded bg-[#0847F7] text-white text-sm disabled:opacity-50"
             >
-              {isPendingSwitch ? "Switching..." : "Switch Network"}
+              {isPendingSwitch ? "SWITCHING..." : "SWITCH NETWORK"}
             </button>
           ) : (
             <div className="relative group">
               <button
                 className="font-semibold px-4 py-2 transition-all active:scale-95 flex items-center gap-2 text-sm"
                 style={{
-                  background: "#1E2329",
-                  border: "1px solid #2B3139",
-                  color: "#EAECEF",
+                  background: "rgba(255, 255, 255, 0.03)",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
+                  color: "#ffffff",
                   borderRadius: "4px",
                 }}
               >
@@ -743,9 +784,9 @@ export const Header: React.FC = () => {
                   <span
                     className="text-[9px] px-1.5 py-0.5 rounded font-bold"
                     style={{
-                      background: "rgba(55,91,210,0.1)",
-                      color: "#375BD2",
-                      border: "1px solid rgba(55,91,210,0.2)",
+                      background: "rgba(8, 71, 247,0.1)",
+                      color: "#0847F7",
+                      border: "1px solid rgba(8, 71, 247,0.2)",
                     }}
                   >
                     DEMO
@@ -762,7 +803,7 @@ export const Header: React.FC = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className="transition-transform group-hover:rotate-180"
-                  style={{ color: "#848E9C" }}
+                  style={{ color: "#d0d0d0" }}
                 >
                   <path d="m6 9 6 6 6-6" />
                 </svg>
@@ -770,27 +811,104 @@ export const Header: React.FC = () => {
               <div
                 className="absolute right-0 top-full mt-1 w-52 shadow-2xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50"
                 style={{
-                  background: "#1E2329",
-                  border: "1px solid #2B3139",
+                  background: "rgba(255, 255, 255, 0.03)",
+                  border: "1px solid rgba(255, 255, 255, 0.05)",
                   borderRadius: "4px",
                 }}
               >
                 <div
                   className="px-4 pt-3 pb-2"
-                  style={{ borderBottom: "1px solid #2B3139" }}
+                  style={{
+                    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                  }}
                 >
                   <p
                     className="text-[10px] uppercase tracking-wider font-semibold mb-1"
-                    style={{ color: "#474D57" }}
+                    style={{ color: "#a0a0a0" }}
                   >
                     {isDemoMode ? "Demo Wallet" : "Connected"}
                   </p>
-                  <p
-                    className="font-mono text-xs truncate"
-                    style={{ color: "#EAECEF" }}
-                  >
-                    {address}
-                  </p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p
+                      className="font-mono text-xs truncate min-w-0"
+                      style={{ color: "#ffffff" }}
+                    >
+                      {address}
+                    </p>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          if (address) {
+                            navigator.clipboard.writeText(address);
+                            toast.success("Address copied!", {
+                              id: "copy-address-desktop",
+                              style: {
+                                background: "rgba(255, 255, 255, 0.03)",
+                                color: "#ffffff",
+                                border: "1px solid rgba(255, 255, 255, 0.05)",
+                                fontSize: "12px",
+                              },
+                              iconTheme: {
+                                primary: "#2EBD85",
+                                secondary: "#ffffff",
+                              },
+                            });
+                          }
+                        }}
+                        className="p-1 hover:bg-white/10 rounded transition-colors"
+                        title="Copy Address"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{ color: "#d0d0d0" }}
+                        >
+                          <rect
+                            width="14"
+                            height="14"
+                            x="8"
+                            y="8"
+                            rx="2"
+                            ry="2"
+                          />
+                          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                        </svg>
+                      </button>
+                      <a
+                        href={`https://sepolia.etherscan.io/address/${address}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="p-1 hover:bg-white/10 rounded transition-colors"
+                        title="View on Explorer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{ color: "#d0d0d0" }}
+                        >
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                          <polyline points="15 3 21 3 21 9" />
+                          <line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                      </a>
+                    </div>
+                  </div>
                 </div>
                 <button
                   onClick={handleDisconnect}
@@ -826,39 +944,22 @@ export const Header: React.FC = () => {
             </div>
           )
         ) : (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <button
               onClick={startDemo}
               disabled={isDemoLoading}
-              className="font-semibold px-4 py-2 transition-all active:scale-95 flex items-center gap-2 text-sm disabled:opacity-50"
-              style={{
-                background: "#2B3139",
-                border: "1px solid #363C45",
-                color: "#EAECEF",
-                borderRadius: "4px",
-              }}
+              className="flex items-center gap-2 px-4 py-2 font-bold rounded border border-[#0847F7] text-[#0847F7] text-sm disabled:opacity-50"
             >
               {isDemoLoading ? (
-                <div className="h-3.5 w-3.5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                <div className="h-3.5 w-3.5 rounded-full border-2 border-[#0847F7]/20 border-t-[#0847F7] animate-spin" />
               ) : null}
-              {isDemoLoading ? "Starting..." : "Try Demo"}
+              {isDemoLoading ? "STARTING..." : "TRY DEMO"}
             </button>
             <button
               onClick={() => connect({ connector: connectors[0] })}
-              className="font-semibold px-4 py-2 transition-all active:scale-95 text-sm"
-              style={{
-                background: "#375BD2",
-                color: "#1E2329",
-                borderRadius: "4px",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "#2C4AB8";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "#375BD2";
-              }}
+              className="flex items-center gap-2 px-4 py-2 font-bold rounded bg-[#0847F7] text-white text-sm"
             >
-              Connect Wallet
+              CONNECT WALLET
             </button>
           </div>
         )}
@@ -877,8 +978,8 @@ export const Header: React.FC = () => {
           <DialogPanel
             className="p-6 max-w-md w-full mx-4 relative"
             style={{
-              background: "#1E2329",
-              border: "1px solid #2B3139",
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
               borderRadius: "8px",
               boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
             }}
@@ -886,12 +987,12 @@ export const Header: React.FC = () => {
             <button
               onClick={() => setIsFundModalOpen(false)}
               className="absolute top-4 right-4 transition-colors"
-              style={{ color: "#474D57" }}
+              style={{ color: "#a0a0a0" }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "#EAECEF";
+                (e.currentTarget as HTMLElement).style.color = "#ffffff";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "#474D57";
+                (e.currentTarget as HTMLElement).style.color = "#a0a0a0";
               }}
             >
               <svg
@@ -910,10 +1011,10 @@ export const Header: React.FC = () => {
               </svg>
             </button>
 
-            <h2 className="text-lg font-bold mb-1" style={{ color: "#EAECEF" }}>
+            <h2 className="text-lg font-bold mb-1" style={{ color: "#ffffff" }}>
               Faucet Account
             </h2>
-            <p className="text-sm mb-6" style={{ color: "#848E9C" }}>
+            <p className="text-sm mb-6" style={{ color: "#d0d0d0" }}>
               Claim $100 in test funds. Request additional funds every 30
               minutes.
             </p>
@@ -923,9 +1024,9 @@ export const Header: React.FC = () => {
                 <div
                   className="px-6 py-3 font-mono text-lg font-bold flex items-center gap-2 w-full justify-center"
                   style={{
-                    background: "#2B3139",
-                    color: "#EAECEF",
-                    border: "1px solid #363C45",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    color: "#ffffff",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
                     borderRadius: "4px",
                   }}
                 >
@@ -939,7 +1040,7 @@ export const Header: React.FC = () => {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    style={{ color: "#848E9C" }}
+                    style={{ color: "#d0d0d0" }}
                   >
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
@@ -984,18 +1085,18 @@ export const Header: React.FC = () => {
                   disabled={isFunding}
                   className="w-full font-semibold px-6 py-3 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 text-sm"
                   style={{
-                    background: "#375BD2",
-                    color: "#1E2329",
+                    background: "#0847F7",
+                    color: "rgba(255, 255, 255, 0.03)",
                     borderRadius: "4px",
                   }}
                   onMouseEnter={(e) => {
                     if (!isFunding)
                       (e.currentTarget as HTMLElement).style.background =
-                        "#2C4AB8";
+                        "#8AA6F9";
                   }}
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLElement).style.background =
-                      "#375BD2";
+                      "#0847F7";
                   }}
                 >
                   {isFunding ? (

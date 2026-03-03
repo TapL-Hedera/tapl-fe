@@ -4,7 +4,9 @@ import {
   useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
+  useSwitchChain,
 } from "wagmi";
+import { sepolia } from "wagmi/chains";
 import { parseUnits, formatUnits, maxUint256 } from "viem";
 import { toast } from "react-hot-toast";
 import { Sidebar } from "./Sidebar";
@@ -124,19 +126,12 @@ const StatCard: React.FC<StatCardProps> = ({
   sub,
   accent,
 }) => (
-  <div
-    className="flex items-start gap-3 p-4"
-    style={{
-      background: accent ? "rgba(55,91,210,0.06)" : "#1E2329",
-      border: accent ? "1px solid rgba(55,91,210,0.25)" : "1px solid #2B3139",
-      borderRadius: "4px",
-    }}
-  >
+  <div className="flex items-start gap-3 p-4 sci-card group">
     <div
       className="shrink-0 p-2 rounded"
       style={{
-        background: accent ? "rgba(55,91,210,0.12)" : "rgba(255,255,255,0.04)",
-        color: accent ? "#375BD2" : "#848E9C",
+        background: accent ? "rgba(8, 71, 247,0.12)" : "rgba(255,255,255,0.04)",
+        color: accent ? "#0847F7" : "#d0d0d0",
       }}
     >
       {icon}
@@ -144,18 +139,18 @@ const StatCard: React.FC<StatCardProps> = ({
     <div className="min-w-0">
       <p
         className="text-xs font-medium uppercase tracking-wider mb-1"
-        style={{ color: "#848E9C" }}
+        style={{ color: "#d0d0d0" }}
       >
         {label}
       </p>
       <p
         className="text-lg font-bold font-mono break-all"
-        style={{ color: accent ? "#375BD2" : "#EAECEF" }}
+        style={{ color: accent ? "#0847F7" : "#ffffff" }}
       >
         {value}
       </p>
       {sub && (
-        <p className="text-xs mt-0.5" style={{ color: "#474D57" }}>
+        <p className="text-xs mt-0.5" style={{ color: "#a0a0a0" }}>
           {sub}
         </p>
       )}
@@ -166,7 +161,8 @@ const StatCard: React.FC<StatCardProps> = ({
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export const LPView: React.FC = () => {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, chain } = useAccount();
+  const { switchChain, isPending: isPendingSwitch } = useSwitchChain();
   const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">("deposit");
 
   // Input state
@@ -430,24 +426,31 @@ export const LPView: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen xl:pl-[220px] 2xl:pl-64 flex flex-col pb-14 xl:pb-0 overflow-x-hidden"
+      className="min-h-screen xl:pl-[220px] 2xl:pl-64 flex flex-col pb-14 xl:pb-0 overflow-x-hidden relative"
       style={{
-        background: "#0B0E11",
-        color: "#EAECEF",
+        background: "#080A0C",
+        color: "#ffffff",
         fontFamily: "'Inter', sans-serif",
       }}
     >
+      {/* Subtle background glow */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-20 pointer-events-none rounded-full blur-[100px]"
+        style={{
+          background: "radial-gradient(circle, #0847F7 0%, transparent 70%)",
+        }}
+      />
       <Header />
       <Sidebar />
 
-      <main className="flex-1 p-4 lg:p-8 max-w-4xl mx-auto w-full">
+      <main className="flex-1 p-4 lg:p-8 max-w-4xl mx-auto w-full relative z-10">
         {/* Page heading */}
         <div className="flex justify-between items-center mb-6 pt-4 lg:pt-0">
           <div>
-            <h1 className="text-lg font-semibold" style={{ color: "#EAECEF" }}>
+            <h1 className="text-lg font-semibold" style={{ color: "#ffffff" }}>
               LP Position
             </h1>
-            <p className="text-xs mt-0.5" style={{ color: "#848E9C" }}>
+            <p className="text-xs mt-0.5" style={{ color: "#d0d0d0" }}>
               Provide liquidity · earn yield from the pool
             </p>
           </div>
@@ -455,16 +458,16 @@ export const LPView: React.FC = () => {
             onClick={refreshAll}
             className="flex items-center gap-1.5 text-xs font-medium transition-colors px-3 py-1.5"
             style={{
-              color: "#848E9C",
-              background: "#1E2329",
-              border: "1px solid #2B3139",
+              color: "#d0d0d0",
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
               borderRadius: "4px",
             }}
             onMouseEnter={(e) =>
-              ((e.currentTarget as HTMLElement).style.color = "#EAECEF")
+              ((e.currentTarget as HTMLElement).style.color = "#ffffff")
             }
             onMouseLeave={(e) =>
-              ((e.currentTarget as HTMLElement).style.color = "#848E9C")
+              ((e.currentTarget as HTMLElement).style.color = "#d0d0d0")
             }
           >
             <IconRefresh />
@@ -502,16 +505,12 @@ export const LPView: React.FC = () => {
         </div>
 
         {/* ── Action Panel ── */}
-        <div
-          className="max-w-xl mx-auto w-full overflow-hidden"
-          style={{
-            background: "#1E2329",
-            border: "1px solid #2B3139",
-            borderRadius: "4px",
-          }}
-        >
+        <div className="max-w-xl mx-auto w-full overflow-hidden sci-card">
           {/* Tabs */}
-          <div className="flex" style={{ borderBottom: "1px solid #2B3139" }}>
+          <div
+            className="flex relative"
+            style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+          >
             {(["deposit", "withdraw"] as const).map((tab) => (
               <button
                 key={tab}
@@ -520,22 +519,25 @@ export const LPView: React.FC = () => {
                   setDepositAmountStr("");
                   setWithdrawSharesStr("");
                 }}
-                className="flex-1 py-3 px-4 text-sm font-medium transition-all duration-200 capitalize"
-                style={{
-                  color: activeTab === tab ? "#EAECEF" : "#474D57",
-                  borderBottom:
-                    activeTab === tab
-                      ? "2px solid #375BD2"
-                      : "2px solid transparent",
-                  background: "transparent",
-                }}
+                className={`flex-1 py-4 px-6 text-sm font-bold transition-all duration-300 capitalize relative overflow-hidden
+                  ${activeTab === tab ? "text-white" : "text-[#a0a0a0] hover:text-[#d0d0d0]"}`}
               >
-                {tab}
+                {activeTab === tab && (
+                  <div className="absolute inset-0 bg-linear-to-t from-[#0847F7]/20 to-transparent opacity-50"></div>
+                )}
+                <span className="relative z-10">{tab}</span>
+                {activeTab === tab && (
+                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#0847F7] animate-pulse">
+                    <div className="absolute inset-0 bg-[#0847F7] blur-sm"></div>
+                  </div>
+                )}
               </button>
             ))}
           </div>
 
-          <div className="p-5 space-y-5">
+          <div className="p-5 space-y-5 relative">
+            {/* Background elements inside the form */}
+            <div className="absolute top-1/2 left-0 w-64 h-64 bg-[#0847F7] rounded-full blur-[120px] opacity-10 pointer-events-none -translate-y-1/2"></div>
             {/* ── DEPOSIT TAB ── */}
             {activeTab === "deposit" && (
               <>
@@ -544,7 +546,7 @@ export const LPView: React.FC = () => {
                   <div className="flex justify-between mb-2">
                     <label
                       className="text-xs font-medium uppercase tracking-wider"
-                      style={{ color: "#848E9C" }}
+                      style={{ color: "#d0d0d0" }}
                     >
                       Amount (Tokens)
                     </label>
@@ -552,7 +554,7 @@ export const LPView: React.FC = () => {
                       <button
                         onClick={handleMaxDeposit}
                         className="text-xs font-mono transition-colors"
-                        style={{ color: "#375BD2" }}
+                        style={{ color: "#0847F7" }}
                       >
                         Max: {fmt(tokenBalance as bigint, dec)}
                       </button>
@@ -565,19 +567,23 @@ export const LPView: React.FC = () => {
                     placeholder="0.0"
                     min="0"
                     step="0.001"
-                    className="w-full p-3.5 text-xl font-bold font-mono outline-none transition-colors"
+                    className="w-full p-4 pl-5 text-xl font-bold font-mono outline-none transition-all duration-300 relative z-10"
                     style={{
-                      background: "#2B3139",
-                      border: "1px solid #363C45",
-                      borderRadius: "4px",
-                      color: "#EAECEF",
+                      background: "rgba(0,0,0,0.3)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: "12px",
+                      color: "#FFFFFF",
                     }}
-                    onFocus={(e) =>
-                      ((e.target as HTMLElement).style.borderColor = "#375BD2")
-                    }
-                    onBlur={(e) =>
-                      ((e.target as HTMLElement).style.borderColor = "#363C45")
-                    }
+                    onFocus={(e) => {
+                      (e.target as HTMLElement).style.borderColor = "#0847F7";
+                      (e.target as HTMLElement).style.boxShadow =
+                        "0 0 0 3px rgba(8, 71, 247,0.2)";
+                    }}
+                    onBlur={(e) => {
+                      (e.target as HTMLElement).style.borderColor =
+                        "rgba(255,255,255,0.08)";
+                      (e.target as HTMLElement).style.boxShadow = "none";
+                    }}
                   />
 
                   {depositAmountStr &&
@@ -587,8 +593,8 @@ export const LPView: React.FC = () => {
                         <span
                           className="text-xs font-medium px-2.5 py-1"
                           style={{
-                            color: "#375BD2",
-                            background: "rgba(55,91,210,0.08)",
+                            color: "#0847F7",
+                            background: "rgba(8, 71, 247,0.08)",
                             borderRadius: "4px",
                           }}
                         >
@@ -599,37 +605,33 @@ export const LPView: React.FC = () => {
                     )}
                 </div>
 
-                <button
-                  onClick={handleDeposit}
-                  disabled={!isConnected || isPendingDeposit}
-                  className="w-full py-3.5 px-6 text-sm font-semibold tracking-wider uppercase transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{
-                    background:
-                      !isConnected || isPendingDeposit ? "#2B3139" : "#375BD2",
-                    color:
-                      !isConnected || isPendingDeposit ? "#474D57" : "#FFFFFF",
-                    borderRadius: "4px",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!(!isConnected || isPendingDeposit))
-                      (e.currentTarget as HTMLElement).style.background =
-                        "#2C4AB8";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background =
-                      !isConnected || isPendingDeposit ? "#2B3139" : "#375BD2";
-                  }}
-                >
-                  {!isConnected
-                    ? "Wallet Not Connected"
-                    : isApproving || isWaitingApprove
-                      ? "Approving…"
-                      : isDepositingLP || isWaitingDeposit
-                        ? "Depositing…"
-                        : needApproval
-                          ? "Approve Tokens"
-                          : "Deposit LP"}
-                </button>
+                {isConnected && chain?.id !== sepolia.id ? (
+                  <button
+                    onClick={() => switchChain?.({ chainId: sepolia.id })}
+                    disabled={isPendingSwitch}
+                    className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
+                    style={{ background: "#0847F7", color: "#ffffff" }}
+                  >
+                    {isPendingSwitch ? "Switching..." : "Switch to Sepolia"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleDeposit}
+                    disabled={!isConnected || isPendingDeposit}
+                    className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
+                    style={{ background: "#0847F7", color: "#ffffff" }}
+                  >
+                    {!isConnected
+                      ? "Wallet Not Connected"
+                      : isApproving || isWaitingApprove
+                        ? "Approving…"
+                        : isDepositingLP || isWaitingDeposit
+                          ? "Depositing…"
+                          : needApproval
+                            ? "Approve Tokens"
+                            : "Deposit LP"}
+                  </button>
+                )}
               </>
             )}
 
@@ -641,7 +643,7 @@ export const LPView: React.FC = () => {
                   <div className="flex justify-between mb-2">
                     <label
                       className="text-xs font-medium uppercase tracking-wider"
-                      style={{ color: "#848E9C" }}
+                      style={{ color: "#d0d0d0" }}
                     >
                       Shares to Burn
                     </label>
@@ -649,7 +651,7 @@ export const LPView: React.FC = () => {
                       <button
                         onClick={handleMaxWithdraw}
                         className="text-xs font-mono"
-                        style={{ color: "#375BD2" }}
+                        style={{ color: "#0847F7" }}
                       >
                         Max: {fmt(lpShares as bigint, dec)}
                       </button>
@@ -662,19 +664,23 @@ export const LPView: React.FC = () => {
                     placeholder="0.0"
                     min="0"
                     step="0.000001"
-                    className="w-full p-3.5 text-xl font-bold font-mono outline-none transition-colors"
+                    className="w-full p-4 pl-5 text-xl font-bold font-mono outline-none transition-all duration-300 relative z-10"
                     style={{
-                      background: "#2B3139",
-                      border: "1px solid #363C45",
-                      borderRadius: "4px",
-                      color: "#EAECEF",
+                      background: "rgba(0,0,0,0.3)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: "12px",
+                      color: "#FFFFFF",
                     }}
-                    onFocus={(e) =>
-                      ((e.target as HTMLElement).style.borderColor = "#375BD2")
-                    }
-                    onBlur={(e) =>
-                      ((e.target as HTMLElement).style.borderColor = "#363C45")
-                    }
+                    onFocus={(e) => {
+                      (e.target as HTMLElement).style.borderColor = "#0847F7";
+                      (e.target as HTMLElement).style.boxShadow =
+                        "0 0 0 3px rgba(8, 71, 247,0.2)";
+                    }}
+                    onBlur={(e) => {
+                      (e.target as HTMLElement).style.borderColor =
+                        "rgba(255,255,255,0.08)";
+                      (e.target as HTMLElement).style.boxShadow = "none";
+                    }}
                   />
 
                   {withdrawSharesStr &&
@@ -684,7 +690,7 @@ export const LPView: React.FC = () => {
                         <span
                           className="text-xs font-medium px-2.5 py-1"
                           style={{
-                            color: "#375BD2",
+                            color: "#0847F7",
                             background: "rgba(55,91,210,0.08)",
                             borderRadius: "4px",
                           }}
@@ -707,54 +713,50 @@ export const LPView: React.FC = () => {
                     </p>
                   )}
 
-                <button
-                  onClick={handleWithdraw}
-                  disabled={!isConnected || isPendingWithdraw}
-                  className="w-full py-3.5 px-6 text-sm font-semibold tracking-wider uppercase transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{
-                    background:
-                      !isConnected || isPendingWithdraw ? "#2B3139" : "#375BD2",
-                    color:
-                      !isConnected || isPendingWithdraw ? "#474D57" : "#FFFFFF",
-                    borderRadius: "4px",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!(!isConnected || isPendingWithdraw))
-                      (e.currentTarget as HTMLElement).style.background =
-                        "#2C4AB8";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background =
-                      !isConnected || isPendingWithdraw ? "#2B3139" : "#375BD2";
-                  }}
-                >
-                  {!isConnected
-                    ? "Wallet Not Connected"
-                    : isWithdrawingLP || isWaitingWithdraw
-                      ? "Withdrawing…"
-                      : "Withdraw LP"}
-                </button>
+                {isConnected && chain?.id !== sepolia.id ? (
+                  <button
+                    onClick={() => switchChain?.({ chainId: sepolia.id })}
+                    disabled={isPendingSwitch}
+                    className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
+                    style={{ background: "#0847F7", color: "#ffffff" }}
+                  >
+                    {isPendingSwitch ? "Switching..." : "Switch to Sepolia"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleWithdraw}
+                    disabled={!isConnected || isPendingWithdraw}
+                    className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
+                    style={{ background: "#0847F7", color: "#ffffff" }}
+                  >
+                    {!isConnected
+                      ? "Wallet Not Connected"
+                      : isWithdrawingLP || isWaitingWithdraw
+                        ? "Withdrawing…"
+                        : "Withdraw LP"}
+                  </button>
+                )}
               </>
             )}
 
             {/* Info box */}
             <div
-              className="p-4 rounded"
+              className="p-4 rounded-xl relative z-10"
               style={{
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid #2B3139",
+                background: "rgba(0,0,0,0.3)",
+                border: "1px solid rgba(255,255,255,0.05)",
               }}
             >
               <h3
                 className="text-xs font-semibold mb-2 uppercase tracking-widest flex items-center gap-2"
-                style={{ color: "#474D57" }}
+                style={{ color: "#a0a0a0" }}
               >
                 <IconInfo />
                 How it works
               </h3>
               <p
                 className="text-xs leading-relaxed"
-                style={{ color: "#848E9C" }}
+                style={{ color: "#d0d0d0" }}
               >
                 {activeTab === "deposit"
                   ? "Deposit tokens to mint LP shares proportional to your contribution. Approve once, then deposit any amount."
@@ -765,17 +767,10 @@ export const LPView: React.FC = () => {
         </div>
 
         {/* ── Pool Breakdown ── */}
-        <div
-          className="max-w-xl mx-auto w-full mt-4 p-4"
-          style={{
-            background: "#1E2329",
-            border: "1px solid #2B3139",
-            borderRadius: "4px",
-          }}
-        >
+        <div className="max-w-xl mx-auto w-full mt-4 p-4 sci-card">
           <h2
             className="text-xs font-semibold uppercase tracking-widest mb-4 flex items-center gap-2"
-            style={{ color: "#848E9C" }}
+            style={{ color: "#d0d0d0" }}
           >
             <IconPieChart />
             Pool Breakdown
@@ -804,12 +799,12 @@ export const LPView: React.FC = () => {
               },
             ].map(({ label, val, accent }) => (
               <div key={label}>
-                <p className="text-xs mb-0.5" style={{ color: "#848E9C" }}>
+                <p className="text-xs mb-0.5" style={{ color: "#d0d0d0" }}>
                   {label}
                 </p>
                 <p
                   className="font-mono font-bold"
-                  style={{ color: accent ? "#375BD2" : "#EAECEF" }}
+                  style={{ color: accent ? "#0847F7" : "#ffffff" }}
                 >
                   {val}
                 </p>
@@ -823,20 +818,23 @@ export const LPView: React.FC = () => {
               <div className="mt-4">
                 <div
                   className="flex justify-between text-xs mb-1.5"
-                  style={{ color: "#848E9C" }}
+                  style={{ color: "#d0d0d0" }}
                 >
                   <span>Your pool share</span>
-                  <span style={{ color: "#375BD2" }}>{sharePercent}%</span>
+                  <span style={{ color: "#0847F7" }}>{sharePercent}%</span>
                 </div>
                 <div
                   className="h-1.5 overflow-hidden"
-                  style={{ background: "#2B3139", borderRadius: "2px" }}
+                  style={{
+                    background: "rgba(255, 255, 255, 0.05)",
+                    borderRadius: "2px",
+                  }}
                 >
                   <div
                     className="h-full transition-all duration-700"
                     style={{
                       width: `${Math.min(parseFloat(sharePercent), 100)}%`,
-                      background: "#375BD2",
+                      background: "#0847F7",
                       borderRadius: "2px",
                     }}
                   />
