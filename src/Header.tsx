@@ -356,7 +356,7 @@ export const Header: React.FC = () => {
 
   return (
     <header
-      className="xl:h-14 flex flex-col xl:flex-row xl:items-center xl:justify-between px-3 sm:px-4 xl:px-6 sticky top-0 z-40 gap-0"
+      className="xl:h-14 flex flex-col xl:flex-row xl:items-center xl:justify-between px-3 sm:px-4 xl:px-6 sticky top-0 z-40 gap-0 py-2"
       style={{
         background: "rgba(22, 20, 42, 0.4)",
         backdropFilter: "blur(20px)",
@@ -785,7 +785,7 @@ export const Header: React.FC = () => {
               </span>
               <span
                 className="font-bold font-mono text-sm"
-                style={{ color: "#8AA6F9" }}
+                style={{ color: "#0847F7" }}
               >
                 {"$"}
                 {Number(balance).toFixed(2)}

@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { Sidebar } from "./Sidebar";
-import { Header } from "./Header";
 import {
   useWorkerControllerGetPriceIntegrityBatches,
   useWorkerControllerGetBatchSubmitted,
@@ -280,623 +278,601 @@ export const CREProofView: React.FC = () => {
       : 0;
 
   return (
-    <div
-      className="flex h-screen w-full text-vibe-text font-sans overflow-hidden relative"
-      style={{ background: "#080A0C", fontFamily: "'Inter', sans-serif" }}
-    >
-      {/* Subtle background glow */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-20 pointer-events-none rounded-full blur-[100px]"
-        style={{
-          background: "radial-gradient(circle, #0847F7 0%, transparent 70%)",
-        }}
-      />
-      <Sidebar />
-      <main className="flex-1 flex flex-col xl:pl-[220px] 2xl:pl-64 h-full relative z-10 transition-all duration-300 overflow-hidden pb-[60px] xl:pb-0">
-        <Header />
-
-        <div className="flex-1 flex flex-col p-3 sm:p-5 gap-4 overflow-y-auto relative">
-          {/* Page title */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className="w-9 h-9 flex items-center justify-center"
-                style={{
-                  background: "rgba(8,71,247,0.1)",
-                  borderRadius: "4px",
-                }}
-              >
-                <ShieldCheck size={18} style={{ color: "#0847F7" }} />
-              </div>
-              <div>
-                <h2
-                  className="text-base font-semibold"
-                  style={{ color: "#ffffff" }}
-                >
-                  CRE Workflows
-                </h2>
-                <p className="text-xs" style={{ color: "#d0d0d0" }}>
-                  On-chain Chainlink CRE workflow events · Last 7 days
-                </p>
-              </div>
-            </div>
-
-            {/* Summary stats */}
-            <div className="hidden md:flex gap-2">
-              <StatChip
-                label="Total Batches"
-                value={fmt(totalBatches)}
-                color="#0847F7"
-              />
-              <StatChip
-                label="Passed"
-                value={
-                  <span className="flex items-center gap-1">
-                    <CheckCircle2 size={12} />
-                    {passedBatches}
-                  </span>
-                }
-                color="#2EBD85"
-              />
-              <StatChip
-                label="Failed"
-                value={
-                  <span className="flex items-center gap-1">
-                    <XCircle size={12} />
-                    {failedBatches}
-                  </span>
-                }
-                color="#F6465D"
-              />
-              <StatChip
-                label="Avg Score"
-                value={bpsToPercent(avgScore)}
-                color="#d0d0d0"
-              />
-            </div>
+    <div className="flex-1 flex flex-col p-3 sm:p-5 gap-4 overflow-y-auto relative">
+      {/* Page title */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-9 h-9 flex items-center justify-center"
+            style={{
+              background: "rgba(8,71,247,0.1)",
+              borderRadius: "4px",
+            }}
+          >
+            <ShieldCheck size={18} style={{ color: "#0847F7" }} />
           </div>
-
-          {/* ── 1. Price Integrity Batches ── */}
-          <Section
-            icon={<Activity size={15} />}
-            title="Price Integrity Batches"
-            subtitle="PriceIntegrityBatchReported events · Chainlink vs Internal OHLC"
-            accentColor="#0847F7"
-            badge={
-              <span
-                className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest"
-                style={{
-                  background: "rgba(8, 71, 247, 0.1)",
-                  color: "#0847F7",
-                  borderRadius: "4px",
-                }}
-              >
-                {piRows.length} rows
-              </span>
-            }
-          >
-            {piLoading ? (
-              <Loader color="#0847F7" />
-            ) : piRows.length === 0 ? (
-              <Empty />
-            ) : (
-              <DataTable
-                accentColor="#0847F7"
-                columns={[
-                  { key: "epochId", label: "Epoch ID" },
-                  {
-                    key: "windowStart",
-                    label: "Window Start",
-                    render: (r) => {
-                      const ts = Number(r.windowStart);
-                      if (!ts) return "-";
-                      return new Date(ts * 1000).toLocaleString();
-                    },
-                  },
-                  { key: "candleCount", label: "Candles" },
-                  {
-                    key: "scoreBps",
-                    label: "Score",
-                    render: (r) => (
-                      <span style={{ color: "#0847F7" }}>
-                        {bpsToPercent(r.scoreBps as number)}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "ohlcP95Bps",
-                    label: "P95 MAE",
-                    render: (r) => bpsToPercent(r.ohlcP95Bps as number),
-                  },
-                  {
-                    key: "ohlcMaxBps",
-                    label: "Max MAE",
-                    render: (r) => bpsToPercent(r.ohlcMaxBps as number),
-                  },
-                  {
-                    key: "directionMatchBps",
-                    label: "Dir Match",
-                    render: (r) => bpsToPercent(r.directionMatchBps as number),
-                  },
-                  { key: "outlierCount", label: "Outliers" },
-                  {
-                    key: "internalCandlesHash",
-                    label: "Int Hash",
-                    render: (r) => (
-                      <span
-                        title={String(r.internalCandlesHash ?? "")}
-                        className="font-mono text-[10px]"
-                        style={{ color: "#d0d0d0" }}
-                      >
-                        {shortHash(r.internalCandlesHash as string)}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "diffMerkleRoot",
-                    label: "Merkle Root",
-                    render: (r) => (
-                      <span
-                        title={String(r.diffMerkleRoot ?? "")}
-                        className="font-mono text-[10px]"
-                        style={{ color: "#d0d0d0" }}
-                      >
-                        {shortHash(r.diffMerkleRoot as string)}
-                      </span>
-                    ),
-                  },
-                ]}
-                rows={piRows}
-              />
-            )}
-          </Section>
-
-          {/* ── 2. Batch Submitted ── */}
-          <Section
-            icon={<Zap size={15} />}
-            title="Batch Submitted"
-            subtitle="BatchSubmitted events · Authoritative pass/fail results"
-            accentColor="#A78BFA"
-            badge={
-              <span
-                className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest"
-                style={{
-                  background: "rgba(167,139,250,0.1)",
-                  color: "#A78BFA",
-                  borderRadius: "4px",
-                }}
-              >
-                {bsRows.length} rows
-              </span>
-            }
-          >
-            {bsLoading ? (
-              <Loader color="#A78BFA" />
-            ) : bsRows.length === 0 ? (
-              <Empty />
-            ) : (
-              <DataTable
-                accentColor="#A78BFA"
-                columns={[
-                  { key: "epochId", label: "Epoch ID" },
-                  {
-                    key: "scoreBps",
-                    label: "Score",
-                    render: (r) => (
-                      <span style={{ color: "#A78BFA" }}>
-                        {bpsToPercent(r.scoreBps as number)}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "ohlcP95Bps",
-                    label: "P95 MAE",
-                    render: (r) => bpsToPercent(r.ohlcP95Bps as number),
-                  },
-                  {
-                    key: "isPassed",
-                    label: "Result",
-                    render: (r) => <PassBadge passed={r.isPassed as boolean} />,
-                  },
-                  {
-                    key: "failureFlags",
-                    label: "Fail Flags",
-                    render: (r) => (
-                      <span
-                        style={{
-                          color: r.failureFlags ? "#f87171" : "#d0d0d0",
-                        }}
-                      >
-                        {r.failureFlags != null
-                          ? `0x${Number(r.failureFlags).toString(16).padStart(2, "0")}`
-                          : "-"}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "txHash",
-                    label: "Tx Hash",
-                    render: (r) => (
-                      <span
-                        className="font-mono text-[10px]"
-                        style={{ color: "#d0d0d0" }}
-                        title={String(r.txHash ?? "")}
-                      >
-                        {shortHash(r.txHash as string)}
-                      </span>
-                    ),
-                  },
-                ]}
-                rows={bsRows}
-              />
-            )}
-          </Section>
-
-          {/* ── 3. Settlement Batches ── */}
-          <Section
-            icon={<Layers size={16} />}
-            title="Settlement Batches"
-            subtitle="SettlementBatchCommitted events · Committed payouts"
-            accentColor="#34D399"
-            badge={
-              <span
-                className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
-                style={{
-                  background: "rgba(52,211,153,0.12)",
-                  color: "#34D399",
-                }}
-              >
-                {settlementRows.length} rows
-              </span>
-            }
-          >
-            {settlementLoading ? (
-              <Loader color="#34D399" />
-            ) : settlementRows.length === 0 ? (
-              <Empty />
-            ) : (
-              <DataTable
-                accentColor="#34D399"
-                columns={[
-                  {
-                    key: "batchId",
-                    label: "Batch ID",
-                    render: (r) => (
-                      <span
-                        className="font-mono text-[10px]"
-                        style={{ color: "#34D399" }}
-                        title={String(r.batchId ?? "")}
-                      >
-                        {shortHash(r.batchId as string)}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "merkleRoot",
-                    label: "Merkle Root",
-                    render: (r) => (
-                      <span
-                        className="font-mono text-[10px]"
-                        style={{ color: "#d0d0d0" }}
-                        title={String(r.merkleRoot ?? "")}
-                      >
-                        {shortHash(r.merkleRoot as string)}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "totalPayout",
-                    label: "Total Payout",
-                    render: (r) => (
-                      <span style={{ color: "#34D399" }}>
-                        {fmt(r.totalPayout as number)}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "withdrawableCap",
-                    label: "Withdrawable Cap",
-                    render: (r) => fmt(r.withdrawableCap as number),
-                  },
-                  {
-                    key: "windowStart",
-                    label: "Window Start",
-                    render: (r) => {
-                      const ts = Number(r.windowStart);
-                      return ts
-                        ? new Date(ts * 1000).toLocaleDateString()
-                        : "-";
-                    },
-                  },
-                  {
-                    key: "windowEnd",
-                    label: "Window End",
-                    render: (r) => {
-                      const ts = Number(r.windowEnd);
-                      return ts
-                        ? new Date(ts * 1000).toLocaleDateString()
-                        : "-";
-                    },
-                  },
-                ]}
-                rows={settlementRows}
-              />
-            )}
-          </Section>
-
-          {/* ── 4. Solvency Reports ── */}
-          <Section
-            icon={<BarChart3 size={16} />}
-            title="Pool Solvency Reports"
-            subtitle="SolvencyReported events · Pool PoR snapshots"
-            accentColor="#63B3ED"
-            badge={
-              <span
-                className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
-                style={{
-                  background: "rgba(99,179,237,0.12)",
-                  color: "#63B3ED",
-                }}
-              >
-                {solvencyRows.length} rows
-              </span>
-            }
-          >
-            {solvencyLoading ? (
-              <Loader color="#63B3ED" />
-            ) : solvencyRows.length === 0 ? (
-              <Empty />
-            ) : (
-              <DataTable
-                accentColor="#63B3ED"
-                columns={[
-                  { key: "epochId", label: "Epoch ID" },
-                  {
-                    key: "poolBalance",
-                    label: "Pool Balance",
-                    render: (r) => (
-                      <span style={{ color: "#63B3ED" }}>
-                        {fmt(r.poolBalance as number)}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "totalLiability",
-                    label: "Total Liability",
-                    render: (r) => fmt(r.totalLiability as number),
-                  },
-                  {
-                    key: "utilizationBps",
-                    label: "Utilization",
-                    render: (r) => {
-                      const pct = Number(r.utilizationBps ?? 0) / 100;
-                      const color =
-                        pct > 80 ? "#f87171" : pct > 60 ? "#0847F7" : "#45ab84";
-                      return <span style={{ color }}>{pct.toFixed(2)}%</span>;
-                    },
-                  },
-                  {
-                    key: "maxSingleBetExposure",
-                    label: "Max Bet Exposure",
-                    render: (r) => fmt(r.maxSingleBetExposure as number),
-                  },
-                ]}
-                rows={solvencyRows}
-              />
-            )}
-          </Section>
-
-          {/* ── 5 & 6. LP Distribution + Reserve Allocated ── */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 shrink-0">
-            {/* LP Distribution */}
-            <Section
-              icon={<ArrowRightLeft size={16} />}
-              title="LP Distribution Requests"
-              subtitle="CCIPDistributionRequested events"
-              accentColor="#F6AD55"
-              badge={
-                <span
-                  className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
-                  style={{
-                    background: "rgba(246,173,85,0.12)",
-                    color: "#F6AD55",
-                  }}
-                >
-                  {lpDistRows.length} rows
-                </span>
-              }
-              defaultOpen={false}
+          <div>
+            <h2
+              className="text-base font-semibold"
+              style={{ color: "#ffffff" }}
             >
-              {lpLoading ? (
-                <Loader color="#F6AD55" />
-              ) : lpDistRows.length === 0 ? (
-                <Empty />
-              ) : (
-                <DataTable
-                  accentColor="#F6AD55"
-                  columns={[
-                    { key: "epochId", label: "Epoch" },
-                    {
-                      key: "amount",
-                      label: "Amount",
-                      render: (r) => (
-                        <span style={{ color: "#F6AD55" }}>
-                          {fmt(r.amount as number)}
-                        </span>
-                      ),
-                    },
-                    {
-                      key: "dstChainSelector",
-                      label: "Dest Chain",
-                      render: (r) => String(r.dstChainSelector ?? "-"),
-                    },
-                    {
-                      key: "receiver",
-                      label: "Receiver",
-                      render: (r) => (
-                        <span
-                          className="font-mono text-[10px]"
-                          style={{ color: "#d0d0d0" }}
-                          title={String(r.receiver ?? "")}
-                        >
-                          {shortHash(r.receiver as string)}
-                        </span>
-                      ),
-                    },
-                  ]}
-                  rows={lpDistRows}
-                />
-              )}
-            </Section>
-
-            {/* Reserve Allocated */}
-            <Section
-              icon={<Coins size={16} />}
-              title="Reserve Allocated"
-              subtitle="ReserveAllocatedToDistributor events"
-              accentColor="#FC8181"
-              badge={
-                <span
-                  className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
-                  style={{
-                    background: "rgba(252,129,129,0.12)",
-                    color: "#FC8181",
-                  }}
-                >
-                  {reserveRows.length} rows
-                </span>
-              }
-              defaultOpen={false}
-            >
-              {reserveLoading ? (
-                <Loader color="#FC8181" />
-              ) : reserveRows.length === 0 ? (
-                <Empty />
-              ) : (
-                <DataTable
-                  accentColor="#FC8181"
-                  columns={[
-                    {
-                      key: "amount",
-                      label: "Amount",
-                      render: (r) => (
-                        <span style={{ color: "#FC8181" }}>
-                          {fmt(r.amount as number)}
-                        </span>
-                      ),
-                    },
-                    {
-                      key: "receiver",
-                      label: "Receiver",
-                      render: (r) => (
-                        <span
-                          className="font-mono text-[10px]"
-                          style={{ color: "#d0d0d0" }}
-                          title={String(r.receiver ?? "")}
-                        >
-                          {shortHash(r.receiver as string)}
-                        </span>
-                      ),
-                    },
-                    {
-                      key: "txHash",
-                      label: "Tx Hash",
-                      render: (r) => (
-                        <span
-                          className="font-mono text-[10px]"
-                          style={{ color: "#d0d0d0" }}
-                          title={String(r.txHash ?? "")}
-                        >
-                          {shortHash(r.txHash as string)}
-                        </span>
-                      ),
-                    },
-                  ]}
-                  rows={reserveRows}
-                />
-              )}
-            </Section>
+              CRE Workflows
+            </h2>
+            <p className="text-xs" style={{ color: "#d0d0d0" }}>
+              On-chain Chainlink CRE workflow events · Last 7 days
+            </p>
           </div>
-
-          {/* ── 7. Volatility Regimes ── */}
-          <Section
-            icon={<TrendingUp size={16} />}
-            title="Volatility Regime Changes"
-            subtitle="VolatilityRegimeChanged events · Strategy rebalances"
-            accentColor="#F687B3"
-            badge={
-              <span
-                className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
-                style={{
-                  background: "rgba(246,135,179,0.12)",
-                  color: "#F687B3",
-                }}
-              >
-                {volRows.length} rows
-              </span>
-            }
-            defaultOpen={false}
-          >
-            {volLoading ? (
-              <Loader color="#F687B3" />
-            ) : volRows.length === 0 ? (
-              <Empty />
-            ) : (
-              <DataTable
-                accentColor="#F687B3"
-                columns={[
-                  { key: "regimeId", label: "Regime ID" },
-                  {
-                    key: "fortressSpreadBps",
-                    label: "Fortress Spread",
-                    render: (r) => (
-                      <span style={{ color: "#F687B3" }}>
-                        {bpsToPercent(r.fortressSpreadBps as number)}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "maxMultiplier",
-                    label: "Max Multiplier",
-                    render: (r) => (
-                      <span style={{ color: "#0847F7" }}>
-                        {r.maxMultiplier != null
-                          ? `${Number(r.maxMultiplier).toFixed(2)}x`
-                          : "-"}
-                      </span>
-                    ),
-                  },
-                  {
-                    key: "blockNumber",
-                    label: "Block",
-                    render: (r) => fmt(r.blockNumber as number),
-                  },
-                  {
-                    key: "txHash",
-                    label: "Tx Hash",
-                    render: (r) => (
-                      <span
-                        className="font-mono text-[10px]"
-                        style={{ color: "#d0d0d0" }}
-                        title={String(r.txHash ?? "")}
-                      >
-                        {shortHash(r.txHash as string)}
-                      </span>
-                    ),
-                  },
-                ]}
-                rows={volRows}
-              />
-            )}
-          </Section>
-
-          {/* Footer note */}
-          <p className="text-center text-[10px] pb-4" style={{ color: "#444" }}>
-            Data sourced from on-chain Chainlink CRE events · Indexed by Tapl
-            worker
-          </p>
         </div>
-      </main>
+
+        {/* Summary stats */}
+        <div className="hidden md:flex gap-2">
+          <StatChip
+            label="Total Batches"
+            value={fmt(totalBatches)}
+            color="#0847F7"
+          />
+          <StatChip
+            label="Passed"
+            value={
+              <span className="flex items-center gap-1">
+                <CheckCircle2 size={12} />
+                {passedBatches}
+              </span>
+            }
+            color="#2EBD85"
+          />
+          <StatChip
+            label="Failed"
+            value={
+              <span className="flex items-center gap-1">
+                <XCircle size={12} />
+                {failedBatches}
+              </span>
+            }
+            color="#F6465D"
+          />
+          <StatChip
+            label="Avg Score"
+            value={bpsToPercent(avgScore)}
+            color="#d0d0d0"
+          />
+        </div>
+      </div>
+
+      {/* ── 1. Price Integrity Batches ── */}
+      <Section
+        icon={<Activity size={15} />}
+        title="Price Integrity Batches"
+        subtitle="PriceIntegrityBatchReported events · Chainlink vs Internal OHLC"
+        accentColor="#0847F7"
+        badge={
+          <span
+            className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest"
+            style={{
+              background: "rgba(8, 71, 247, 0.1)",
+              color: "#0847F7",
+              borderRadius: "4px",
+            }}
+          >
+            {piRows.length} rows
+          </span>
+        }
+      >
+        {piLoading ? (
+          <Loader color="#0847F7" />
+        ) : piRows.length === 0 ? (
+          <Empty />
+        ) : (
+          <DataTable
+            accentColor="#0847F7"
+            columns={[
+              { key: "epochId", label: "Epoch ID" },
+              {
+                key: "windowStart",
+                label: "Window Start",
+                render: (r) => {
+                  const ts = Number(r.windowStart);
+                  if (!ts) return "-";
+                  return new Date(ts * 1000).toLocaleString();
+                },
+              },
+              { key: "candleCount", label: "Candles" },
+              {
+                key: "scoreBps",
+                label: "Score",
+                render: (r) => (
+                  <span style={{ color: "#0847F7" }}>
+                    {bpsToPercent(r.scoreBps as number)}
+                  </span>
+                ),
+              },
+              {
+                key: "ohlcP95Bps",
+                label: "P95 MAE",
+                render: (r) => bpsToPercent(r.ohlcP95Bps as number),
+              },
+              {
+                key: "ohlcMaxBps",
+                label: "Max MAE",
+                render: (r) => bpsToPercent(r.ohlcMaxBps as number),
+              },
+              {
+                key: "directionMatchBps",
+                label: "Dir Match",
+                render: (r) => bpsToPercent(r.directionMatchBps as number),
+              },
+              { key: "outlierCount", label: "Outliers" },
+              {
+                key: "internalCandlesHash",
+                label: "Int Hash",
+                render: (r) => (
+                  <span
+                    title={String(r.internalCandlesHash ?? "")}
+                    className="font-mono text-[10px]"
+                    style={{ color: "#d0d0d0" }}
+                  >
+                    {shortHash(r.internalCandlesHash as string)}
+                  </span>
+                ),
+              },
+              {
+                key: "diffMerkleRoot",
+                label: "Merkle Root",
+                render: (r) => (
+                  <span
+                    title={String(r.diffMerkleRoot ?? "")}
+                    className="font-mono text-[10px]"
+                    style={{ color: "#d0d0d0" }}
+                  >
+                    {shortHash(r.diffMerkleRoot as string)}
+                  </span>
+                ),
+              },
+            ]}
+            rows={piRows}
+          />
+        )}
+      </Section>
+
+      {/* ── 2. Batch Submitted ── */}
+      <Section
+        icon={<Zap size={15} />}
+        title="Batch Submitted"
+        subtitle="BatchSubmitted events · Authoritative pass/fail results"
+        accentColor="#A78BFA"
+        badge={
+          <span
+            className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest"
+            style={{
+              background: "rgba(167,139,250,0.1)",
+              color: "#A78BFA",
+              borderRadius: "4px",
+            }}
+          >
+            {bsRows.length} rows
+          </span>
+        }
+      >
+        {bsLoading ? (
+          <Loader color="#A78BFA" />
+        ) : bsRows.length === 0 ? (
+          <Empty />
+        ) : (
+          <DataTable
+            accentColor="#A78BFA"
+            columns={[
+              { key: "epochId", label: "Epoch ID" },
+              {
+                key: "scoreBps",
+                label: "Score",
+                render: (r) => (
+                  <span style={{ color: "#A78BFA" }}>
+                    {bpsToPercent(r.scoreBps as number)}
+                  </span>
+                ),
+              },
+              {
+                key: "ohlcP95Bps",
+                label: "P95 MAE",
+                render: (r) => bpsToPercent(r.ohlcP95Bps as number),
+              },
+              {
+                key: "isPassed",
+                label: "Result",
+                render: (r) => <PassBadge passed={r.isPassed as boolean} />,
+              },
+              {
+                key: "failureFlags",
+                label: "Fail Flags",
+                render: (r) => (
+                  <span
+                    style={{
+                      color: r.failureFlags ? "#f87171" : "#d0d0d0",
+                    }}
+                  >
+                    {r.failureFlags != null
+                      ? `0x${Number(r.failureFlags).toString(16).padStart(2, "0")}`
+                      : "-"}
+                  </span>
+                ),
+              },
+              {
+                key: "txHash",
+                label: "Tx Hash",
+                render: (r) => (
+                  <span
+                    className="font-mono text-[10px]"
+                    style={{ color: "#d0d0d0" }}
+                    title={String(r.txHash ?? "")}
+                  >
+                    {shortHash(r.txHash as string)}
+                  </span>
+                ),
+              },
+            ]}
+            rows={bsRows}
+          />
+        )}
+      </Section>
+
+      {/* ── 3. Settlement Batches ── */}
+      <Section
+        icon={<Layers size={16} />}
+        title="Settlement Batches"
+        subtitle="SettlementBatchCommitted events · Committed payouts"
+        accentColor="#34D399"
+        badge={
+          <span
+            className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
+            style={{
+              background: "rgba(52,211,153,0.12)",
+              color: "#34D399",
+            }}
+          >
+            {settlementRows.length} rows
+          </span>
+        }
+      >
+        {settlementLoading ? (
+          <Loader color="#34D399" />
+        ) : settlementRows.length === 0 ? (
+          <Empty />
+        ) : (
+          <DataTable
+            accentColor="#34D399"
+            columns={[
+              {
+                key: "batchId",
+                label: "Batch ID",
+                render: (r) => (
+                  <span
+                    className="font-mono text-[10px]"
+                    style={{ color: "#34D399" }}
+                    title={String(r.batchId ?? "")}
+                  >
+                    {shortHash(r.batchId as string)}
+                  </span>
+                ),
+              },
+              {
+                key: "merkleRoot",
+                label: "Merkle Root",
+                render: (r) => (
+                  <span
+                    className="font-mono text-[10px]"
+                    style={{ color: "#d0d0d0" }}
+                    title={String(r.merkleRoot ?? "")}
+                  >
+                    {shortHash(r.merkleRoot as string)}
+                  </span>
+                ),
+              },
+              {
+                key: "totalPayout",
+                label: "Total Payout",
+                render: (r) => (
+                  <span style={{ color: "#34D399" }}>
+                    {fmt(r.totalPayout as number)}
+                  </span>
+                ),
+              },
+              {
+                key: "withdrawableCap",
+                label: "Withdrawable Cap",
+                render: (r) => fmt(r.withdrawableCap as number),
+              },
+              {
+                key: "windowStart",
+                label: "Window Start",
+                render: (r) => {
+                  const ts = Number(r.windowStart);
+                  return ts ? new Date(ts * 1000).toLocaleDateString() : "-";
+                },
+              },
+              {
+                key: "windowEnd",
+                label: "Window End",
+                render: (r) => {
+                  const ts = Number(r.windowEnd);
+                  return ts ? new Date(ts * 1000).toLocaleDateString() : "-";
+                },
+              },
+            ]}
+            rows={settlementRows}
+          />
+        )}
+      </Section>
+
+      {/* ── 4. Solvency Reports ── */}
+      <Section
+        icon={<BarChart3 size={16} />}
+        title="Pool Solvency Reports"
+        subtitle="SolvencyReported events · Pool PoR snapshots"
+        accentColor="#63B3ED"
+        badge={
+          <span
+            className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
+            style={{
+              background: "rgba(99,179,237,0.12)",
+              color: "#63B3ED",
+            }}
+          >
+            {solvencyRows.length} rows
+          </span>
+        }
+      >
+        {solvencyLoading ? (
+          <Loader color="#63B3ED" />
+        ) : solvencyRows.length === 0 ? (
+          <Empty />
+        ) : (
+          <DataTable
+            accentColor="#63B3ED"
+            columns={[
+              { key: "epochId", label: "Epoch ID" },
+              {
+                key: "poolBalance",
+                label: "Pool Balance",
+                render: (r) => (
+                  <span style={{ color: "#63B3ED" }}>
+                    {fmt(r.poolBalance as number)}
+                  </span>
+                ),
+              },
+              {
+                key: "totalLiability",
+                label: "Total Liability",
+                render: (r) => fmt(r.totalLiability as number),
+              },
+              {
+                key: "utilizationBps",
+                label: "Utilization",
+                render: (r) => {
+                  const pct = Number(r.utilizationBps ?? 0) / 100;
+                  const color =
+                    pct > 80 ? "#f87171" : pct > 60 ? "#0847F7" : "#45ab84";
+                  return <span style={{ color }}>{pct.toFixed(2)}%</span>;
+                },
+              },
+              {
+                key: "maxSingleBetExposure",
+                label: "Max Bet Exposure",
+                render: (r) => fmt(r.maxSingleBetExposure as number),
+              },
+            ]}
+            rows={solvencyRows}
+          />
+        )}
+      </Section>
+
+      {/* ── 5 & 6. LP Distribution + Reserve Allocated ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 shrink-0">
+        {/* LP Distribution */}
+        <Section
+          icon={<ArrowRightLeft size={16} />}
+          title="LP Distribution Requests"
+          subtitle="CCIPDistributionRequested events"
+          accentColor="#F6AD55"
+          badge={
+            <span
+              className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
+              style={{
+                background: "rgba(246,173,85,0.12)",
+                color: "#F6AD55",
+              }}
+            >
+              {lpDistRows.length} rows
+            </span>
+          }
+          defaultOpen={false}
+        >
+          {lpLoading ? (
+            <Loader color="#F6AD55" />
+          ) : lpDistRows.length === 0 ? (
+            <Empty />
+          ) : (
+            <DataTable
+              accentColor="#F6AD55"
+              columns={[
+                { key: "epochId", label: "Epoch" },
+                {
+                  key: "amount",
+                  label: "Amount",
+                  render: (r) => (
+                    <span style={{ color: "#F6AD55" }}>
+                      {fmt(r.amount as number)}
+                    </span>
+                  ),
+                },
+                {
+                  key: "dstChainSelector",
+                  label: "Dest Chain",
+                  render: (r) => String(r.dstChainSelector ?? "-"),
+                },
+                {
+                  key: "receiver",
+                  label: "Receiver",
+                  render: (r) => (
+                    <span
+                      className="font-mono text-[10px]"
+                      style={{ color: "#d0d0d0" }}
+                      title={String(r.receiver ?? "")}
+                    >
+                      {shortHash(r.receiver as string)}
+                    </span>
+                  ),
+                },
+              ]}
+              rows={lpDistRows}
+            />
+          )}
+        </Section>
+
+        {/* Reserve Allocated */}
+        <Section
+          icon={<Coins size={16} />}
+          title="Reserve Allocated"
+          subtitle="ReserveAllocatedToDistributor events"
+          accentColor="#FC8181"
+          badge={
+            <span
+              className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
+              style={{
+                background: "rgba(252,129,129,0.12)",
+                color: "#FC8181",
+              }}
+            >
+              {reserveRows.length} rows
+            </span>
+          }
+          defaultOpen={false}
+        >
+          {reserveLoading ? (
+            <Loader color="#FC8181" />
+          ) : reserveRows.length === 0 ? (
+            <Empty />
+          ) : (
+            <DataTable
+              accentColor="#FC8181"
+              columns={[
+                {
+                  key: "amount",
+                  label: "Amount",
+                  render: (r) => (
+                    <span style={{ color: "#FC8181" }}>
+                      {fmt(r.amount as number)}
+                    </span>
+                  ),
+                },
+                {
+                  key: "receiver",
+                  label: "Receiver",
+                  render: (r) => (
+                    <span
+                      className="font-mono text-[10px]"
+                      style={{ color: "#d0d0d0" }}
+                      title={String(r.receiver ?? "")}
+                    >
+                      {shortHash(r.receiver as string)}
+                    </span>
+                  ),
+                },
+                {
+                  key: "txHash",
+                  label: "Tx Hash",
+                  render: (r) => (
+                    <span
+                      className="font-mono text-[10px]"
+                      style={{ color: "#d0d0d0" }}
+                      title={String(r.txHash ?? "")}
+                    >
+                      {shortHash(r.txHash as string)}
+                    </span>
+                  ),
+                },
+              ]}
+              rows={reserveRows}
+            />
+          )}
+        </Section>
+      </div>
+
+      {/* ── 7. Volatility Regimes ── */}
+      <Section
+        icon={<TrendingUp size={16} />}
+        title="Volatility Regime Changes"
+        subtitle="VolatilityRegimeChanged events · Strategy rebalances"
+        accentColor="#F687B3"
+        badge={
+          <span
+            className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
+            style={{
+              background: "rgba(246,135,179,0.12)",
+              color: "#F687B3",
+            }}
+          >
+            {volRows.length} rows
+          </span>
+        }
+        defaultOpen={false}
+      >
+        {volLoading ? (
+          <Loader color="#F687B3" />
+        ) : volRows.length === 0 ? (
+          <Empty />
+        ) : (
+          <DataTable
+            accentColor="#F687B3"
+            columns={[
+              { key: "regimeId", label: "Regime ID" },
+              {
+                key: "fortressSpreadBps",
+                label: "Fortress Spread",
+                render: (r) => (
+                  <span style={{ color: "#F687B3" }}>
+                    {bpsToPercent(r.fortressSpreadBps as number)}
+                  </span>
+                ),
+              },
+              {
+                key: "maxMultiplier",
+                label: "Max Multiplier",
+                render: (r) => (
+                  <span style={{ color: "#0847F7" }}>
+                    {r.maxMultiplier != null
+                      ? `${Number(r.maxMultiplier).toFixed(2)}x`
+                      : "-"}
+                  </span>
+                ),
+              },
+              {
+                key: "blockNumber",
+                label: "Block",
+                render: (r) => fmt(r.blockNumber as number),
+              },
+              {
+                key: "txHash",
+                label: "Tx Hash",
+                render: (r) => (
+                  <span
+                    className="font-mono text-[10px]"
+                    style={{ color: "#d0d0d0" }}
+                    title={String(r.txHash ?? "")}
+                  >
+                    {shortHash(r.txHash as string)}
+                  </span>
+                ),
+              },
+            ]}
+            rows={volRows}
+          />
+        )}
+      </Section>
+
+      {/* Footer note */}
+      <p className="text-center text-[10px] pb-4" style={{ color: "#444" }}>
+        Data sourced from on-chain Chainlink CRE events · Indexed by Tapl worker
+      </p>
     </div>
   );
 };

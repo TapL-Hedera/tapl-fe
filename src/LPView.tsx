@@ -9,8 +9,6 @@ import {
 import { sepolia } from "wagmi/chains";
 import { parseUnits, formatUnits, maxUint256 } from "viem";
 import { toast } from "react-hot-toast";
-import { Sidebar } from "./Sidebar";
-import { Header } from "./Header";
 import {
   POOL_RESERVE_ADDRESS,
   POOL_RESERVE_ABI,
@@ -126,31 +124,47 @@ const StatCard: React.FC<StatCardProps> = ({
   sub,
   accent,
 }) => (
-  <div className="flex items-start gap-3 p-4 sci-card group">
+  <div
+    className="flex items-start gap-3 p-4 rounded-2xl transition-all duration-300 group hover:-translate-y-0.5"
+    style={{
+      background: accent
+        ? "linear-gradient(145deg, rgba(8,71,247,0.16) 0%, rgba(255,255,255,0.03) 100%)"
+        : "linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
+      border: accent
+        ? "1px solid rgba(8, 71, 247, 0.35)"
+        : "1px solid rgba(255,255,255,0.08)",
+      boxShadow: accent
+        ? "0 10px 30px rgba(8,71,247,0.18)"
+        : "0 10px 24px rgba(0,0,0,0.25)",
+    }}
+  >
     <div
-      className="shrink-0 p-2 rounded"
+      className="shrink-0 p-2.5 rounded-lg"
       style={{
-        background: accent ? "rgba(8, 71, 247,0.12)" : "rgba(255,255,255,0.04)",
+        background: accent ? "rgba(8,71,247,0.2)" : "rgba(255,255,255,0.06)",
         color: accent ? "#0847F7" : "#d0d0d0",
+        border: accent
+          ? "1px solid rgba(8,71,247,0.35)"
+          : "1px solid rgba(255,255,255,0.08)",
       }}
     >
       {icon}
     </div>
     <div className="min-w-0">
       <p
-        className="text-xs font-medium uppercase tracking-wider mb-1"
+        className="text-[11px] font-semibold uppercase tracking-[0.15em] mb-1"
         style={{ color: "#d0d0d0" }}
       >
         {label}
       </p>
       <p
-        className="text-lg font-bold font-mono break-all"
+        className="text-2xl leading-none font-bold font-mono break-all"
         style={{ color: accent ? "#0847F7" : "#ffffff" }}
       >
         {value}
       </p>
       {sub && (
-        <p className="text-xs mt-0.5" style={{ color: "#a0a0a0" }}>
+        <p className="text-xs mt-2" style={{ color: "#a0a0a0" }}>
           {sub}
         </p>
       )}
@@ -425,428 +439,356 @@ export const LPView: React.FC = () => {
   const dec = decimals as number;
 
   return (
-    <div
-      className="min-h-screen xl:pl-[220px] 2xl:pl-64 flex flex-col pb-14 xl:pb-0 overflow-x-hidden relative"
-      style={{
-        background: "#080A0C",
-        color: "#ffffff",
-        fontFamily: "'Inter', sans-serif",
-      }}
-    >
-      {/* Subtle background glow */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-20 pointer-events-none rounded-full blur-[100px]"
-        style={{
-          background: "radial-gradient(circle, #0847F7 0%, transparent 70%)",
-        }}
-      />
-      <Header />
-      <Sidebar />
-
-      <main className="flex-1 p-4 lg:p-8 max-w-4xl mx-auto w-full relative z-10">
-        {/* Page heading */}
-        <div className="flex justify-between items-center mb-6 pt-4 lg:pt-0">
-          <div>
-            <h1 className="text-lg font-semibold" style={{ color: "#ffffff" }}>
-              LP Position
-            </h1>
-            <p className="text-xs mt-0.5" style={{ color: "#d0d0d0" }}>
-              Provide liquidity · earn yield from the pool
-            </p>
-          </div>
-          <button
-            onClick={refreshAll}
-            className="flex items-center gap-1.5 text-xs font-medium transition-colors px-3 py-1.5"
-            style={{
-              color: "#d0d0d0",
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.05)",
-              borderRadius: "4px",
-            }}
-            onMouseEnter={(e) =>
-              ((e.currentTarget as HTMLElement).style.color = "#ffffff")
-            }
-            onMouseLeave={(e) =>
-              ((e.currentTarget as HTMLElement).style.color = "#d0d0d0")
-            }
+    <div className="flex-1 p-4 lg:p-8 max-w-5xl mx-auto w-full relative z-10">
+      <div className="absolute -top-24 -left-16 w-80 h-80 rounded-full blur-[120px] bg-[#0847F7]/20 pointer-events-none" />
+      <div className="absolute top-1/3 -right-24 w-96 h-96 rounded-full blur-[130px] bg-[#2EBD85]/10 pointer-events-none" />
+      {/* Page heading */}
+      <div className="flex justify-between items-start mb-8 pt-4 lg:pt-0 relative">
+        <div>
+          <h1
+            className="text-2xl md:text-3xl font-semibold"
+            style={{ color: "#ffffff" }}
           >
+            LP Position
+          </h1>
+          <p className="text-sm mt-1.5" style={{ color: "#d0d0d0" }}>
+            Provide liquidity · earn yield from the pool
+          </p>
+        </div>
+        <button
+          onClick={refreshAll}
+          className="flex items-center gap-1.5 text-xs font-medium transition-all px-3.5 py-2 rounded-lg hover:-translate-y-0.5 hover:border-white/25 group"
+          style={{
+            color: "#d0d0d0",
+            background:
+              "linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
+            border: "1px solid rgba(255, 255, 255, 0.12)",
+          }}
+          onMouseEnter={(e) =>
+            ((e.currentTarget as HTMLElement).style.color = "#ffffff")
+          }
+          onMouseLeave={(e) =>
+            ((e.currentTarget as HTMLElement).style.color = "#d0d0d0")
+          }
+        >
+          <span className="group-hover:rotate-180 transition-transform duration-500">
             <IconRefresh />
-            Refresh
-          </button>
-        </div>
+          </span>
+          Refresh
+        </button>
+      </div>
 
-        {/* ── Position Stats ── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          <StatCard
-            icon={<IconCoins />}
-            label="Your Shares"
-            value={fmt(lpShares as bigint | undefined, dec)}
-            sub="LP shares owned"
-            accent={!!(lpShares && (lpShares as bigint) > 0n)}
-          />
-          <StatCard
-            icon={<IconTrendingUp />}
-            label="Share Value"
-            value={fmt(lpValue as bigint | undefined, dec)}
-            sub="Tokens claimable"
-          />
-          <StatCard
-            icon={<IconPieChart />}
-            label="Pool Share"
-            value={`${sharePercent}%`}
-            sub="Of total LP shares"
-          />
-          <StatCard
-            icon={<IconCoins />}
-            label="Pool Total"
-            value={fmt(totalCollateral as bigint | undefined, dec)}
-            sub="All collateral in pool"
-          />
-        </div>
+      {/* ── Position Stats ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
+        <StatCard
+          icon={<IconCoins />}
+          label="Your Shares"
+          value={fmt(lpShares as bigint | undefined, dec)}
+          sub="LP shares owned"
+          accent={!!(lpShares && (lpShares as bigint) > 0n)}
+        />
+        <StatCard
+          icon={<IconTrendingUp />}
+          label="Share Value"
+          value={fmt(lpValue as bigint | undefined, dec)}
+          sub="Tokens claimable"
+        />
+        <StatCard
+          icon={<IconPieChart />}
+          label="Pool Share"
+          value={`${sharePercent}%`}
+          sub="Of total LP shares"
+        />
+        <StatCard
+          icon={<IconCoins />}
+          label="Pool Total"
+          value={fmt(totalCollateral as bigint | undefined, dec)}
+          sub="All collateral in pool"
+        />
+      </div>
 
-        {/* ── Action Panel ── */}
-        <div className="max-w-xl mx-auto w-full overflow-hidden sci-card">
-          {/* Tabs */}
-          <div
-            className="flex relative"
-            style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-          >
-            {(["deposit", "withdraw"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => {
-                  setActiveTab(tab);
-                  setDepositAmountStr("");
-                  setWithdrawSharesStr("");
-                }}
-                className={`flex-1 py-4 px-6 text-sm font-bold transition-all duration-300 capitalize relative overflow-hidden
-                  ${activeTab === tab ? "text-white" : "text-[#a0a0a0] hover:text-[#d0d0d0]"}`}
-              >
-                {activeTab === tab && (
-                  <div className="absolute inset-0 bg-linear-to-t from-[#0847F7]/20 to-transparent opacity-50"></div>
-                )}
-                <span className="relative z-10">
-                  {tab === "deposit"
-                    ? "Deposit Liquidity"
-                    : "Withdraw Liquidity"}
-                </span>
-                {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#0847F7] animate-pulse">
-                    <div className="absolute inset-0 bg-[#0847F7] blur-sm"></div>
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-
-          <div className="p-5 space-y-5 relative">
-            {/* Background elements inside the form */}
-            <div className="absolute top-1/2 left-0 w-64 h-64 bg-[#0847F7] rounded-full blur-[120px] opacity-10 pointer-events-none -translate-y-1/2"></div>
-            {/* ── DEPOSIT TAB ── */}
-            {activeTab === "deposit" && (
-              <>
-                {/* Token amount input */}
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <label
-                      className="text-xs font-medium uppercase tracking-wider"
-                      style={{ color: "#d0d0d0" }}
-                    >
-                      Amount (Tokens)
-                    </label>
-                    {tokenBalance !== undefined && (
-                      <button
-                        onClick={handleMaxDeposit}
-                        className="text-xs font-mono transition-colors"
-                        style={{ color: "#0847F7" }}
-                      >
-                        Max: {fmt(tokenBalance as bigint, dec)}
-                      </button>
-                    )}
-                  </div>
-                  <input
-                    type="number"
-                    value={depositAmountStr}
-                    onChange={(e) => setDepositAmountStr(e.target.value)}
-                    placeholder="0.0"
-                    min="0"
-                    step="0.001"
-                    className="w-full p-4 pl-5 text-xl font-bold font-mono outline-none transition-all duration-300 relative z-10"
-                    style={{
-                      background: "rgba(0,0,0,0.3)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: "12px",
-                      color: "#FFFFFF",
-                    }}
-                    onFocus={(e) => {
-                      (e.target as HTMLElement).style.borderColor = "#0847F7";
-                      (e.target as HTMLElement).style.boxShadow =
-                        "0 0 0 3px rgba(8, 71, 247,0.2)";
-                    }}
-                    onBlur={(e) => {
-                      (e.target as HTMLElement).style.borderColor =
-                        "rgba(255,255,255,0.08)";
-                      (e.target as HTMLElement).style.boxShadow = "none";
-                    }}
-                  />
-
-                  {depositAmountStr &&
-                    depositAmountRaw > 0n &&
-                    previewDepositShares !== undefined && (
-                      <div className="mt-2 text-right">
-                        <span
-                          className="text-xs font-medium px-2.5 py-1"
-                          style={{
-                            color: "#0847F7",
-                            background: "rgba(8, 71, 247,0.08)",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          ≈ {fmt(previewDepositShares as bigint, dec)} shares
-                          minted
-                        </span>
-                      </div>
-                    )}
-                </div>
-
-                {isConnected && chain?.id !== sepolia.id ? (
-                  <button
-                    onClick={() => switchChain?.({ chainId: sepolia.id })}
-                    disabled={isPendingSwitch}
-                    className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
-                    style={{ background: "#0847F7", color: "#ffffff" }}
-                  >
-                    {isPendingSwitch ? "Switching..." : "Switch to Sepolia"}
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleDeposit}
-                    disabled={!isConnected || isPendingDeposit}
-                    className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
-                    style={{ background: "#0847F7", color: "#ffffff" }}
-                  >
-                    {!isConnected
-                      ? "Wallet Not Connected"
-                      : isApproving || isWaitingApprove
-                        ? "Approving…"
-                        : isDepositingLP || isWaitingDeposit
-                          ? "Depositing…"
-                          : needApproval
-                            ? "Approve Tokens"
-                            : "Deposit Liquidity"}
-                  </button>
-                )}
-              </>
-            )}
-
-            {/* ── WITHDRAW TAB ── */}
-            {activeTab === "withdraw" && (
-              <>
-                {/* Shares input */}
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <label
-                      className="text-xs font-medium uppercase tracking-wider"
-                      style={{ color: "#d0d0d0" }}
-                    >
-                      Shares to Burn
-                    </label>
-                    {lpShares !== undefined && (
-                      <button
-                        onClick={handleMaxWithdraw}
-                        className="text-xs font-mono"
-                        style={{ color: "#0847F7" }}
-                      >
-                        Max: {fmt(lpShares as bigint, dec)}
-                      </button>
-                    )}
-                  </div>
-                  <input
-                    type="number"
-                    value={withdrawSharesStr}
-                    onChange={(e) => setWithdrawSharesStr(e.target.value)}
-                    placeholder="0.0"
-                    min="0"
-                    step="0.000001"
-                    className="w-full p-4 pl-5 text-xl font-bold font-mono outline-none transition-all duration-300 relative z-10"
-                    style={{
-                      background: "rgba(0,0,0,0.3)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: "12px",
-                      color: "#FFFFFF",
-                    }}
-                    onFocus={(e) => {
-                      (e.target as HTMLElement).style.borderColor = "#0847F7";
-                      (e.target as HTMLElement).style.boxShadow =
-                        "0 0 0 3px rgba(8, 71, 247,0.2)";
-                    }}
-                    onBlur={(e) => {
-                      (e.target as HTMLElement).style.borderColor =
-                        "rgba(255,255,255,0.08)";
-                      (e.target as HTMLElement).style.boxShadow = "none";
-                    }}
-                  />
-
-                  {withdrawSharesStr &&
-                    withdrawSharesRaw > 0n &&
-                    previewWithdrawAssets !== undefined && (
-                      <div className="mt-2 text-right">
-                        <span
-                          className="text-xs font-medium px-2.5 py-1"
-                          style={{
-                            color: "#0847F7",
-                            background: "rgba(55,91,210,0.08)",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          ≈ {fmt(previewWithdrawAssets as bigint, dec)} tokens
-                          returned
-                        </span>
-                      </div>
-                    )}
-                </div>
-
-                {lpShares !== undefined &&
-                  withdrawSharesRaw > 0n &&
-                  (lpShares as bigint) < withdrawSharesRaw && (
-                    <p
-                      className="text-xs text-right"
-                      style={{ color: "#F6465D" }}
-                    >
-                      Exceeds your LP shares balance
-                    </p>
-                  )}
-
-                {isConnected && chain?.id !== sepolia.id ? (
-                  <button
-                    onClick={() => switchChain?.({ chainId: sepolia.id })}
-                    disabled={isPendingSwitch}
-                    className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
-                    style={{ background: "#0847F7", color: "#ffffff" }}
-                  >
-                    {isPendingSwitch ? "Switching..." : "Switch to Sepolia"}
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleWithdraw}
-                    disabled={!isConnected || isPendingWithdraw}
-                    className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
-                    style={{ background: "#0847F7", color: "#ffffff" }}
-                  >
-                    {!isConnected
-                      ? "Wallet Not Connected"
-                      : isWithdrawingLP || isWaitingWithdraw
-                        ? "Withdrawing…"
-                        : "Withdraw Liquidity"}
-                  </button>
-                )}
-              </>
-            )}
-
-            {/* Info box */}
-            <div
-              className="p-4 rounded-xl relative z-10"
-              style={{
-                background: "rgba(0,0,0,0.3)",
-                border: "1px solid rgba(255,255,255,0.05)",
+      {/* ── Action Panel ── */}
+      <div
+        className="max-w-2xl mx-auto w-full overflow-hidden rounded-3xl relative"
+        style={{
+          border: "1px solid rgba(255,255,255,0.12)",
+          boxShadow: "0 24px 60px rgba(0,0,0,0.38)",
+        }}
+      >
+        <div className="absolute -top-20 right-8 w-48 h-48 rounded-full bg-[#0847F7]/20 blur-[80px] pointer-events-none" />
+        {/* Tab switcher */}
+        <div
+          className="flex relative"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+        >
+          {(["deposit", "withdraw"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveTab(tab);
+                setDepositAmountStr("");
+                setWithdrawSharesStr("");
               }}
+              className={`flex-1 py-4 px-6 text-sm font-bold transition-all duration-300 capitalize relative overflow-hidden
+                  ${activeTab === tab ? "text-white" : "text-[#a0a0a0] hover:text-[#d0d0d0]"}`}
             >
-              <h3
-                className="text-xs font-semibold mb-2 uppercase tracking-widest flex items-center gap-2"
-                style={{ color: "#a0a0a0" }}
-              >
-                <IconInfo />
-                How it works
-              </h3>
-              <p
-                className="text-xs leading-relaxed"
-                style={{ color: "#d0d0d0" }}
-              >
-                {activeTab === "deposit"
-                  ? "Deposit tokens to mint LP shares proportional to your contribution. Approve once, then deposit any amount."
-                  : "Withdraw by burning LP shares. The contract calculates the proportional token amount to return."}
-              </p>
-            </div>
-          </div>
+              {activeTab === tab && (
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0847F7]/20 to-transparent opacity-50"></div>
+              )}
+              <span className="relative z-10">{tab} Activity</span>
+              {activeTab === tab && (
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#0847F7] animate-pulse">
+                  <div className="absolute inset-0 bg-[#0847F7] blur-sm"></div>
+                </div>
+              )}
+            </button>
+          ))}
         </div>
 
-        {/* ── Pool Breakdown ── */}
-        <div className="max-w-xl mx-auto w-full mt-4 p-4 sci-card">
-          <h2
-            className="text-xs font-semibold uppercase tracking-widest mb-4 flex items-center gap-2"
-            style={{ color: "#d0d0d0" }}
-          >
-            <IconPieChart />
-            Pool Breakdown
-          </h2>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
-            {[
-              {
-                label: "Total LP Shares",
-                val: fmt(totalLPShares as bigint | undefined, dec),
-                accent: false,
-              },
-              {
-                label: "Total Collateral",
-                val: fmt(totalCollateral as bigint | undefined, dec),
-                accent: false,
-              },
-              {
-                label: "Your Shares",
-                val: fmt(lpShares as bigint | undefined, dec),
-                accent: true,
-              },
-              {
-                label: "Your Value",
-                val: fmt(lpValue as bigint | undefined, dec),
-                accent: true,
-              },
-            ].map(({ label, val, accent }) => (
-              <div key={label}>
-                <p className="text-xs mb-0.5" style={{ color: "#d0d0d0" }}>
-                  {label}
-                </p>
-                <p
-                  className="font-mono font-bold"
-                  style={{ color: accent ? "#0847F7" : "#ffffff" }}
-                >
-                  {val}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {totalLPShares !== undefined &&
-            (totalLPShares as bigint) > 0n &&
-            lpShares !== undefined && (
-              <div className="mt-4">
-                <div
-                  className="flex justify-between text-xs mb-1.5"
-                  style={{ color: "#d0d0d0" }}
-                >
-                  <span>Your pool share</span>
-                  <span style={{ color: "#0847F7" }}>{sharePercent}%</span>
+        <div className="p-6 space-y-5 relative">
+          {/* Background elements inside the form */}
+          <div className="absolute top-1/2 left-0 w-64 h-64 bg-[#0847F7] rounded-full blur-[120px] opacity-10 pointer-events-none -translate-y-1/2"></div>
+          {/* ── DEPOSIT TAB ── */}
+          {activeTab === "deposit" && (
+            <>
+              {/* Token amount input */}
+              <div className="space-y-2">
+                <div className="flex justify-between mb-2">
+                  <label
+                    className="text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d0d0d0" }}
+                  >
+                    Amount (Tokens)
+                  </label>
+                  {tokenBalance !== undefined && (
+                    <button
+                      onClick={handleMaxDeposit}
+                      className="text-xs font-mono transition-colors"
+                      style={{ color: "#0847F7" }}
+                    >
+                      Max: {fmt(tokenBalance as bigint, dec)}
+                    </button>
+                  )}
                 </div>
-                <div
-                  className="h-1.5 overflow-hidden"
+                <input
+                  type="number"
+                  value={depositAmountStr}
+                  onChange={(e) => setDepositAmountStr(e.target.value)}
+                  placeholder="0.0"
+                  min="0"
+                  step="0.001"
+                  className="w-full p-4 pl-5 text-2xl font-bold font-mono outline-none transition-all duration-300 relative z-10"
                   style={{
-                    background: "rgba(255, 255, 255, 0.05)",
-                    borderRadius: "2px",
+                    background: "rgba(0,0,0,0.3)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: "12px",
+                    color: "#FFFFFF",
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLElement).style.borderColor = "#0847F7";
+                    (e.target as HTMLElement).style.boxShadow =
+                      "0 0 0 3px rgba(8, 71, 247,0.2)";
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLElement).style.borderColor =
+                      "rgba(255,255,255,0.08)";
+                    (e.target as HTMLElement).style.boxShadow = "none";
+                  }}
+                />
+
+                {depositAmountStr &&
+                  depositAmountRaw > 0n &&
+                  previewDepositShares !== undefined && (
+                    <div className="mt-2 text-right">
+                      <span
+                        className="text-xs font-medium px-2.5 py-1"
+                        style={{
+                          color: "#0847F7",
+                          background: "rgba(8, 71, 247,0.08)",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        ≈ {fmt(previewDepositShares as bigint, dec)} shares
+                        minted
+                      </span>
+                    </div>
+                  )}
+              </div>
+
+              {isConnected && chain?.id !== sepolia.id ? (
+                <button
+                  onClick={() => switchChain?.({ chainId: sepolia.id })}
+                  disabled={isPendingSwitch}
+                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider shadow-[0_10px_30px_rgba(8,71,247,0.35)]"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, #0847F7 0%, #2D58FF 70%, #3B74FF 100%)",
+                    color: "#ffffff",
                   }}
                 >
-                  <div
-                    className="h-full transition-all duration-700"
-                    style={{
-                      width: `${Math.min(parseFloat(sharePercent), 100)}%`,
-                      background: "#0847F7",
-                      borderRadius: "2px",
-                    }}
-                  />
+                  {isPendingSwitch ? "Switching..." : "Switch to Sepolia"}
+                </button>
+              ) : (
+                <button
+                  onClick={handleDeposit}
+                  disabled={!isConnected || isPendingDeposit}
+                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider shadow-[0_10px_30px_rgba(8,71,247,0.35)]"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, #0847F7 0%, #2D58FF 70%, #3B74FF 100%)",
+                    color: "#ffffff",
+                  }}
+                >
+                  {!isConnected
+                    ? "Wallet Not Connected"
+                    : isApproving || isWaitingApprove
+                      ? "Approving…"
+                      : isDepositingLP || isWaitingDeposit
+                        ? "Depositing…"
+                        : needApproval
+                          ? "Approve Tokens"
+                          : "Deposit Liquidity"}
+                </button>
+              )}
+            </>
+          )}
+
+          {/* ── WITHDRAW TAB ── */}
+          {activeTab === "withdraw" && (
+            <>
+              {/* Shares input */}
+              <div className="space-y-2">
+                <div className="flex justify-between mb-2">
+                  <label
+                    className="text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d0d0d0" }}
+                  >
+                    Shares to Burn
+                  </label>
+                  {lpShares !== undefined && (
+                    <button
+                      onClick={handleMaxWithdraw}
+                      className="text-xs font-mono"
+                      style={{ color: "#0847F7" }}
+                    >
+                      Max: {fmt(lpShares as bigint, dec)}
+                    </button>
+                  )}
                 </div>
+                <input
+                  type="number"
+                  value={withdrawSharesStr}
+                  onChange={(e) => setWithdrawSharesStr(e.target.value)}
+                  placeholder="0.0"
+                  min="0"
+                  step="0.000001"
+                  className="w-full p-4 pl-5 text-2xl font-bold font-mono outline-none transition-all duration-300 relative z-10"
+                  style={{
+                    background: "rgba(0,0,0,0.3)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    borderRadius: "12px",
+                    color: "#FFFFFF",
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLElement).style.borderColor = "#0847F7";
+                    (e.target as HTMLElement).style.boxShadow =
+                      "0 0 0 3px rgba(8, 71, 247,0.2)";
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLElement).style.borderColor =
+                      "rgba(255,255,255,0.08)";
+                    (e.target as HTMLElement).style.boxShadow = "none";
+                  }}
+                />
+
+                {withdrawSharesStr &&
+                  withdrawSharesRaw > 0n &&
+                  previewWithdrawAssets !== undefined && (
+                    <div className="mt-2 text-right">
+                      <span
+                        className="text-xs font-medium px-2.5 py-1"
+                        style={{
+                          color: "#0847F7",
+                          background: "rgba(55,91,210,0.08)",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        ≈ {fmt(previewWithdrawAssets as bigint, dec)} tokens
+                        returned
+                      </span>
+                    </div>
+                  )}
               </div>
-            )}
+
+              {lpShares !== undefined &&
+                withdrawSharesRaw > 0n &&
+                (lpShares as bigint) < withdrawSharesRaw && (
+                  <p
+                    className="text-xs text-right"
+                    style={{ color: "#F6465D" }}
+                  >
+                    Exceeds your LP shares balance
+                  </p>
+                )}
+
+              {isConnected && chain?.id !== sepolia.id ? (
+                <button
+                  onClick={() => switchChain?.({ chainId: sepolia.id })}
+                  disabled={isPendingSwitch}
+                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider shadow-[0_10px_30px_rgba(8,71,247,0.35)]"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, #0847F7 0%, #2D58FF 70%, #3B74FF 100%)",
+                    color: "#ffffff",
+                  }}
+                >
+                  {isPendingSwitch ? "Switching..." : "Switch to Sepolia"}
+                </button>
+              ) : (
+                <button
+                  onClick={handleWithdraw}
+                  disabled={!isConnected || isPendingWithdraw}
+                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider shadow-[0_10px_30px_rgba(8,71,247,0.35)]"
+                  style={{
+                    background:
+                      "linear-gradient(90deg, #0847F7 0%, #2D58FF 70%, #3B74FF 100%)",
+                    color: "#ffffff",
+                  }}
+                >
+                  {!isConnected
+                    ? "Wallet Not Connected"
+                    : isWithdrawingLP || isWaitingWithdraw
+                      ? "Withdrawing…"
+                      : "Withdraw Liquidity"}
+                </button>
+              )}
+            </>
+          )}
+
+          {/* Info box */}
+          <div
+            className="p-4 rounded-xl relative z-10"
+            style={{
+              background:
+                "linear-gradient(145deg, rgba(0,0,0,0.28), rgba(255,255,255,0.02))",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <h3
+              className="text-xs font-semibold mb-2 uppercase tracking-widest flex items-center gap-2"
+              style={{ color: "#a0a0a0" }}
+            >
+              <IconInfo />
+              How it works
+            </h3>
+            <p className="text-xs leading-relaxed" style={{ color: "#d0d0d0" }}>
+              {activeTab === "deposit"
+                ? "Deposit tokens to mint LP shares proportional to your contribution. Approve once, then deposit any amount."
+                : "Withdraw by burning LP shares. The contract calculates the proportional token amount to return."}
+            </p>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

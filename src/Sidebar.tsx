@@ -18,7 +18,7 @@ export const Sidebar: React.FC = () => {
   const location = useLocation();
 
   const navItems = [
-    { icon: AreaChart, label: "Trade", path: "/" },
+    { icon: AreaChart, label: "Trade", path: "/trade" },
     { icon: History, label: "History", path: "/history" },
     { icon: Wallet, label: "Trader Account", path: "/wallet" },
     { icon: TrendingUp, label: "LP", path: "/lp" },
@@ -38,16 +38,21 @@ export const Sidebar: React.FC = () => {
       >
         {/* Brand */}
         <div style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.05)" }}>
-          <Link to="/" className="flex items-center gap-3 px-5">
-            <div className="w-30 h-30 rounded flex items-center justify-center shrink-0">
+          <Link to="/" className="flex items-center gap-3 px-5 py-3">
+            <div className="w-12 h-12 rounded flex items-center justify-center shrink-0">
               <img
                 src="/tapl.png"
                 alt="tapl logo"
-                className="w-30 h-30 object-contain"
+                className="w-12 h-12 object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
                 }}
               />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xl font-semibold leading-tight text-[#0847F7]">
+                TAPL
+              </p>
             </div>
           </Link>
         </div>
@@ -97,25 +102,6 @@ export const Sidebar: React.FC = () => {
             );
           })}
         </nav>
-
-        {/* Bottom badge */}
-        <div
-          className="m-3 rounded p-3"
-          style={{
-            background: "rgba(8, 71, 247, 0.04)",
-            border: "1px solid rgba(8, 71, 247, 0.1)",
-          }}
-        >
-          <p
-            className="text-[10px] font-semibold uppercase tracking-widest mb-1"
-            style={{ color: "#0847F7" }}
-          >
-            Powered by
-          </p>
-          <p className="text-xs" style={{ color: "#d0d0d0" }}>
-            Chainlink Data Streams
-          </p>
-        </div>
       </aside>
 
       <nav

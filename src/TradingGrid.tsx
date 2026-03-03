@@ -83,7 +83,7 @@ export const TradingGrid: React.FC = () => {
 
   const handlePlaceBet = (cell: CellData, canBet: boolean) => {
     try {
-      if (cell.timeWindowStart > now && cell.timeWindowStart - now <= 10000) {
+      if (cell.timeWindowStart > now && cell.timeWindowStart - now <= 7000) {
         const hasBet = bets[cell.id] || pendingBets[cell.id];
         if (!hasBet) {
           toast.error("This grid is closing soon, please select another one", {
@@ -351,7 +351,7 @@ export const TradingGrid: React.FC = () => {
             const top = getPriceY(cell.priceLevel + modePriceStep / 2);
             const isFuture = cell.timeWindowStart > now;
 
-            const intervalMs = 10000;
+            const intervalMs = 7000;
             const isNext = isFuture && cell.timeWindowStart - now <= intervalMs;
             const canBet = isFuture && !isNext && !hasAnyBet;
 
