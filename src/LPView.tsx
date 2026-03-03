@@ -525,7 +525,11 @@ export const LPView: React.FC = () => {
                 {activeTab === tab && (
                   <div className="absolute inset-0 bg-linear-to-t from-[#0847F7]/20 to-transparent opacity-50"></div>
                 )}
-                <span className="relative z-10">{tab}</span>
+                <span className="relative z-10">
+                  {tab === "deposit"
+                    ? "Deposit Liquidity"
+                    : "Withdraw Liquidity"}
+                </span>
                 {activeTab === tab && (
                   <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#0847F7] animate-pulse">
                     <div className="absolute inset-0 bg-[#0847F7] blur-sm"></div>
@@ -629,7 +633,7 @@ export const LPView: React.FC = () => {
                           ? "Depositing…"
                           : needApproval
                             ? "Approve Tokens"
-                            : "Deposit LP"}
+                            : "Deposit Liquidity"}
                   </button>
                 )}
               </>
@@ -733,7 +737,7 @@ export const LPView: React.FC = () => {
                       ? "Wallet Not Connected"
                       : isWithdrawingLP || isWaitingWithdraw
                         ? "Withdrawing…"
-                        : "Withdraw LP"}
+                        : "Withdraw Liquidity"}
                   </button>
                 )}
               </>
