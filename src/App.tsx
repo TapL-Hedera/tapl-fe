@@ -15,7 +15,7 @@ function App() {
         <Route path="/history" element={<HistoryView />} />
         <Route path="/wallet" element={<WalletView />} />
         <Route path="/lp" element={<LPView />} />
-        <Route path="/cre-proof" element={<CREProofView />} />
+        <Route path="/cre-workflows" element={<CREProofView />} />
       </Routes>
     </Router>
   );

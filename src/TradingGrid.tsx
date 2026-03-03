@@ -23,6 +23,7 @@ export const TradingGrid: React.FC = () => {
   const placeBet = useGameStore((state) => state.placeBet);
   const bets = useGameStore((state) => state.bets);
   const pendingBets = useGameStore((state) => state.pendingBets);
+  const pendingWins = useGameStore((state) => state.pendingWins);
   const socket = useGameStore((state) => state.socket);
   const wssKey = useGameStore((state) => state.wssKey);
   const betAmount = useGameStore((state) => state.betAmount);
@@ -57,14 +58,21 @@ export const TradingGrid: React.FC = () => {
       if (currentCameraPrice === 0 && target !== 0) {
         currentCameraPrice = target;
       } else {
-        currentCameraPrice += (target - currentCameraPrice) * 0.06; // Smooth camera tracking
+        currentCameraPrice += (target - currentCameraPrice) * 0.1; // Smooth camera tracking, snappier follow
       }
 
-      // Throttle React renders to ~30fps to reduce CPU load and avoid memory leaks from excessive rerenders
-      if (n - lastRenderTime > 33) {
-        setNow(n);
+      // Throttle React renders to ~60fps (15ms) down from 30fps to make UI buttery smooth
+      if (n - lastRenderTime > 15) {
+        const state = useGameStore.getState();
+        const serverSyncTime = n + state.serverTimeOffset;
+        setNow(serverSyncTime);
         setCameraPrice(currentCameraPrice);
         lastRenderTime = n;
+
+        // Check if chart hit grid for remote wins
+        if (Object.keys(state.pendingWins).length > 0) {
+          state.checkWinEffects(serverSyncTime);
+        }
       }
 
       frameId = requestAnimationFrame(loop);
@@ -75,6 +83,19 @@ export const TradingGrid: React.FC = () => {
 
   const handlePlaceBet = (cell: CellData, canBet: boolean) => {
     try {
+      if (cell.timeWindowStart > now && cell.timeWindowStart - now <= 10000) {
+        const hasBet = bets[cell.id] || pendingBets[cell.id];
+        if (!hasBet) {
+          toast.error("This grid is closing soon, please select another one", {
+            style: {
+              background: "#252422",
+              color: "#f6465d",
+              border: "1px solid rgba(246, 70, 93, 0.5)",
+            },
+          });
+          return;
+        }
+      }
       if (canBet) {
         if (!localStorage.getItem("token")) {
           toast.error("Please connect wallet and login to place bet");
@@ -116,8 +137,8 @@ export const TradingGrid: React.FC = () => {
             cell: cellOrigin,
             userSignature: signature,
           };
-
           console.log("payload: ", payload);
+
           socket.emit("place_bet", payload);
         }
         placeBet(cell.id, betAmount);
@@ -322,14 +343,15 @@ export const TradingGrid: React.FC = () => {
             // Khi chart chạm đến cột (tiến vào thời gian của cell) -> Ẩn toàn bộ ô không cược
             if (now >= cell.timeWindowStart && !hasAnyBet) return null;
 
-            // Sau khi chart đi qua cell (quá khứ) -> Ẩn tiếp ô đã cược nếu như không trúng (fail)
-            if (isPast && !isHit) return null;
+            // Sau khi chart đi qua cell (quá khứ) -> Ẩn ô đã cược nếu không trúng VÀ không có pending win
+            const hasPendingWin = pendingWins[cell.id] !== undefined;
+            if (isPast && !isHit && !hasPendingWin) return null;
 
             const left = getTimeX(cell.timeWindowStart);
             const top = getPriceY(cell.priceLevel + modePriceStep / 2);
             const isFuture = cell.timeWindowStart > now;
 
-            const intervalMs = modeIntervalSeconds * 1000;
+            const intervalMs = 10000;
             const isNext = isFuture && cell.timeWindowStart - now <= intervalMs;
             const canBet = isFuture && !isNext && !hasAnyBet;
 
@@ -342,8 +364,8 @@ export const TradingGrid: React.FC = () => {
                   isNext &&
                     !hasAnyBet &&
                     "opacity-30 cursor-not-allowed animate-pulse",
-                  !isPast && hasBet && "cursor-pointer z-10",
-                  !isPast && isPending && "cursor-pointer z-10 animate-pulse",
+                  !isPast && hasAnyBet && "cursor-pointer z-10",
+                  !isPast && isPending && "animate-pulse",
                   isHit && hasAnyBet && "z-20",
                 )}
                 style={{
@@ -353,24 +375,24 @@ export const TradingGrid: React.FC = () => {
                   height: `${rowHeight}%`,
                   borderColor: "rgba(255, 255, 255, 0.05)",
                   background:
-                    !isPast && hasBet
-                      ? "rgba(8, 71, 247, 0.08)"
-                      : isHit && hasAnyBet
-                        ? "rgba(46,189,133,0.15)"
+                    isHit && hasAnyBet
+                      ? "rgba(46,189,133,0.15)"
+                      : !isPast && hasAnyBet
+                        ? "rgba(8, 71, 247, 0.08)"
                         : isNext && !hasAnyBet
                           ? "rgba(246,70,93,0.06)"
                           : undefined,
                   boxShadow:
-                    !isPast && hasBet
-                      ? "inset 0 0 16px rgba(8, 71, 247, 0.1)"
-                      : isHit && hasAnyBet
-                        ? "0 0 20px rgba(46,189,133,0.3), inset 0 0 20px rgba(46,189,133,0.15)"
+                    isHit && hasAnyBet
+                      ? "0 0 20px rgba(46,189,133,0.3), inset 0 0 20px rgba(46,189,133,0.15)"
+                      : !isPast && hasAnyBet
+                        ? "inset 0 0 16px rgba(8, 71, 247, 0.1)"
                         : undefined,
                   outline:
-                    !isPast && hasBet
-                      ? "1px solid rgba(8, 71, 247, 0.3)"
-                      : isHit && hasAnyBet
-                        ? "1px solid #2EBD85"
+                    isHit && hasAnyBet
+                      ? "1px solid #2EBD85"
+                      : !isPast && hasAnyBet
+                        ? "1px solid rgba(8, 71, 247, 0.3)"
                         : undefined,
                 }}
                 onClick={() => handlePlaceBet(cell, canBet)}
@@ -411,28 +433,61 @@ export const TradingGrid: React.FC = () => {
                     : Number(cell.original.rewardRate).toFixed(2)}
                   x
                 </div>
-                {hasAnyBet && (
+                {hasAnyBet && !isHit && (
                   <div
                     className={cn(
                       "text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 font-bold px-1.5 sm:px-2 py-0.5 shadow-md",
-                      isHit
-                        ? "animate-bounce"
-                        : isPending && !isHit
-                          ? "opacity-80 animate-pulse"
-                          : "",
+                      isPending ? "opacity-80 animate-pulse" : "",
                     )}
                     style={{
                       borderRadius: "6px",
-                      background: isHit ? "#2EBD85" : "#0847F7",
+                      background: "#0847F7",
                       color: "#ffffff",
-                      boxShadow: isHit
-                        ? "0 0 10px #2EBD85"
-                        : "0 0 8px rgba(8, 71, 247, 0.5)",
+                      boxShadow: "0 0 8px rgba(8, 71, 247, 0.5)",
                     }}
                   >
                     ${displayBetAmount}
                   </div>
                 )}
+                {isHit &&
+                  hasAnyBet &&
+                  (() => {
+                    const winPayout =
+                      displayBetAmount *
+                      (cell.multiplier && !isNaN(cell.multiplier)
+                        ? cell.multiplier
+                        : 0);
+                    return (
+                      <div className="flex flex-col items-center gap-0.5 mt-0.5">
+                        <div
+                          className="text-[8px] sm:text-[9px] font-black tracking-widest animate-pulse"
+                          style={{
+                            color: "#2EBD85",
+                            textShadow:
+                              "0 0 8px #2EBD85, 0 0 16px rgba(46,189,133,0.6)",
+                            letterSpacing: "0.15em",
+                          }}
+                        >
+                          WIN!
+                        </div>
+                        <div
+                          className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 shadow-md animate-bounce"
+                          style={{
+                            borderRadius: "6px",
+                            background: "#2EBD85",
+                            color: "#ffffff",
+                            boxShadow:
+                              "0 0 12px #2EBD85, 0 0 24px rgba(46,189,133,0.4)",
+                          }}
+                        >
+                          +$
+                          {winPayout > 0
+                            ? winPayout.toFixed(2)
+                            : displayBetAmount}
+                        </div>
+                      </div>
+                    );
+                  })()}
               </div>
             );
           });
@@ -451,7 +506,7 @@ export const TradingGrid: React.FC = () => {
             <path
               d={getSvgPath()}
               fill="none"
-              stroke="#2EBD85"
+              stroke="#8AA6F9"
               strokeWidth="2"
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -463,7 +518,7 @@ export const TradingGrid: React.FC = () => {
                 cx={lPt.x}
                 cy={lPt.y}
                 r="3.5"
-                fill="#2EBD85"
+                fill="#0847F7"
                 className="animate-pulse"
               />
             )}

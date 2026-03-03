@@ -229,7 +229,6 @@ export const CREProofView: React.FC = () => {
   const { data: priceIntegrityData, isLoading: piLoading } =
     useWorkerControllerGetPriceIntegrityBatches(params);
 
-  console.log("priceIntegrityData: ", priceIntegrityData);
   const { data: batchSubmittedData, isLoading: bsLoading } =
     useWorkerControllerGetBatchSubmitted(params);
 
@@ -262,9 +261,7 @@ export const CREProofView: React.FC = () => {
   }
 
   const piRows = safeRows(priceIntegrityData);
-  console.log("piRows: ", piRows);
   const bsRows = safeRows(batchSubmittedData);
-  console.log("bsRows: ", bsRows);
   const settlementRows = safeRows(settlementData);
   const solvencyRows = safeRows(solvencyData);
   const lpDistRows = safeRows(lpDistData);
@@ -316,7 +313,7 @@ export const CREProofView: React.FC = () => {
                   className="text-base font-semibold"
                   style={{ color: "#ffffff" }}
                 >
-                  CRE Proof
+                  CRE Workflows
                 </h2>
                 <p className="text-xs" style={{ color: "#d0d0d0" }}>
                   On-chain Chainlink CRE workflow events · Last 7 days

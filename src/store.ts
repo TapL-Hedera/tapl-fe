@@ -28,6 +28,7 @@ export interface RemoteCell {
 
 interface GameState {
   balance: number;
+  serverBalance: number;
   currentPrice: number;
   history: PricePoint[];
   cells: CellData[];
@@ -38,14 +39,17 @@ interface GameState {
   bets: Record<string, number>;
   betRates: Record<string, number>;
   pendingBets: Record<string, number>;
+  pendingWins: Record<string, number>;
   socket: Socket | null;
   wssKey: string | null;
   betAmount: number;
   isDemoMode: boolean;
   demoAddress: string | null;
+  serverTimeOffset: number; // diff between server ts and local Date.now()
 
   setConnection: (socket: Socket | null, wssKey: string | null) => void;
-  updatePrice: (price: number) => void;
+  updatePrice: (price: number, serverTs?: number) => void;
+  syncServerTime: (serverTs: number) => void;
   placeBet: (cellId: string, amount: number) => void;
   ensureCells: () => void;
   tickTime: () => void;
@@ -58,10 +62,12 @@ interface GameState {
   setOpenBets: (orders: any[]) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   updateOrder: (data: any) => void;
+  checkWinEffects: (now: number) => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
   balance: 1000.0,
+  serverBalance: 1000.0,
   currentPrice: 0,
   history: [], // Keep track of the line chart
   cells: [],
@@ -72,15 +78,33 @@ export const useGameStore = create<GameState>((set) => ({
   bets: {},
   betRates: {},
   pendingBets: {},
+  pendingWins: {},
   socket: null,
   wssKey: null,
   betAmount: 10,
   isDemoMode: localStorage.getItem("is-demo-mode") === "true",
   demoAddress: localStorage.getItem("demo-wallet-address") || null,
+  serverTimeOffset: 0,
 
   setConnection: (socket, wssKey) => set({ socket, wssKey }),
 
-  updateBalance: (balance) => set({ balance }),
+  updateBalance: (balance) =>
+    set((state) => {
+      const pendingWinsTotal = Object.values(state.pendingWins).reduce(
+        (a, b) => a + b,
+        0,
+      );
+      // Derive the display balance by subtracting pending wins that haven't been shown yet
+      return {
+        serverBalance: balance,
+        balance: balance - pendingWinsTotal,
+      };
+    }),
+
+  syncServerTime: (serverTs) =>
+    set(() => ({
+      serverTimeOffset: serverTs - Date.now(),
+    })),
 
   setBetAmount: (amount) => set({ betAmount: amount }),
 
@@ -131,7 +155,7 @@ export const useGameStore = create<GameState>((set) => ({
       const end = data.cellTimeEnd || data.cell?.endTs || data.endTs;
       const lower = data.lowerPrice || data.cell?.lowerPrice;
       const upper = data.upperPrice || data.cell?.upperPrice;
-      const cellId = `${start}:${end}:${lower}:${upper}`;
+      let cellId = `${start}:${end}:${lower}:${upper}`;
 
       if (data.status === "OPEN") {
         const newPendingBets = { ...newState.pendingBets };
@@ -170,50 +194,158 @@ export const useGameStore = create<GameState>((set) => ({
         };
       }
 
-      if (data.settledWin === true) {
-        const cell = newState.cells.find((c) => c.id === cellId);
+      const isWin =
+        data.settledWin === true ||
+        String(data.settledWin) === "true" ||
+        data.status === "WIN";
+
+      if (isWin) {
+        let cell = newState.cells.find((c) => c.id === cellId);
+        // Failsafe approximate match in case price float precision caused ID mismatch
+        if (!cell && start && end) {
+          cell = newState.cells.find(
+            (c) =>
+              c.timeWindowStart === Number(start) &&
+              c.timeWindowEnd === Number(end) &&
+              (newState.bets[c.id] || newState.pendingBets[c.id]),
+          );
+          if (cell) cellId = cell.id;
+        }
 
         if (cell && cell.status !== "hit") {
-          const betAmount = newState.bets[cellId] || Number(data.amount) || 0;
-          const win = betAmount * cell.multiplier;
+          const betAmount =
+            newState.bets[cellId] ||
+            newState.pendingBets[cellId] ||
+            Number(data.amount) ||
+            10; // Failsafe fallback to persist
 
-          if (win > 0) {
-            toast.success(`You won $${win.toFixed(2)}! 🚀`, {
-              style: {
-                background: "#252422",
-                color: "#d57455",
-                border: "1px solid rgba(213, 116, 85, 0.5)",
-                boxShadow: "0 0 15px rgba(213, 116, 85, 0.3)",
-              },
-              iconTheme: {
-                primary: "#d57455",
-                secondary: "#252422",
-              },
-            });
-          }
+          const mult =
+            cell.multiplier && !isNaN(cell.multiplier) ? cell.multiplier : 0;
+          const win = betAmount * mult;
 
+          const newPendingBets = { ...newState.pendingBets };
+          delete newPendingBets[cellId];
+
+          const newPendingWins = { ...newState.pendingWins, [cellId]: win };
           newState = {
             ...newState,
-            cells: newState.cells.map((c) =>
-              c.id === cellId ? { ...c, status: "hit" as const } : c,
-            ),
+            pendingBets: newPendingBets,
+            bets: { ...newState.bets, [cellId]: betAmount }, // Persist the bet so hasAnyBet is true
+            pendingWins: newPendingWins,
+            balance:
+              newState.serverBalance -
+              Object.values(newPendingWins).reduce((a, b) => a + b, 0),
           };
         }
       }
       return newState;
     }),
 
-  updatePrice: (price) =>
+  checkWinEffects: (now: number) =>
+    set((state) => {
+      let changed = false;
+      const newState = { ...state };
+      const newPendingWins = { ...state.pendingWins };
+
+      for (const [cellId, winAmount] of Object.entries(state.pendingWins)) {
+        const cell = newState.cells.find((c) => c.id === cellId);
+
+        // Cleanup if cell is gone
+        if (!cell) {
+          delete newPendingWins[cellId];
+          changed = true;
+          continue;
+        }
+
+        // Must have a confirmed bet on this cell
+        const hasBet =
+          (newState.bets[cellId] ?? 0) > 0 ||
+          (newState.pendingBets[cellId] ?? 0) > 0;
+        if (!hasBet) {
+          // No bet recorded yet — wait (don't remove from pendingWins)
+          continue;
+        }
+
+        // Calculate physical grid bounds to ensure chart physically touched it
+        const lowerPrice =
+          cell.original.lowerPrice !== undefined
+            ? parseFloat(cell.original.lowerPrice)
+            : cell.priceLevel - newState.modePriceStep / 2;
+        const upperPrice =
+          cell.original.upperPrice !== undefined
+            ? parseFloat(cell.original.upperPrice)
+            : cell.priceLevel + newState.modePriceStep / 2;
+
+        const isTimeInside =
+          now >= cell.timeWindowStart && now <= cell.timeWindowEnd;
+        const isTimePassed = now > cell.timeWindowEnd;
+        const isPriceInside =
+          newState.currentPrice >= lowerPrice &&
+          newState.currentPrice <= upperPrice;
+
+        const isTouching = isTimeInside && isPriceInside;
+
+        // Trigger win effect exactly when chart line physically touches the cell, or if the time has passed as fallback
+        if (cell.status !== "hit" && (isTouching || isTimePassed)) {
+          if (winAmount > 0) {
+            toast.success(`You won $${winAmount.toFixed(2)}! 🚀`, {
+              style: {
+                background: "#252422",
+                color: "#2EBD85",
+                border: "1px solid rgba(46, 189, 133, 0.5)",
+                boxShadow: "0 0 15px rgba(46, 189, 133, 0.3)",
+              },
+              iconTheme: {
+                primary: "#2EBD85",
+                secondary: "#252422",
+              },
+            });
+          }
+
+          newState.cells = newState.cells.map((c) =>
+            c.id === cellId ? { ...c, status: "hit" as const } : c,
+          );
+
+          delete newPendingWins[cellId];
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        newState.pendingWins = newPendingWins;
+        newState.balance =
+          newState.serverBalance -
+          Object.values(newPendingWins).reduce((a, b) => a + b, 0);
+        return newState;
+      }
+      return state;
+    }),
+
+  updatePrice: (price, serverTs) =>
     set((state) => {
       const now = Date.now();
+      let newOffset = state.serverTimeOffset;
+
+      if (serverTs) {
+        const rawOffset = serverTs - now;
+        if (state.serverTimeOffset === 0) {
+          newOffset = rawOffset;
+        } else {
+          // EMA to smooth out network latency jitter
+          newOffset = state.serverTimeOffset * 0.95 + rawOffset * 0.05;
+        }
+      }
+      const syncedNow = now + newOffset;
+
       // Keep history of last 120 seconds for smooth scrolling
-      const newHistory = [...state.history, { time: now, price }].filter(
-        (p) => now - p.time <= 120000,
+      const newHistory = [...state.history, { time: syncedNow, price }].filter(
+        (p) => syncedNow - p.time <= 120000,
       );
 
       return {
         currentPrice: price,
         history: newHistory,
+        serverTimeOffset: newOffset,
       };
     }),
 
@@ -225,6 +357,7 @@ export const useGameStore = create<GameState>((set) => ({
       }
       if (state.balance >= amount) {
         return {
+          serverBalance: state.serverBalance - amount,
           balance: state.balance - amount,
           pendingBets: { ...state.pendingBets, [cellId]: amount },
         };
@@ -300,11 +433,17 @@ export const useGameStore = create<GameState>((set) => ({
 
       // Filter out cells that are obsolete (older than 60s)
       // And remove any active future cell that the server no longer broadcasted
+      // BUT: never remove cells that have bets (confirmed or pending) — keep them until resolved
       const finalCells = combinedCells.filter((c) => {
+        const hasBetOnCell =
+          (state.bets[c.id] && state.bets[c.id] > 0) ||
+          (state.pendingBets[c.id] && state.pendingBets[c.id] > 0) ||
+          state.pendingWins[c.id] !== undefined;
         if (
           c.status === "active" &&
           c.timeWindowStart > now &&
-          !remoteIds.has(c.id)
+          !remoteIds.has(c.id) &&
+          !hasBetOnCell // Don't discard cells the user has bet on
         ) {
           return false; // Safely discard missing future predictions
         }
@@ -349,6 +488,7 @@ export const useGameStore = create<GameState>((set) => ({
         bets: cleanDict(state.bets),
         pendingBets: cleanDict(state.pendingBets),
         betRates: cleanDict(state.betRates),
+        pendingWins: cleanDict(state.pendingWins),
       };
     }),
 }));

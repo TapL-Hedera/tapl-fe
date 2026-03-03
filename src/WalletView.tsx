@@ -169,7 +169,6 @@ export const WalletView: React.FC = () => {
   // --------------- Effect: deposit tx confirmed → call API ---------------
   useEffect(() => {
     const handleDepositApi = async () => {
-      console.log("handleDepositApi");
       if (depositTxHash && depositTokenAmountRaw > 0n) {
         try {
           setIsSubmittingApi(true);
@@ -229,7 +228,6 @@ export const WalletView: React.FC = () => {
           await paymentControllerGetActiveWithdrawalSession({
             headers: authHeader,
           });
-        console.log("sessionResponse: ", sessionResponse);
 
         // The session data is in sessionResponse.data (typed as void by generated code,
         // but at runtime it contains the actual object)
@@ -239,7 +237,6 @@ export const WalletView: React.FC = () => {
           | null
           | undefined;
 
-        console.log("sessionId: ", sessionData?.sessionId);
         if (!sessionData?.sessionId) {
           toast.error("Could not retrieve withdrawal session ID.");
           return;

@@ -219,7 +219,7 @@ export const Header: React.FC = () => {
             switch (evt) {
               case "price_now":
                 if (data?.price) {
-                  updatePrice(data.price);
+                  updatePrice(data.price, data.ts);
                 }
                 break;
               case "grid_update":
@@ -229,6 +229,10 @@ export const Header: React.FC = () => {
                 break;
               case "balance_update":
                 if (data) {
+                  console.log(
+                    `balance_update at ${data.timestamp ? new Date(Number(data.timestamp)).toLocaleString("en-GB", { timeZone: "Asia/Bangkok" }) : "N/A"}`,
+                    data,
+                  );
                   queryClient.setQueryData(
                     getAccountControllerGetBalanceQueryKey(),
                     data,
@@ -236,6 +240,17 @@ export const Header: React.FC = () => {
                 }
                 break;
               case "order_update":
+                console.log(
+                  `order_update at time ${
+                    data.settledTimestamp
+                      ? new Date(Number(data.settledTimestamp)).toLocaleString(
+                          "en-GB",
+                          { timeZone: "Asia/Bangkok" },
+                        )
+                      : "N/A"
+                  }`,
+                  data,
+                );
                 updateOrder(data);
                 break;
             }
@@ -616,31 +631,47 @@ export const Header: React.FC = () => {
             >
               Bet
             </span>
-            <select
-              value={betAmount}
-              onChange={(e) => setBetAmount(Number(e.target.value))}
-              className="bg-transparent font-bold font-mono text-xs outline-none cursor-pointer appearance-none pr-3"
-              style={{ color: "#0847F7" }}
-            >
-              <option
-                style={{ background: "#080A0C", color: "#0847F7" }}
-                value={10}
+            <div className="relative flex items-center">
+              <select
+                value={betAmount}
+                onChange={(e) => setBetAmount(Number(e.target.value))}
+                className="bg-transparent font-bold font-mono text-xs outline-none cursor-pointer appearance-none pr-4"
+                style={{ color: "#0847F7" }}
               >
-                $10
-              </option>
-              <option
-                style={{ background: "#080A0C", color: "#0847F7" }}
-                value={50}
+                <option
+                  style={{ background: "#080A0C", color: "#0847F7" }}
+                  value={10}
+                >
+                  $10
+                </option>
+                <option
+                  style={{ background: "#080A0C", color: "#0847F7" }}
+                  value={50}
+                >
+                  $50
+                </option>
+                <option
+                  style={{ background: "#080A0C", color: "#0847F7" }}
+                  value={100}
+                >
+                  $100
+                </option>
+              </select>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#0847F7"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="absolute right-0 pointer-events-none"
               >
-                $50
-              </option>
-              <option
-                style={{ background: "#080A0C", color: "#0847F7" }}
-                value={100}
-              >
-                $100
-              </option>
-            </select>
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
           </div>
 
           {/* Balance */}
@@ -662,10 +693,8 @@ export const Header: React.FC = () => {
               className="font-bold font-mono text-xs"
               style={{ color: "#ffffff" }}
             >
-              $
-              {Number(
-                (balanceData as unknown as { free?: string })?.free ?? balance,
-              ).toFixed(2)}
+              {"$"}
+              {Number(balance).toFixed(2)}
             </span>
           </div>
 
@@ -697,31 +726,47 @@ export const Header: React.FC = () => {
               >
                 Bet:
               </span>
-              <select
-                value={betAmount}
-                onChange={(e) => setBetAmount(Number(e.target.value))}
-                className="bg-transparent font-bold font-mono text-sm outline-none cursor-pointer appearance-none pr-4"
-                style={{ color: "#0847F7" }}
-              >
-                <option
-                  style={{ background: "#080A0C", color: "#0847F7" }}
-                  value={10}
+              <div className="relative flex items-center">
+                <select
+                  value={betAmount}
+                  onChange={(e) => setBetAmount(Number(e.target.value))}
+                  className="bg-transparent font-bold font-mono text-sm outline-none cursor-pointer appearance-none pr-5"
+                  style={{ color: "#0847F7" }}
                 >
-                  $10
-                </option>
-                <option
-                  style={{ background: "#080A0C", color: "#0847F7" }}
-                  value={50}
+                  <option
+                    style={{ background: "#080A0C", color: "#0847F7" }}
+                    value={10}
+                  >
+                    $10
+                  </option>
+                  <option
+                    style={{ background: "#080A0C", color: "#0847F7" }}
+                    value={50}
+                  >
+                    $50
+                  </option>
+                  <option
+                    style={{ background: "#080A0C", color: "#0847F7" }}
+                    value={100}
+                  >
+                    $100
+                  </option>
+                </select>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#0847F7"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="absolute right-0 pointer-events-none"
                 >
-                  $50
-                </option>
-                <option
-                  style={{ background: "#080A0C", color: "#0847F7" }}
-                  value={100}
-                >
-                  $100
-                </option>
-              </select>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </div>
             </div>
 
             <div
@@ -740,13 +785,10 @@ export const Header: React.FC = () => {
               </span>
               <span
                 className="font-bold font-mono text-sm"
-                style={{ color: "#2EBD85" }}
+                style={{ color: "#8AA6F9" }}
               >
-                $
-                {Number(
-                  (balanceData as unknown as { free?: string })?.free ??
-                    balance,
-                ).toFixed(2)}
+                {"$"}
+                {Number(balance).toFixed(2)}
               </span>
             </div>
 

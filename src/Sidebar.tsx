@@ -22,7 +22,7 @@ export const Sidebar: React.FC = () => {
     { icon: History, label: "History", path: "/history" },
     { icon: Wallet, label: "Trader Account", path: "/wallet" },
     { icon: TrendingUp, label: "LP", path: "/lp" },
-    { icon: ShieldCheck, label: "CRE Proof", path: "/cre-proof" },
+    { icon: ShieldCheck, label: "CRE Workflows", path: "/cre-workflows" },
   ];
 
   return (
@@ -39,11 +39,11 @@ export const Sidebar: React.FC = () => {
         {/* Brand */}
         <div style={{ borderBottom: "1px solid rgba(255, 255, 255, 0.05)" }}>
           <Link to="/" className="flex items-center gap-3 px-5">
-            <div className="w-20 h-20 rounded flex items-center justify-center shrink-0">
+            <div className="w-30 h-30 rounded flex items-center justify-center shrink-0">
               <img
                 src="/tapl.png"
                 alt="tapl logo"
-                className="w-20 h-20 object-contain"
+                className="w-30 h-30 object-contain"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
                 }}
