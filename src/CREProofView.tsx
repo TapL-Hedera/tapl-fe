@@ -81,7 +81,7 @@ const Section: React.FC<SectionProps> = ({
       {/* Header */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex items-center justify-between px-5 py-3.5 text-left"
+        className="w-full flex items-center justify-between px-5 py-3.5 text-left cursor-pointer"
         style={{
           borderBottom: open ? "1px solid rgba(255, 255, 255, 0.05)" : "none",
         }}
@@ -405,42 +405,12 @@ export const CREProofView: React.FC = () => {
               {
                 key: "internalCandlesHash",
                 label: "Int Hash",
-                render: (r) => {
-                  const hash = r.internalCandlesHash as string;
-                  if (!hash) return <span style={{ color: "#d0d0d0" }}>-</span>;
-                  return (
-                    <a
-                      href={`https://sepolia.etherscan.io/search?q=${hash}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-mono text-[10px] hover:underline"
-                      style={{ color: "#3B82F6" }}
-                      title={hash}
-                    >
-                      {shortHash(hash)}
-                    </a>
-                  );
-                },
+                render: (r) => shortHash(r.internalCandlesHash as string),
               },
               {
                 key: "diffMerkleRoot",
                 label: "Merkle Root",
-                render: (r) => {
-                  const hash = r.diffMerkleRoot as string;
-                  if (!hash) return <span style={{ color: "#d0d0d0" }}>-</span>;
-                  return (
-                    <a
-                      href={`https://sepolia.etherscan.io/search?q=${hash}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-mono text-[10px] hover:underline"
-                      style={{ color: "#3B82F6" }}
-                      title={hash}
-                    >
-                      {shortHash(hash)}
-                    </a>
-                  );
-                },
+                render: (r) => shortHash(r.diffMerkleRoot as string),
               },
               {
                 key: "transactionHash",
