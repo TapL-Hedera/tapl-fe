@@ -3,6 +3,8 @@ import { useGameStore, type CellData } from "./store";
 import { format } from "date-fns";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { motion } from "framer-motion";
+import confetti from "canvas-confetti";
 import CryptoJS from "crypto-js";
 import { useAccount } from "wagmi";
 import toast from "react-hot-toast";
@@ -42,6 +44,55 @@ export const TradingGrid: React.FC = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(
     () => window.innerWidth < 1280,
   );
+
+  const triggeredWinsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    cells.forEach((cell) => {
+      const isHit = cell.status === "hit";
+      const hasBet =
+        (bets[cell.id] || 0) > 0 || (pendingBets[cell.id] || 0) > 0;
+      if (isHit && hasBet) {
+        if (!triggeredWinsRef.current.has(cell.id)) {
+          triggeredWinsRef.current.add(cell.id);
+          // Vegas style confetti
+          const count = 200;
+          const defaults = { origin: { y: 0.6 }, zIndex: 10000 };
+          function fire(particleRatio: number, opts: confetti.Options) {
+            confetti(
+              Object.assign({}, defaults, opts, {
+                particleCount: Math.floor(count * particleRatio),
+              }),
+            );
+          }
+          fire(0.25, {
+            spread: 26,
+            startVelocity: 55,
+            colors: ["#2ebd85", "#ffffff", "#eab308"],
+          });
+          fire(0.2, { spread: 60, colors: ["#2ebd85", "#ffffff", "#eab308"] });
+          fire(0.35, {
+            spread: 100,
+            decay: 0.91,
+            scalar: 0.8,
+            colors: ["#2ebd85", "#ffffff", "#eab308"],
+          });
+          fire(0.1, {
+            spread: 120,
+            startVelocity: 25,
+            decay: 0.92,
+            scalar: 1.2,
+            colors: ["#2ebd85", "#ffffff", "#eab308"],
+          });
+          fire(0.1, {
+            spread: 120,
+            startVelocity: 45,
+            colors: ["#2ebd85", "#ffffff", "#eab308"],
+          });
+        }
+      }
+    });
+  }, [cells, bets, pendingBets]);
 
   // Animation loop for perfect smooth scrolling
   useEffect(() => {
@@ -356,7 +407,13 @@ export const TradingGrid: React.FC = () => {
             const canBet = isFuture && !isNext && !hasAnyBet;
 
             return (
-              <div
+              <motion.div
+                whileHover={
+                  canBet && !hasAnyBet
+                    ? { scale: 0.95, backgroundColor: "rgba(255,255,255,0.1)" }
+                    : {}
+                }
+                whileTap={canBet && !hasAnyBet ? { scale: 0.9 } : {}}
                 key={cell.id}
                 className={cn(
                   "absolute border-t border-l flex flex-col items-center justify-center text-[10px] transition duration-300",
@@ -488,7 +545,7 @@ export const TradingGrid: React.FC = () => {
                       </div>
                     );
                   })()}
-              </div>
+              </motion.div>
             );
           });
         })()}

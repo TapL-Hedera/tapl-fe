@@ -13,9 +13,11 @@
   "dependencies": {
     "@headlessui/react": "^2.2.9",
     "@tanstack/react-query": "^5.90.21",
+    "@types/canvas-confetti": "^1.9.0",
     "@web3modal/react": "^2.7.1",
     "@web3modal/wagmi": "^5.1.11",
     "axios": "^1.13.5",
+    "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "code-inspector-plugin": "^1.4.2",
     "crypto-js": "^4.2.0",
