@@ -124,51 +124,27 @@ const StatCard: React.FC<StatCardProps> = ({
   sub,
   accent,
 }) => (
-  <div
-    className="flex items-start gap-3 p-4 rounded-2xl transition-all duration-300 group hover:-translate-y-0.5"
-    style={{
-      background: accent
-        ? "linear-gradient(145deg, rgba(8,71,247,0.16) 0%, rgba(255,255,255,0.03) 100%)"
-        : "linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-      border: accent
-        ? "1px solid rgba(8, 71, 247, 0.35)"
-        : "1px solid rgba(255,255,255,0.08)",
-      boxShadow: accent
-        ? "0 10px 30px rgba(8,71,247,0.18)"
-        : "0 10px 24px rgba(0,0,0,0.25)",
-    }}
-  >
+  <div className="p-6 sci-card group relative overflow-hidden">
     <div
-      className="shrink-0 p-2.5 rounded-lg"
-      style={{
-        background: accent ? "rgba(8,71,247,0.2)" : "rgba(255,255,255,0.06)",
-        color: accent ? "#0847F7" : "#d0d0d0",
-        border: accent
-          ? "1px solid rgba(8,71,247,0.35)"
-          : "1px solid rgba(255,255,255,0.08)",
-      }}
-    >
-      {icon}
-    </div>
-    <div className="min-w-0">
-      <p
-        className="text-[11px] font-semibold uppercase tracking-[0.15em] mb-1"
-        style={{ color: "#d0d0d0" }}
-      >
+      className={`absolute top-0 right-0 w-32 h-32 ${accent ? "bg-[#2EBD85]" : "bg-[#0847F7]"} opacity-5 rounded-full blur-3xl group-hover:opacity-10 transition-opacity`}
+    ></div>
+    <div className="flex items-center gap-2 mb-2">
+      <div className="text-[#d0d0d0] opacity-80">{icon}</div>
+      <p className="text-sm font-medium" style={{ color: "#d0d0d0" }}>
         {label}
       </p>
-      <p
-        className="text-2xl leading-none font-bold font-mono break-all"
-        style={{ color: accent ? "#0847F7" : "#ffffff" }}
-      >
-        {value}
-      </p>
-      {sub && (
-        <p className="text-xs mt-2" style={{ color: "#a0a0a0" }}>
-          {sub}
-        </p>
-      )}
     </div>
+    <p
+      className="text-2xl font-black font-mono tracking-tight"
+      style={{ color: "#FFFFFF" }}
+    >
+      {value}
+    </p>
+    {sub && (
+      <p className="text-xs mt-2 font-medium" style={{ color: "#a0a0a0" }}>
+        {sub}
+      </p>
+    )}
   </div>
 );
 
@@ -439,37 +415,31 @@ export const LPView: React.FC = () => {
   const dec = decimals as number;
 
   return (
-    <div className="flex-1 p-4 lg:p-8 max-w-5xl mx-auto w-full relative z-10">
-      <div className="absolute -top-24 -left-16 w-80 h-80 rounded-full blur-[120px] bg-[#0847F7]/20 pointer-events-none" />
-      <div className="absolute top-1/3 -right-24 w-96 h-96 rounded-full blur-[130px] bg-[#2EBD85]/10 pointer-events-none" />
+    <div className="flex-1 p-4 lg:p-8 max-w-4xl mx-auto w-full relative z-10">
       {/* Page heading */}
-      <div className="flex justify-between items-start mb-8 pt-4 lg:pt-0 relative">
-        <div>
+      <div className="flex justify-between items-center mb-8 pt-4 lg:pt-0">
+        <div className="flex items-center gap-4">
           <h1
-            className="text-2xl md:text-3xl font-semibold"
-            style={{ color: "#ffffff" }}
+            className="text-3xl font-extrabold tracking-tight"
+            style={{ color: "#FFFFFF" }}
           >
             LP Position
           </h1>
-          <p className="text-sm mt-1.5" style={{ color: "#d0d0d0" }}>
-            Provide liquidity · earn yield from the pool
-          </p>
+          <span
+            className="text-xs px-2.5 py-1 font-semibold uppercase tracking-wider backdrop-blur-md"
+            style={{
+              background: "rgba(55,91,210,0.15)",
+              color: "#d0d0d0",
+              border: "1px solid rgba(55,91,210,0.3)",
+              borderRadius: "6px",
+            }}
+          >
+            Testnet
+          </span>
         </div>
         <button
           onClick={refreshAll}
-          className="flex items-center gap-1.5 text-xs font-medium transition-all px-3.5 py-2 rounded-lg hover:-translate-y-0.5 hover:border-white/25 group"
-          style={{
-            color: "#d0d0d0",
-            background:
-              "linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-          }}
-          onMouseEnter={(e) =>
-            ((e.currentTarget as HTMLElement).style.color = "#ffffff")
-          }
-          onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLElement).style.color = "#d0d0d0")
-          }
+          className="flex items-center gap-1.5 text-xs font-bold transition-all px-3.5 py-2 rounded-lg hover:-translate-y-0.5 hover:border-white/25 group bg-[#0847F7]/20 text-[#d0d0d0] hover:bg-[#0847F7]/40 uppercase tracking-wider"
         >
           <span className="group-hover:rotate-180 transition-transform duration-500">
             <IconRefresh />
@@ -479,7 +449,7 @@ export const LPView: React.FC = () => {
       </div>
 
       {/* ── Position Stats ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
         <StatCard
           icon={<IconCoins />}
           label="Your Shares"
@@ -508,13 +478,7 @@ export const LPView: React.FC = () => {
       </div>
 
       {/* ── Action Panel ── */}
-      <div
-        className="max-w-2xl mx-auto w-full overflow-hidden rounded-3xl relative"
-        style={{
-          border: "1px solid rgba(255,255,255,0.12)",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.38)",
-        }}
-      >
+      <div className="sci-card relative overflow-hidden">
         <div className="absolute -top-20 right-8 w-48 h-48 rounded-full bg-[#0847F7]/20 blur-[80px] pointer-events-none" />
         {/* Tab switcher */}
         <div
@@ -545,71 +509,88 @@ export const LPView: React.FC = () => {
           ))}
         </div>
 
-        <div className="p-6 space-y-5 relative">
+        <div className="p-6 md:p-8 space-y-8 relative">
           {/* Background elements inside the form */}
           <div className="absolute top-1/2 left-0 w-64 h-64 bg-[#0847F7] rounded-full blur-[120px] opacity-10 pointer-events-none -translate-y-1/2"></div>
+
           {/* ── DEPOSIT TAB ── */}
           {activeTab === "deposit" && (
-            <>
-              {/* Token amount input */}
-              <div className="space-y-2">
-                <div className="flex justify-between mb-2">
+            <div className="relative z-10 animate-[fadeIn_0.3s_ease-out]">
+              <div className="mb-6">
+                <div className="flex justify-between mb-3 items-end">
                   <label
-                    className="text-xs font-medium uppercase tracking-wider"
+                    className="text-xs font-bold uppercase tracking-widest"
                     style={{ color: "#d0d0d0" }}
                   >
-                    Amount (Tokens)
+                    Amount to Deposit
                   </label>
                   {tokenBalance !== undefined && (
-                    <button
-                      onClick={handleMaxDeposit}
-                      className="text-xs font-mono transition-colors"
-                      style={{ color: "#0847F7" }}
+                    <span
+                      className="text-xs font-medium"
+                      style={{ color: "#d0d0d0" }}
                     >
-                      Max: {fmt(tokenBalance as bigint, dec)}
-                    </button>
+                      Available:{" "}
+                      <strong className="text-white font-mono">
+                        {fmt(tokenBalance as bigint, dec)}
+                      </strong>{" "}
+                      Tokens
+                    </span>
                   )}
                 </div>
-                <input
-                  type="number"
-                  value={depositAmountStr}
-                  onChange={(e) => setDepositAmountStr(e.target.value)}
-                  placeholder="0.0"
-                  min="0"
-                  step="0.001"
-                  className="w-full p-4 pl-5 text-2xl font-bold font-mono outline-none transition-all duration-300 relative z-10"
-                  style={{
-                    background: "rgba(0,0,0,0.3)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: "12px",
-                    color: "#FFFFFF",
-                  }}
-                  onFocus={(e) => {
-                    (e.target as HTMLElement).style.borderColor = "#0847F7";
-                    (e.target as HTMLElement).style.boxShadow =
-                      "0 0 0 3px rgba(8, 71, 247,0.2)";
-                  }}
-                  onBlur={(e) => {
-                    (e.target as HTMLElement).style.borderColor =
-                      "rgba(255,255,255,0.08)";
-                    (e.target as HTMLElement).style.boxShadow = "none";
-                  }}
-                />
+                <div className="relative group">
+                  <input
+                    type="number"
+                    value={depositAmountStr}
+                    onChange={(e) => setDepositAmountStr(e.target.value)}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.001"
+                    className="w-full p-4 pl-5 pr-20 text-2xl font-black font-mono outline-none transition-all duration-300 relative z-10"
+                    style={{
+                      background: "rgba(0,0,0,0.3)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: "12px",
+                      color: "#FFFFFF",
+                    }}
+                    onFocus={(e) => {
+                      (e.target as HTMLElement).style.borderColor = "#0847F7";
+                      (e.target as HTMLElement).style.boxShadow =
+                        "0 0 0 3px rgba(8, 71, 247,0.2)";
+                    }}
+                    onBlur={(e) => {
+                      (e.target as HTMLElement).style.borderColor =
+                        "rgba(255,255,255,0.08)";
+                      (e.target as HTMLElement).style.boxShadow = "none";
+                    }}
+                  />
+                  <button
+                    className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 text-xs font-bold rounded-md bg-[#0847F7]/20 text-[#d0d0d0] hover:bg-[#0847F7]/40 transition-colors uppercase tracking-wider z-20"
+                    onClick={handleMaxDeposit}
+                  >
+                    Max
+                  </button>
+                </div>
 
                 {depositAmountStr &&
                   depositAmountRaw > 0n &&
                   previewDepositShares !== undefined && (
-                    <div className="mt-2 text-right">
-                      <span
-                        className="text-xs font-medium px-2.5 py-1"
-                        style={{
-                          color: "#0847F7",
-                          background: "rgba(8, 71, 247,0.08)",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        ≈ {fmt(previewDepositShares as bigint, dec)} shares
-                        minted
+                    <div className="mt-4 flex items-center justify-between text-sm p-3 rounded-lg bg-[#0847F7]/5 border border-[#0847F7]/10">
+                      <span className="text-[#d0d0d0]">You will receive:</span>
+                      <span className="font-bold text-[#d0d0d0] flex items-center gap-1.5">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        {fmt(previewDepositShares as bigint, dec)} shares
                       </span>
                     </div>
                   )}
@@ -619,102 +600,175 @@ export const LPView: React.FC = () => {
                 <button
                   onClick={() => switchChain?.({ chainId: sepolia.id })}
                   disabled={isPendingSwitch}
-                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider shadow-[0_10px_30px_rgba(8,71,247,0.35)]"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #0847F7 0%, #2D58FF 70%, #3B74FF 100%)",
-                    color: "#ffffff",
-                  }}
+                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
+                  style={{ background: "#0847F7", color: "#ffffff" }}
                 >
-                  {isPendingSwitch ? "Switching..." : "Switch to Sepolia"}
+                  <span className="flex items-center justify-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21.5 2v6h-6M2.13 15.57a9 9 0 1 0 3.87-8.91L2 9"></path>
+                    </svg>
+                    {isPendingSwitch
+                      ? "Switching Network..."
+                      : "Switch to Sepolia"}
+                  </span>
                 </button>
               ) : (
                 <button
                   onClick={handleDeposit}
                   disabled={!isConnected || isPendingDeposit}
-                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider shadow-[0_10px_30px_rgba(8,71,247,0.35)]"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #0847F7 0%, #2D58FF 70%, #3B74FF 100%)",
-                    color: "#ffffff",
-                  }}
+                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
+                  style={{ background: "#0847F7", color: "#ffffff" }}
                 >
-                  {!isConnected
-                    ? "Wallet Not Connected"
-                    : isApproving || isWaitingApprove
-                      ? "Approving…"
-                      : isDepositingLP || isWaitingDeposit
-                        ? "Depositing…"
-                        : needApproval
-                          ? "Approve Tokens"
-                          : "Deposit Liquidity"}
+                  <span className="flex items-center justify-center gap-2">
+                    {!isConnected ? (
+                      "Wallet Not Connected"
+                    ) : isApproving || isWaitingApprove ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Approving...
+                      </>
+                    ) : isDepositingLP || isWaitingDeposit ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Depositing...
+                      </>
+                    ) : needApproval ? (
+                      "Approve Tokens"
+                    ) : (
+                      "Deposit Liquidity"
+                    )}
+                  </span>
                 </button>
               )}
-            </>
+            </div>
           )}
 
           {/* ── WITHDRAW TAB ── */}
           {activeTab === "withdraw" && (
-            <>
-              {/* Shares input */}
-              <div className="space-y-2">
-                <div className="flex justify-between mb-2">
+            <div className="relative z-10 animate-[fadeIn_0.3s_ease-out]">
+              <div className="mb-6">
+                <div className="flex justify-between mb-3 items-end">
                   <label
-                    className="text-xs font-medium uppercase tracking-wider"
+                    className="text-xs font-bold uppercase tracking-widest"
                     style={{ color: "#d0d0d0" }}
                   >
                     Shares to Burn
                   </label>
                   {lpShares !== undefined && (
-                    <button
-                      onClick={handleMaxWithdraw}
-                      className="text-xs font-mono"
-                      style={{ color: "#0847F7" }}
+                    <span
+                      className="text-xs font-medium"
+                      style={{ color: "#d0d0d0" }}
                     >
-                      Max: {fmt(lpShares as bigint, dec)}
-                    </button>
+                      Available:{" "}
+                      <strong className="text-white font-mono">
+                        {fmt(lpShares as bigint, dec)}
+                      </strong>{" "}
+                      Shares
+                    </span>
                   )}
                 </div>
-                <input
-                  type="number"
-                  value={withdrawSharesStr}
-                  onChange={(e) => setWithdrawSharesStr(e.target.value)}
-                  placeholder="0.0"
-                  min="0"
-                  step="0.000001"
-                  className="w-full p-4 pl-5 text-2xl font-bold font-mono outline-none transition-all duration-300 relative z-10"
-                  style={{
-                    background: "rgba(0,0,0,0.3)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: "12px",
-                    color: "#FFFFFF",
-                  }}
-                  onFocus={(e) => {
-                    (e.target as HTMLElement).style.borderColor = "#0847F7";
-                    (e.target as HTMLElement).style.boxShadow =
-                      "0 0 0 3px rgba(8, 71, 247,0.2)";
-                  }}
-                  onBlur={(e) => {
-                    (e.target as HTMLElement).style.borderColor =
-                      "rgba(255,255,255,0.08)";
-                    (e.target as HTMLElement).style.boxShadow = "none";
-                  }}
-                />
+                <div className="relative group">
+                  <input
+                    type="number"
+                    value={withdrawSharesStr}
+                    onChange={(e) => setWithdrawSharesStr(e.target.value)}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.000001"
+                    className="w-full p-4 pl-5 pr-20 text-2xl font-black font-mono outline-none transition-all duration-300 relative z-10"
+                    style={{
+                      background: "rgba(0,0,0,0.3)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: "12px",
+                      color: "#FFFFFF",
+                    }}
+                    onFocus={(e) => {
+                      (e.target as HTMLElement).style.borderColor = "#0847F7";
+                      (e.target as HTMLElement).style.boxShadow =
+                        "0 0 0 3px rgba(8, 71, 247,0.2)";
+                    }}
+                    onBlur={(e) => {
+                      (e.target as HTMLElement).style.borderColor =
+                        "rgba(255,255,255,0.08)";
+                      (e.target as HTMLElement).style.boxShadow = "none";
+                    }}
+                  />
+                  <button
+                    className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 text-xs font-bold rounded-md bg-[#0847F7]/20 text-[#d0d0d0] hover:bg-[#0847F7]/40 transition-colors uppercase tracking-wider z-20"
+                    onClick={handleMaxWithdraw}
+                  >
+                    Max
+                  </button>
+                </div>
 
                 {withdrawSharesStr &&
                   withdrawSharesRaw > 0n &&
                   previewWithdrawAssets !== undefined && (
-                    <div className="mt-2 text-right">
-                      <span
-                        className="text-xs font-medium px-2.5 py-1"
-                        style={{
-                          color: "#0847F7",
-                          background: "rgba(55,91,210,0.08)",
-                          borderRadius: "4px",
-                        }}
-                      >
+                    <div className="mt-4 flex items-center justify-between text-sm p-3 rounded-lg bg-[#0847F7]/5 border border-[#0847F7]/10">
+                      <span className="text-[#d0d0d0]">You will receive:</span>
+                      <span className="font-bold text-[#d0d0d0] flex items-center gap-1.5">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
                         ≈ {fmt(previewWithdrawAssets as bigint, dec)} tokens
-                        returned
                       </span>
                     </div>
                   )}
@@ -724,7 +778,7 @@ export const LPView: React.FC = () => {
                 withdrawSharesRaw > 0n &&
                 (lpShares as bigint) < withdrawSharesRaw && (
                   <p
-                    className="text-xs text-right"
+                    className="text-xs text-right mb-4"
                     style={{ color: "#F6465D" }}
                   >
                     Exceeds your LP shares balance
@@ -735,53 +789,90 @@ export const LPView: React.FC = () => {
                 <button
                   onClick={() => switchChain?.({ chainId: sepolia.id })}
                   disabled={isPendingSwitch}
-                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider shadow-[0_10px_30px_rgba(8,71,247,0.35)]"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #0847F7 0%, #2D58FF 70%, #3B74FF 100%)",
-                    color: "#ffffff",
-                  }}
+                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
+                  style={{ background: "#0847F7", color: "#ffffff" }}
                 >
-                  {isPendingSwitch ? "Switching..." : "Switch to Sepolia"}
+                  <span className="flex items-center justify-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M21.5 2v6h-6M2.13 15.57a9 9 0 1 0 3.87-8.91L2 9"></path>
+                    </svg>
+                    {isPendingSwitch
+                      ? "Switching Network..."
+                      : "Switch to Sepolia"}
+                  </span>
                 </button>
               ) : (
                 <button
                   onClick={handleWithdraw}
                   disabled={!isConnected || isPendingWithdraw}
-                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-95 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider shadow-[0_10px_30px_rgba(8,71,247,0.35)]"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #0847F7 0%, #2D58FF 70%, #3B74FF 100%)",
-                    color: "#ffffff",
-                  }}
+                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
+                  style={{ background: "#0847F7", color: "#ffffff" }}
                 >
-                  {!isConnected
-                    ? "Wallet Not Connected"
-                    : isWithdrawingLP || isWaitingWithdraw
-                      ? "Withdrawing…"
-                      : "Withdraw Liquidity"}
+                  <span className="flex items-center justify-center gap-2">
+                    {!isConnected ? (
+                      "Wallet Not Connected"
+                    ) : isWithdrawingLP || isWaitingWithdraw ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Withdrawing...
+                      </>
+                    ) : (
+                      "Withdraw Liquidity"
+                    )}
+                  </span>
                 </button>
               )}
-            </>
+            </div>
           )}
 
           {/* Info box */}
           <div
             className="p-4 rounded-xl relative z-10"
             style={{
-              background:
-                "linear-gradient(145deg, rgba(0,0,0,0.28), rgba(255,255,255,0.02))",
+              background: "rgba(255,255,255,0.03)",
               border: "1px solid rgba(255,255,255,0.08)",
             }}
           >
             <h3
-              className="text-xs font-semibold mb-2 uppercase tracking-widest flex items-center gap-2"
+              className="text-xs font-bold mb-2 uppercase tracking-widest flex items-center gap-2"
               style={{ color: "#a0a0a0" }}
             >
               <IconInfo />
               How it works
             </h3>
-            <p className="text-xs leading-relaxed" style={{ color: "#d0d0d0" }}>
+            <p
+              className="text-sm font-medium leading-relaxed"
+              style={{ color: "#d0d0d0" }}
+            >
               {activeTab === "deposit"
                 ? "Deposit tokens to mint LP shares proportional to your contribution. Approve once, then deposit any amount."
                 : "Withdraw by burning LP shares. The contract calculates the proportional token amount to return."}

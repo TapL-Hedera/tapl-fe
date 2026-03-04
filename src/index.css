@@ -123,12 +123,56 @@
     }
   }
 
+  @keyframes walletToastShake {
+    0% {
+      transform: translateX(8px) rotate(0deg);
+    }
+    20% {
+      transform: translateX(-6px) rotate(-1deg);
+    }
+    40% {
+      transform: translateX(5px) rotate(1deg);
+    }
+    60% {
+      transform: translateX(-4px) rotate(-0.6deg);
+    }
+    80% {
+      transform: translateX(2px) rotate(0.4deg);
+    }
+    100% {
+      transform: translateX(0) rotate(0deg);
+    }
+  }
+
+  @keyframes walletToastFadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+    }
+  }
+
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
 
   .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  .wallet-win-toast {
+    animation:
+      walletToastShake 0.55s ease-in-out 0s 1,
+      walletToastFadeOut 1.2s ease-in 3.1s forwards;
+  }
+
+  .wallet-win-toast-leave {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+    transition: all 0.2s ease;
   }
 
   /* Binance-style nav glass */

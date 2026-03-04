@@ -106,56 +106,56 @@ export const Header: React.FC = () => {
     };
   }, [isFundModalOpen]);
 
-  useEffect(() => {
-    const handleLogin = async () => {
-      if (!isConnected || !address || isLoggingIn.current) return;
+  const handleLogin = async () => {
+    if (!isConnected || !address || isLoggingIn.current) return;
 
-      const token = localStorage.getItem("token");
-      const storedAddress = localStorage.getItem("wallet-address");
+    const token = localStorage.getItem("token");
+    const storedAddress = localStorage.getItem("wallet-address");
 
-      if (token && storedAddress === address) return;
+    if (token && storedAddress === address) return;
 
-      if (promptedAddress.current === address) return;
+    if (promptedAddress.current === address) return;
 
-      isLoggingIn.current = true;
-      promptedAddress.current = address;
-      try {
-        const challengeRes = await authControllerGetChallenge({ address });
-        const challenge = (challengeRes as unknown as { challenge: string })
-          .challenge;
+    isLoggingIn.current = true;
+    promptedAddress.current = address;
+    try {
+      const challengeRes = await authControllerGetChallenge({ address });
+      const challenge = (challengeRes as unknown as { challenge: string })
+        .challenge;
 
-        let signature: string;
-        if (isDemoMode) {
-          const demoPk = localStorage.getItem("demo-private-key");
-          if (!demoPk) {
-            setDemoMode(false);
-            return;
-          }
-          const account = privateKeyToAccount(demoPk as `0x${string}`);
-          signature = await account.signMessage({ message: challenge });
-        } else {
-          signature = await signMessageAsync({ message: challenge });
+      let signature: string;
+      if (isDemoMode) {
+        const demoPk = localStorage.getItem("demo-private-key");
+        if (!demoPk) {
+          setDemoMode(false);
+          return;
         }
-
-        const loginRes = await authControllerLogin({
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ address, signature }),
-        });
-        const accessToken = (loginRes as unknown as { accessToken: string })
-          .accessToken;
-
-        localStorage.setItem("token", accessToken);
-        setToken(accessToken);
-        localStorage.setItem("wallet-address", address);
-        refetchBalance();
-      } catch (error) {
-        console.error("Login failed:", error);
-      } finally {
-        isLoggingIn.current = false;
+        const account = privateKeyToAccount(demoPk as `0x${string}`);
+        signature = await account.signMessage({ message: challenge });
+      } else {
+        signature = await signMessageAsync({ message: challenge });
       }
-    };
 
+      const loginRes = await authControllerLogin({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address, signature }),
+      });
+      const accessToken = (loginRes as unknown as { accessToken: string })
+        .accessToken;
+
+      localStorage.setItem("token", accessToken);
+      setToken(accessToken);
+      localStorage.setItem("wallet-address", address);
+      refetchBalance();
+    } catch (error) {
+      console.error("Login failed:", error);
+    } finally {
+      isLoggingIn.current = false;
+    }
+  };
+
+  useEffect(() => {
     handleLogin();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, address, isDemoMode]);
@@ -433,6 +433,16 @@ export const Header: React.FC = () => {
             >
               {isPendingSwitch ? "SWITCHING..." : "SWITCH NETWORK"}
             </button>
+          ) : !token ? (
+            <button
+              onClick={() => {
+                promptedAddress.current = null;
+                handleLogin();
+              }}
+              className="px-3 py-1.5 font-bold rounded bg-[#0847F7] text-white active:scale-95 transition-transform text-xs whitespace-nowrap"
+            >
+              LOGIN
+            </button>
           ) : (
             <div className="relative">
               {walletMenuOpen && (
@@ -697,14 +707,6 @@ export const Header: React.FC = () => {
               {Number(balance).toFixed(2)}
             </span>
           </div>
-
-          {/* Faucet */}
-          <button
-            onClick={() => setIsFundModalOpen(true)}
-            className="shrink-0 px-3 py-1.5 font-bold rounded bg-[#0847F7] text-white transition-all text-xs"
-          >
-            FAUCET
-          </button>
         </div>
       )}
 
@@ -810,6 +812,16 @@ export const Header: React.FC = () => {
             >
               {isPendingSwitch ? "SWITCHING..." : "SWITCH NETWORK"}
             </button>
+          ) : !token ? (
+            <button
+              onClick={() => {
+                promptedAddress.current = null;
+                handleLogin();
+              }}
+              className="flex items-center gap-2 px-4 py-1.5 font-bold rounded bg-[#0847F7] text-white text-sm"
+            >
+              LOGIN
+            </button>
           ) : (
             <div className="relative group">
               <button
@@ -850,6 +862,7 @@ export const Header: React.FC = () => {
                   <path d="m6 9 6 6 6-6" />
                 </svg>
               </button>
+
               <div
                 className="absolute right-0 top-full mt-1 w-52 shadow-2xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50"
                 style={{
@@ -987,16 +1000,6 @@ export const Header: React.FC = () => {
           )
         ) : (
           <div className="flex items-center gap-4">
-            <button
-              onClick={startDemo}
-              disabled={isDemoLoading}
-              className="flex items-center gap-2 px-4 py-2 font-bold rounded border border-[#0847F7] text-[#0847F7] text-sm disabled:opacity-50"
-            >
-              {isDemoLoading ? (
-                <div className="h-3.5 w-3.5 rounded-full border-2 border-[#0847F7]/20 border-t-[#0847F7] animate-spin" />
-              ) : null}
-              {isDemoLoading ? "STARTING..." : "TRY DEMO"}
-            </button>
             <button
               onClick={() => connect({ connector: connectors[0] })}
               className="flex items-center gap-2 px-4 py-2 font-bold rounded bg-[#0847F7] text-white text-sm"
