@@ -405,28 +405,82 @@ export const CREProofView: React.FC = () => {
               {
                 key: "internalCandlesHash",
                 label: "Int Hash",
-                render: (r) => (
-                  <span
-                    title={String(r.internalCandlesHash ?? "")}
-                    className="font-mono text-[10px]"
-                    style={{ color: "#d0d0d0" }}
-                  >
-                    {shortHash(r.internalCandlesHash as string)}
-                  </span>
-                ),
+                render: (r) => {
+                  const hash = r.internalCandlesHash as string;
+                  if (!hash) return <span style={{ color: "#d0d0d0" }}>-</span>;
+                  return (
+                    <a
+                      href={`https://sepolia.etherscan.io/search?q=${hash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-[10px] hover:underline"
+                      style={{ color: "#3B82F6" }}
+                      title={hash}
+                    >
+                      {shortHash(hash)}
+                    </a>
+                  );
+                },
               },
               {
                 key: "diffMerkleRoot",
                 label: "Merkle Root",
-                render: (r) => (
-                  <span
-                    title={String(r.diffMerkleRoot ?? "")}
-                    className="font-mono text-[10px]"
-                    style={{ color: "#d0d0d0" }}
-                  >
-                    {shortHash(r.diffMerkleRoot as string)}
-                  </span>
-                ),
+                render: (r) => {
+                  const hash = r.diffMerkleRoot as string;
+                  if (!hash) return <span style={{ color: "#d0d0d0" }}>-</span>;
+                  return (
+                    <a
+                      href={`https://sepolia.etherscan.io/search?q=${hash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-[10px] hover:underline"
+                      style={{ color: "#3B82F6" }}
+                      title={hash}
+                    >
+                      {shortHash(hash)}
+                    </a>
+                  );
+                },
+              },
+              {
+                key: "transactionHash",
+                label: "Tx Hash",
+                render: (r) => {
+                  const hash = (r.transactionHash || r.txHash) as string;
+                  if (!hash) return <span style={{ color: "#d0d0d0" }}>-</span>;
+                  return (
+                    <a
+                      href={`https://sepolia.etherscan.io/tx/${hash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-[10px] hover:underline"
+                      style={{ color: "#3B82F6" }}
+                      title={hash}
+                    >
+                      {shortHash(hash)}
+                    </a>
+                  );
+                },
+              },
+              {
+                key: "contractAddress",
+                label: "Contract",
+                render: (r) => {
+                  const addr = r.contractAddress as string;
+                  if (!addr) return <span style={{ color: "#d0d0d0" }}>-</span>;
+                  return (
+                    <a
+                      href={`https://sepolia.etherscan.io/address/${addr}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-[10px] hover:underline"
+                      style={{ color: "#3B82F6" }}
+                      title={addr}
+                    >
+                      {shortHash(addr)}
+                    </a>
+                  );
+                },
               },
             ]}
             rows={piRows}
@@ -497,17 +551,44 @@ export const CREProofView: React.FC = () => {
                 ),
               },
               {
-                key: "txHash",
+                key: "transactionHash",
                 label: "Tx Hash",
-                render: (r) => (
-                  <span
-                    className="font-mono text-[10px]"
-                    style={{ color: "#d0d0d0" }}
-                    title={String(r.txHash ?? "")}
-                  >
-                    {shortHash(r.txHash as string)}
-                  </span>
-                ),
+                render: (r) => {
+                  const hash = r.transactionHash as string;
+                  if (!hash) return <span style={{ color: "#d0d0d0" }}>-</span>;
+                  return (
+                    <a
+                      href={`https://sepolia.etherscan.io/tx/${hash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-[10px] hover:underline"
+                      style={{ color: "#3B82F6" }}
+                      title={hash}
+                    >
+                      {shortHash(hash)}
+                    </a>
+                  );
+                },
+              },
+              {
+                key: "contractAddress",
+                label: "Contract",
+                render: (r) => {
+                  const hash = r.contractAddress as string;
+                  if (!hash) return <span style={{ color: "#d0d0d0" }}>-</span>;
+                  return (
+                    <a
+                      href={`https://sepolia.etherscan.io/tx/${hash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-[10px] hover:underline"
+                      style={{ color: "#3B82F6" }}
+                      title={hash}
+                    >
+                      {shortHash(hash)}
+                    </a>
+                  );
+                },
               },
             ]}
             rows={bsRows}
@@ -557,15 +638,22 @@ export const CREProofView: React.FC = () => {
               {
                 key: "merkleRoot",
                 label: "Merkle Root",
-                render: (r) => (
-                  <span
-                    className="font-mono text-[10px]"
-                    style={{ color: "#d0d0d0" }}
-                    title={String(r.merkleRoot ?? "")}
-                  >
-                    {shortHash(r.merkleRoot as string)}
-                  </span>
-                ),
+                render: (r) => {
+                  const hash = r.merkleRoot as string;
+                  if (!hash) return <span style={{ color: "#d0d0d0" }}>-</span>;
+                  return (
+                    <a
+                      href={`https://sepolia.etherscan.io/search?q=${hash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-[10px] hover:underline"
+                      style={{ color: "#3B82F6" }}
+                      title={hash}
+                    >
+                      {shortHash(hash)}
+                    </a>
+                  );
+                },
               },
               {
                 key: "totalPayout",
@@ -712,15 +800,23 @@ export const CREProofView: React.FC = () => {
                 {
                   key: "receiver",
                   label: "Receiver",
-                  render: (r) => (
-                    <span
-                      className="font-mono text-[10px]"
-                      style={{ color: "#d0d0d0" }}
-                      title={String(r.receiver ?? "")}
-                    >
-                      {shortHash(r.receiver as string)}
-                    </span>
-                  ),
+                  render: (r) => {
+                    const addr = r.receiver as string;
+                    if (!addr)
+                      return <span style={{ color: "#d0d0d0" }}>-</span>;
+                    return (
+                      <a
+                        href={`https://sepolia.etherscan.io/address/${addr}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-mono text-[10px] hover:underline"
+                        style={{ color: "#3B82F6" }}
+                        title={addr}
+                      >
+                        {shortHash(addr)}
+                      </a>
+                    );
+                  },
                 },
               ]}
               rows={lpDistRows}
@@ -767,28 +863,44 @@ export const CREProofView: React.FC = () => {
                 {
                   key: "receiver",
                   label: "Receiver",
-                  render: (r) => (
-                    <span
-                      className="font-mono text-[10px]"
-                      style={{ color: "#d0d0d0" }}
-                      title={String(r.receiver ?? "")}
-                    >
-                      {shortHash(r.receiver as string)}
-                    </span>
-                  ),
+                  render: (r) => {
+                    const addr = r.receiver as string;
+                    if (!addr)
+                      return <span style={{ color: "#d0d0d0" }}>-</span>;
+                    return (
+                      <a
+                        href={`https://sepolia.etherscan.io/address/${addr}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-mono text-[10px] hover:underline"
+                        style={{ color: "#3B82F6" }}
+                        title={addr}
+                      >
+                        {shortHash(addr)}
+                      </a>
+                    );
+                  },
                 },
                 {
                   key: "txHash",
                   label: "Tx Hash",
-                  render: (r) => (
-                    <span
-                      className="font-mono text-[10px]"
-                      style={{ color: "#d0d0d0" }}
-                      title={String(r.txHash ?? "")}
-                    >
-                      {shortHash(r.txHash as string)}
-                    </span>
-                  ),
+                  render: (r) => {
+                    const hash = r.txHash as string;
+                    if (!hash)
+                      return <span style={{ color: "#d0d0d0" }}>-</span>;
+                    return (
+                      <a
+                        href={`https://sepolia.etherscan.io/tx/${hash}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="font-mono text-[10px] hover:underline"
+                        style={{ color: "#3B82F6" }}
+                        title={hash}
+                      >
+                        {shortHash(hash)}
+                      </a>
+                    );
+                  },
                 },
               ]}
               rows={reserveRows}
@@ -853,15 +965,22 @@ export const CREProofView: React.FC = () => {
               {
                 key: "txHash",
                 label: "Tx Hash",
-                render: (r) => (
-                  <span
-                    className="font-mono text-[10px]"
-                    style={{ color: "#d0d0d0" }}
-                    title={String(r.txHash ?? "")}
-                  >
-                    {shortHash(r.txHash as string)}
-                  </span>
-                ),
+                render: (r) => {
+                  const hash = r.transactionHash as string;
+                  if (!hash) return <span style={{ color: "#d0d0d0" }}>-</span>;
+                  return (
+                    <a
+                      href={`https://sepolia.etherscan.io/tx/${hash}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-[10px] hover:underline"
+                      style={{ color: "#3B82F6" }}
+                      title={hash}
+                    >
+                      {shortHash(hash)}
+                    </a>
+                  );
+                },
               },
             ]}
             rows={volRows}
