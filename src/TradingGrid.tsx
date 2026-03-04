@@ -142,7 +142,7 @@ export const TradingGrid: React.FC = () => {
       if (cell.timeWindowStart > now && cell.timeWindowStart - now <= 5000) {
         const hasBet = bets[cell.id] || pendingBets[cell.id];
         if (!hasBet) {
-          toast.error("This grid is closing soon, please select another one", {
+          toast.error("This cell is closing soon, please select another one", {
             style: {
               background: "#252422",
               color: "#f6465d",
