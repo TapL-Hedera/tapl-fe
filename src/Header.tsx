@@ -1131,7 +1131,7 @@ export const Header: React.FC = () => {
                   className="w-full font-semibold px-6 py-3 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 text-sm"
                   style={{
                     background: "#0847F7",
-                    color: "rgba(255, 255, 255, 0.03)",
+                    color: "#ffffff",
                     borderRadius: "4px",
                   }}
                   onMouseEnter={(e) => {
