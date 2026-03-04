@@ -142,11 +142,20 @@ export const TradingGrid: React.FC = () => {
       if (cell.timeWindowStart > now && cell.timeWindowStart - now <= 5000) {
         const hasBet = bets[cell.id] || pendingBets[cell.id];
         if (!hasBet) {
-          toast.error("This cell is closing soon, please select another one", {
+          toast("Cell closing soon. Select another!", {
+            icon: "⏳",
             style: {
-              background: "#252422",
+              background: "rgba(18, 20, 30, 0.95)",
               color: "#f6465d",
               border: "1px solid rgba(246, 70, 93, 0.5)",
+              boxShadow:
+                "0 4px 20px rgba(246, 70, 93, 0.25), inset 0 0 10px rgba(246, 70, 93, 0.1)",
+              backdropFilter: "blur(8px)",
+              fontWeight: "bold",
+              fontSize: "13px",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              letterSpacing: "0.02em",
             },
           });
           return;
@@ -154,20 +163,59 @@ export const TradingGrid: React.FC = () => {
       }
       if (canBet) {
         if (!localStorage.getItem("token")) {
-          toast.error("Please connect wallet and login to place bet");
+          toast("Connect wallet & login to trade!", {
+            icon: "🔐",
+            style: {
+              background: "rgba(18, 20, 30, 0.95)",
+              color: "#ffffff",
+              border: "1px solid rgba(8, 71, 247, 0.5)",
+              boxShadow:
+                "0 4px 20px rgba(8, 71, 247, 0.25), inset 0 0 10px rgba(8, 71, 247, 0.1)",
+              backdropFilter: "blur(8px)",
+              fontWeight: "bold",
+              fontSize: "13px",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              letterSpacing: "0.02em",
+            },
+          });
           return;
         }
         if (!betAmount || betAmount <= 0) {
-          toast.error("Invalid bet amount");
+          toast("Invalid bet amount!", {
+            icon: "⚠️",
+            style: {
+              background: "rgba(18, 20, 30, 0.95)",
+              color: "#eab308",
+              border: "1px solid rgba(234, 179, 8, 0.5)",
+              boxShadow:
+                "0 4px 20px rgba(234, 179, 8, 0.25), inset 0 0 10px rgba(234, 179, 8, 0.1)",
+              backdropFilter: "blur(8px)",
+              fontWeight: "bold",
+              fontSize: "13px",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              letterSpacing: "0.02em",
+            },
+          });
           return;
         }
 
         if (betAmount > balance) {
-          toast.error("Insufficient balance!", {
+          toast("Insufficient balance!", {
+            icon: "💸",
             style: {
-              background: "#252422",
-              color: "#d57455",
-              border: "1px solid rgba(213, 116, 85, 0.5)",
+              background: "rgba(18, 20, 30, 0.95)",
+              color: "#f6465d",
+              border: "1px solid rgba(246, 70, 93, 0.5)",
+              boxShadow:
+                "0 4px 20px rgba(246, 70, 93, 0.25), inset 0 0 10px rgba(246, 70, 93, 0.1)",
+              backdropFilter: "blur(8px)",
+              fontWeight: "bold",
+              fontSize: "13px",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              letterSpacing: "0.02em",
             },
           });
           return;

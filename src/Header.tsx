@@ -229,10 +229,6 @@ export const Header: React.FC = () => {
                 break;
               case "balance_update":
                 if (data) {
-                  console.log(
-                    `balance_update at ${data.timestamp ? new Date(Number(data.timestamp)).toLocaleString("en-GB", { timeZone: "Asia/Bangkok" }) : "N/A"}`,
-                    data,
-                  );
                   queryClient.setQueryData(
                     getAccountControllerGetBalanceQueryKey(),
                     data,
@@ -240,17 +236,6 @@ export const Header: React.FC = () => {
                 }
                 break;
               case "order_update":
-                console.log(
-                  `order_update at time ${
-                    data.settledTimestamp
-                      ? new Date(Number(data.settledTimestamp)).toLocaleString(
-                          "en-GB",
-                          { timeZone: "Asia/Bangkok" },
-                        )
-                      : "N/A"
-                  }`,
-                  data,
-                );
                 updateOrder(data);
                 break;
             }

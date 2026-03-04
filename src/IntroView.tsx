@@ -15,6 +15,7 @@ import {
   Cpu,
   ArrowRight,
 } from "lucide-react";
+import { Squares } from "./Squares";
 
 export const IntroView: React.FC = () => {
   const containerVariants = {
@@ -68,15 +69,24 @@ export const IntroView: React.FC = () => {
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto w-full relative">
+    <div className="flex-1 overflow-y-auto w-full relative z-0">
+      <div className="absolute inset-0 z-0">
+        <Squares
+          speed={0.5}
+          squareSize={40}
+          direction="diagonal" // up, down, left, right, diagonal
+          borderColor="rgba(255, 255, 255, 0.05)"
+          hoverFillColor="rgba(8, 71, 247, 0.2)"
+        />
+      </div>
       <div
-        className="absolute top-1/4 left-1/3 w-[600px] h-[600px] opacity-10 pointer-events-none rounded-full blur-[120px]"
+        className="absolute top-1/4 left-1/3 w-[600px] h-[600px] px-0 opacity-10 pointer-events-none rounded-full blur-[120px] z-0"
         style={{
           background: "radial-gradient(circle, #0847F7 0%, transparent 70%)",
         }}
       />
       <div
-        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] opacity-10 pointer-events-none rounded-full blur-[100px]"
+        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] px-0 opacity-10 pointer-events-none rounded-full blur-[100px] z-0"
         style={{
           background: "radial-gradient(circle, #2EBD85 0%, transparent 70%)",
         }}
@@ -85,10 +95,13 @@ export const IntroView: React.FC = () => {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-10 pb-24 lg:pb-12"
+        className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-10 pb-24 lg:pb-12 relative z-10 pointer-events-none"
       >
         {/* Hero Section */}
-        <motion.div variants={itemVariants} className="text-center mb-16 mt-8">
+        <motion.div
+          variants={itemVariants}
+          className="text-center mb-16 mt-8 pointer-events-auto"
+        >
           <div
             className="inline-block px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest mb-6"
             style={{
@@ -127,7 +140,10 @@ export const IntroView: React.FC = () => {
         </motion.div>
 
         {/* How It Works */}
-        <motion.div variants={itemVariants} className="mb-20">
+        <motion.div
+          variants={itemVariants}
+          className="mb-20 pointer-events-auto"
+        >
           <h2 className="text-2xl font-bold mb-3 text-center">How It Works</h2>
           <p
             className="max-w-3xl mx-auto text-center text-sm md:text-base leading-relaxed mb-8"
@@ -184,7 +200,10 @@ export const IntroView: React.FC = () => {
                   STEP {item.step}
                 </div>
                 <h3 className="text-sm font-semibold mb-2">{item.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: "#a0a0a0" }}>
+                <p
+                  className="text-xs leading-relaxed"
+                  style={{ color: "#a0a0a0" }}
+                >
                   {item.desc}
                 </p>
               </div>
@@ -193,7 +212,10 @@ export const IntroView: React.FC = () => {
         </motion.div>
 
         {/* General App Features */}
-        <motion.div variants={itemVariants} className="mb-20">
+        <motion.div
+          variants={itemVariants}
+          className="mb-20 pointer-events-auto"
+        >
           <h2 className="text-2xl font-bold mb-8 text-center">Core Pillars</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
@@ -252,7 +274,10 @@ export const IntroView: React.FC = () => {
         </motion.div>
 
         {/* Highlighted section for CRE Workflow */}
-        <motion.div variants={itemVariants} className="my-16">
+        <motion.div
+          variants={itemVariants}
+          className="my-16 pointer-events-auto"
+        >
           <div
             className="rounded-2xl relative overflow-hidden p-8 md:p-12 border border-[#0847F7]/20"
             style={{
@@ -331,7 +356,10 @@ export const IntroView: React.FC = () => {
         </motion.div>
 
         {/* Architecture diagram abstraction */}
-        <motion.div variants={itemVariants} className="text-center mt-20 mb-10">
+        <motion.div
+          variants={itemVariants}
+          className="text-center mt-20 mb-10 pointer-events-auto"
+        >
           <h2 className="text-2xl font-bold mb-8">Architectural Flow</h2>
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 max-w-4xl mx-auto">
             <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-6 w-full md:w-auto hover:bg-white/10 transition-colors">

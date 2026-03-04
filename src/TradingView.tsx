@@ -3,6 +3,7 @@ import { TradingGrid } from "./TradingGrid";
 import { useGameStore } from "./store";
 import { useAccount } from "wagmi";
 import { useOrderControllerGetUserOrders } from "./services/queries";
+import { HowItWorksModal } from "./HowItWorksModal";
 
 const generateRandomAddress = () => {
   let address = "0x";
@@ -98,6 +99,7 @@ export const TradingView: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col p-2 sm:p-4 md:p-6 relative overflow-hidden">
+      <HowItWorksModal />
       {/* Ambient Purple Glow */}
       <div
         className="absolute top-1/4 left-1/4 w-[600px] h-[600px] rounded-full pointer-events-none opacity-40"
