@@ -57,7 +57,12 @@ export const TradingGrid: React.FC = () => {
           triggeredWinsRef.current.add(cell.id);
           // Vegas style confetti
           const count = 200;
-          const defaults = { origin: { y: 0.6 }, zIndex: 10000 };
+          const defaults = {
+            origin: { y: 0.6 },
+            zIndex: 10000,
+            scalar: 0.5,
+            ticks: 60,
+          };
           function fire(particleRatio: number, opts: confetti.Options) {
             confetti(
               Object.assign({}, defaults, opts, {
@@ -74,14 +79,14 @@ export const TradingGrid: React.FC = () => {
           fire(0.35, {
             spread: 100,
             decay: 0.91,
-            scalar: 0.8,
+            scalar: 0.4,
             colors: ["#2ebd85", "#ffffff", "#eab308"],
           });
           fire(0.1, {
             spread: 120,
             startVelocity: 25,
             decay: 0.92,
-            scalar: 1.2,
+            scalar: 0.6,
             colors: ["#2ebd85", "#ffffff", "#eab308"],
           });
           fire(0.1, {
@@ -433,23 +438,23 @@ export const TradingGrid: React.FC = () => {
                   borderColor: "rgba(255, 255, 255, 0.05)",
                   background:
                     isHit && hasAnyBet
-                      ? "rgba(46,189,133,0.15)"
+                      ? "rgba(46,189,133,0.35)"
                       : !isPast && hasAnyBet
-                        ? "rgba(8, 71, 247, 0.08)"
+                        ? "linear-gradient(180deg, rgba(22, 40, 81, 0.25) 0%, rgba(9, 22, 53, 0.35) 100%)"
                         : isNext && !hasAnyBet
                           ? "rgba(246,70,93,0.06)"
                           : undefined,
                   boxShadow:
                     isHit && hasAnyBet
-                      ? "0 0 20px rgba(46,189,133,0.3), inset 0 0 20px rgba(46,189,133,0.15)"
+                      ? "0 0 20px rgba(46,189,133,0.5), inset 0 0 30px rgba(46,189,133,0.35)"
                       : !isPast && hasAnyBet
-                        ? "inset 0 0 16px rgba(8, 71, 247, 0.1)"
+                        ? "0 0 15px rgba(50, 110, 255, 0.3), inset 0 0 30px rgba(50, 110, 255, 0.3)"
                         : undefined,
                   outline:
                     isHit && hasAnyBet
                       ? "1px solid #2EBD85"
                       : !isPast && hasAnyBet
-                        ? "1px solid rgba(8, 71, 247, 0.3)"
+                        ? "1px solid #0847F7"
                         : undefined,
                 }}
                 onClick={() => handlePlaceBet(cell, canBet)}
