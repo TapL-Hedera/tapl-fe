@@ -10,12 +10,11 @@ import {
   Lock,
   Globe,
   Database,
-  TerminalSquare,
   Network,
-  Cpu,
   ArrowRight,
 } from "lucide-react";
 import { Squares } from "./Squares";
+import { CreWorkflowAnimation } from "./CreWorkflowAnimation";
 
 export const IntroView: React.FC = () => {
   const containerVariants = {
@@ -273,6 +272,15 @@ export const IntroView: React.FC = () => {
           </div>
         </motion.div>
 
+        {/* Architecture diagram abstraction */}
+        <motion.div
+          variants={itemVariants}
+          className="text-center mt-20 mb-10 w-full max-w-4xl mx-auto pointer-events-auto"
+        >
+          <h2 className="text-2xl font-bold mb-8">Architectural Flow</h2>
+          <CreWorkflowAnimation />
+        </motion.div>
+
         {/* Highlighted section for CRE Workflow */}
         <motion.div
           variants={itemVariants}
@@ -351,69 +359,6 @@ export const IntroView: React.FC = () => {
                   </motion.div>
                 ))}
               </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Architecture diagram abstraction */}
-        <motion.div
-          variants={itemVariants}
-          className="text-center mt-20 mb-10 pointer-events-auto"
-        >
-          <h2 className="text-2xl font-bold mb-8">Architectural Flow</h2>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 max-w-4xl mx-auto">
-            <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-6 w-full md:w-auto hover:bg-white/10 transition-colors">
-              <TerminalSquare
-                size={28}
-                className="mx-auto mb-3 text-[#0847F7]"
-              />
-              <h4 className="font-semibold text-sm mb-2">1. Frontend UX</h4>
-              <p className="text-xs text-[#a0a0a0]">
-                User predicts BTC price with click. Order signed via EVM wallet.
-              </p>
-            </div>
-
-            <div className="rotate-90 md:rotate-0 text-[#d0d0d0] shrink-0">
-              <motion.div
-                animate={{ x: [0, 5, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-              >
-                ➜
-              </motion.div>
-            </div>
-
-            <div className="flex-1 bg-white/5 border rounded-xl p-6 w-full md:w-auto hover:bg-[#0847F7]/10 transition-colors border-[#0847F7]/30 shadow-[0_0_30px_rgba(8,71,247,0.15)] relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0847F7] text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded">
-                Chainlink CRE
-              </div>
-              <Cpu size={28} className="mx-auto mb-3 text-[#0847F7]" />
-              <h4 className="font-semibold text-sm mb-2">
-                2. Processing Engine
-              </h4>
-              <p className="text-xs text-white/80">
-                Validates Streams price, builds batches, calculates score &
-                solvency.
-              </p>
-            </div>
-
-            <div className="rotate-90 md:rotate-0 text-[#d0d0d0] shrink-0">
-              <motion.div
-                animate={{ x: [0, 5, 0] }}
-                transition={{ repeat: Infinity, duration: 1.5, delay: 0.2 }}
-              >
-                ➜
-              </motion.div>
-            </div>
-
-            <div className="flex-1 bg-white/5 border border-white/10 rounded-xl p-6 w-full md:w-auto hover:bg-white/10 transition-colors">
-              <Layers size={28} className="mx-auto mb-3 text-[#2EBD85]" />
-              <h4 className="font-semibold text-sm mb-2">
-                3. On-chain Settlement
-              </h4>
-              <p className="text-xs text-[#a0a0a0]">
-                Zero-knowledge Merkle proofs submitted. Winnings released via
-                Smart Contract.
-              </p>
             </div>
           </div>
         </motion.div>
