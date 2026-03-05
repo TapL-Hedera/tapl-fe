@@ -100,22 +100,26 @@ export const LandingPage: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5">
+          <Link to="/" className="flex items-center gap-3">
             <div
-              className="w-8 h-8 rounded flex items-center justify-center"
-              style={{ background: "rgba(8, 71, 247,0.12)" }}
+              className="w-9 h-9 rounded-lg flex items-center justify-center relative overflow-hidden group"
+              style={{
+                background: "linear-gradient(135deg, #0847F7 0%, #002280 100%)",
+                boxShadow: "0 4px 12px rgba(8, 71, 247, 0.4)",
+              }}
             >
               <img
                 src="/tapl.png"
                 alt="tapl"
-                className="w-5 h-5 object-contain"
+                className="w-6 h-6 object-contain relative z-10"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
                 }}
               />
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <span className="text-base font-bold" style={{ color: "#0847F7" }}>
-              TAPL
+            <span className="text-lg font-black tracking-tighter uppercase italic text-white">
+              TAPL<span style={{ color: "#0847F7" }}>.</span>
             </span>
           </Link>
 
@@ -331,7 +335,7 @@ export const LandingPage: React.FC = () => {
             >
               {/* Top Left Circle & Dots */}
               <div
-                className="absolute top-4 left-4 w-[10px] h-[10px] rounded-full border-[2px]"
+                className="absolute top-4 left-4 w-[10px] h-[10px] rounded-full border-2"
                 style={{
                   borderColor: item.color,
                   boxShadow: `0 0 10px ${item.color}`,
@@ -354,7 +358,7 @@ export const LandingPage: React.FC = () => {
 
               {/* Top Right Circle */}
               <div
-                className="absolute top-4 right-4 w-[10px] h-[10px] rounded-full border-[2px]"
+                className="absolute top-4 right-4 w-[10px] h-[10px] rounded-full border-2"
                 style={{
                   borderColor: item.color,
                   boxShadow: `0 0 10px ${item.color}`,
@@ -412,7 +416,7 @@ export const LandingPage: React.FC = () => {
                   className="sci-card p-6 group"
                 >
                   <div
-                    className="absolute top-4 left-4 w-[10px] h-[10px] rounded-full border-[2px]"
+                    className="absolute top-4 left-4 w-[10px] h-[10px] rounded-full border-2"
                     style={{
                       borderColor: "#0847F7",
                       boxShadow: "0 0 10px #0847F7",
@@ -433,7 +437,7 @@ export const LandingPage: React.FC = () => {
                     />
                   </div>
                   <div
-                    className="absolute top-4 right-4 w-[10px] h-[10px] rounded-full border-[2px]"
+                    className="absolute top-4 right-4 w-[10px] h-[10px] rounded-full border-2"
                     style={{
                       borderColor: "#0847F7",
                       boxShadow: "0 0 10px #0847F7",

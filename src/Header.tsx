@@ -351,15 +351,28 @@ export const Header: React.FC = () => {
     >
       {/* ── Row 1 (always visible): logo + market + price + wallet ── */}
       <div className="flex items-center gap-3 h-14 xl:h-auto">
-        {/* tapl logo — mobile only */}
-        <img
-          src="/tapl.png"
-          alt="tapl"
-          className="xl:hidden w-6 h-6 object-contain shrink-0"
-          onError={(e) => {
-            (e.target as HTMLImageElement).style.display = "none";
-          }}
-        />
+        {/* tapl logo */}
+        <div className="flex items-center gap-2 mr-2">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center relative overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, #0847F7 0%, #002280 100%)",
+              boxShadow: "0 2px 8px rgba(8, 71, 247, 0.3)",
+            }}
+          >
+            <img
+              src="/tapl.png"
+              alt="tapl"
+              className="w-5 h-5 object-contain relative z-10"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+          </div>
+          <span className="hidden sm:block text-lg font-black tracking-tighter italic mr-2">
+            TAPL<span style={{ color: "#0847F7" }}>.</span>
+          </span>
+        </div>
 
         {/* Market badge */}
         <div

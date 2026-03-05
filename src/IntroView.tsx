@@ -94,12 +94,38 @@ export const IntroView: React.FC = () => {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-10 pb-24 lg:pb-12 relative z-10 pointer-events-none"
+        className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-6 pb-24 lg:pb-12 relative z-10 pointer-events-none"
       >
+        {/* Navigation Header */}
+        <div className="flex justify-between items-center mb-12 pointer-events-auto">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center relative overflow-hidden group"
+              style={{
+                background: "linear-gradient(135deg, #0847F7 0%, #002280 100%)",
+                boxShadow: "0 4px 15px rgba(8, 71, 247, 0.4)",
+              }}
+            >
+              <img
+                src="/tapl.png"
+                alt="tapl"
+                className="w-7 h-7 object-contain relative z-10"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
+              />
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <span className="text-xl font-black tracking-tighter uppercase italic text-[#0847F7]">
+              TAPL
+            </span>
+          </div>
+        </div>
+
         {/* Hero Section */}
         <motion.div
           variants={itemVariants}
-          className="text-center mb-16 mt-8 pointer-events-auto"
+          className="text-center mb-16 mt-4 pointer-events-auto"
         >
           <div
             className="inline-block px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest mb-6"
@@ -127,13 +153,13 @@ export const IntroView: React.FC = () => {
           <div className="flex justify-center mt-10">
             <Link
               to="/trade"
-              className="px-8 py-3 rounded text-sm font-bold font-mono tracking-widest flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-[0_4px_20px_rgba(8,71,247,0.3)] hover:shadow-[0_4px_30px_rgba(8,71,247,0.5)]"
+              className="px-5 py-2.5 rounded-lg text-xs font-bold font-mono tracking-wider transition-all hover:scale-105 active:scale-95 border border-[#0847F7]/30 hover:border-[#0847F7] w-[200px]"
               style={{
-                background: "#0847F7",
+                background: "rgba(8, 71, 247, 0.1)",
                 color: "#ffffff",
               }}
             >
-              START TRADING <ArrowRight size={16} />
+              LAUNCH APP
             </Link>
           </div>
         </motion.div>
