@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, type Variants } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -11,10 +11,83 @@ import {
   Globe,
   Database,
   Network,
-  ArrowRight,
 } from "lucide-react";
 import { Squares } from "./Squares";
-import { CreWorkflowAnimation } from "./CreWorkflowAnimation";
+import {
+  PriceIntegrityCREWorkflow,
+  ProofOfReserveWorkflow,
+  RegimeModelCREWorkflow,
+  SettlementCREWorkflow,
+} from "./WorkflowDiagrams";
+
+const WORKFLOW_TABS = [
+  {
+    label: "Price Integrity",
+    color: "#F472B6",
+    Component: PriceIntegrityCREWorkflow,
+  },
+  {
+    label: "Proof of Reserve",
+    color: "#6EE7B7",
+    Component: ProofOfReserveWorkflow,
+  },
+  {
+    label: "Regime Model",
+    color: "#FB923C",
+    Component: RegimeModelCREWorkflow,
+  },
+  { label: "Settlement", color: "#818CF8", Component: SettlementCREWorkflow },
+];
+
+const WorkflowDiagramTabs: React.FC = () => {
+  const [active, setActive] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setActive((prev) => (prev + 1) % WORKFLOW_TABS.length);
+    }, 7000);
+    return () => clearInterval(timer);
+  }, [isPaused]);
+
+  const { Component } = WORKFLOW_TABS[active];
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2 justify-center mb-6 relative">
+        {WORKFLOW_TABS.map((tab, i) => (
+          <button
+            key={i}
+            onClick={() => {
+              setActive(i);
+              setIsPaused(true);
+            }}
+            className="px-4 py-1.5 rounded-lg text-[14px] font-bold font-mono tracking-wider transition-all border"
+            style={{
+              background:
+                active === i ? `${tab.color}20` : "rgba(255,255,255,0.04)",
+              color: active === i ? tab.color : "#666",
+              borderColor:
+                active === i ? `${tab.color}50` : "rgba(255,255,255,0.08)",
+            }}
+          >
+            {tab.label}
+          </button>
+        ))}
+        {isPaused && (
+          <button
+            onClick={() => setIsPaused(false)}
+            className="absolute px-3 py-1.5 rounded-lg text-[10px] font-bold font-mono tracking-wider transition-all border border-blue-500/30 text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 top-15 -right-[200px] z-99"
+          >
+            ▶ RESUME AUTO-SWITCH
+          </button>
+        )}
+      </div>
+      <Component key={active} />
+    </div>
+  );
+};
 
 export const IntroView: React.FC = () => {
   const containerVariants = {
@@ -164,6 +237,18 @@ export const IntroView: React.FC = () => {
           </div>
         </motion.div>
 
+        {/* CRE Workflow Diagrams — Tabbed */}
+        <motion.div
+          variants={itemVariants}
+          className="mt-20 mb-10 w-full max-w-5xl mx-auto pointer-events-auto"
+        >
+          <h2 className="text-3xl font-bold mb-2 text-center">
+            Powered by CRE{" "}
+          </h2>
+
+          <WorkflowDiagramTabs />
+        </motion.div>
+
         {/* How It Works */}
         <motion.div
           variants={itemVariants}
@@ -296,15 +381,6 @@ export const IntroView: React.FC = () => {
               </div>
             ))}
           </div>
-        </motion.div>
-
-        {/* Architecture diagram abstraction */}
-        <motion.div
-          variants={itemVariants}
-          className="text-center mt-20 mb-10 w-full max-w-4xl mx-auto pointer-events-auto"
-        >
-          <h2 className="text-2xl font-bold mb-8">Architectural Flow</h2>
-          <CreWorkflowAnimation />
         </motion.div>
 
         {/* Highlighted section for CRE Workflow */}
