@@ -36,6 +36,7 @@ export interface WorkflowConfig {
   title: string;
   subtitle: string;
   accentColor: string;
+  labelScale?: number;
   width: number;
   height: number;
   nodes: NodeDef[];
@@ -112,7 +113,8 @@ const WorkflowNode: React.FC<{
   node: NodeDef;
   active?: boolean;
   visited?: boolean;
-}> = ({ node, active, visited }) => {
+  labelScale?: number;
+}> = ({ node, active, visited, labelScale = 1 }) => {
   const {
     x,
     y,
@@ -128,6 +130,8 @@ const WorkflowNode: React.FC<{
 
   const nodeOpacity = visited ? 1 : 0.4;
   const strokeWidth = active ? 3 : 2;
+  const labelFontSize = 11 * labelScale;
+  const multiLineOffset = 12 * labelScale;
 
   if (shape === "network") {
     return (
@@ -137,7 +141,7 @@ const WorkflowNode: React.FC<{
           x={x}
           y={y + w / 2 + 14}
           textAnchor="middle"
-          fontSize={9}
+          fontSize={labelFontSize}
           fill={color}
           fontFamily="'JetBrains Mono',monospace"
           fontWeight="500"
@@ -174,7 +178,7 @@ const WorkflowNode: React.FC<{
           x={x}
           y={y + w / 2 + 14}
           textAnchor="middle"
-          fontSize={9}
+          fontSize={labelFontSize}
           fill={color}
           fontFamily="'JetBrains Mono',monospace"
           fontWeight="500"
@@ -248,10 +252,13 @@ const WorkflowNode: React.FC<{
         <text
           key={i}
           x={x}
-          y={y + (lines.length === 1 ? 0 : (i - (lines.length - 1) / 2) * 12)}
+          y={
+            y +
+            (lines.length === 1 ? 0 : (i - (lines.length - 1) / 2) * multiLineOffset)
+          }
           textAnchor="middle"
           dominantBaseline="middle"
-          fontSize={9}
+          fontSize={labelFontSize}
           fill={color}
           fontFamily="'JetBrains Mono',monospace"
           fontWeight="600"
@@ -329,6 +336,7 @@ interface AnimatedEdgeProps {
   visited: boolean;
   accentColor: string;
   diagramId: string;
+  labelScale?: number;
 }
 
 const AnimatedEdge: React.FC<AnimatedEdgeProps> = ({
@@ -337,6 +345,7 @@ const AnimatedEdge: React.FC<AnimatedEdgeProps> = ({
   toNode,
   active,
   diagramId,
+  labelScale = 1,
 }) => {
   const { d, midX, midY } = computeEdgePath(fromNode, toNode, edge);
   const color = fromNode.color;
@@ -381,7 +390,7 @@ const AnimatedEdge: React.FC<AnimatedEdgeProps> = ({
           x={labelX}
           y={labelY}
           textAnchor="middle"
-          fontSize={9}
+          fontSize={10 * labelScale}
           fill={active ? "#e5e7eb" : "#888"}
           fontFamily="'JetBrains Mono',monospace"
           fontWeight={active ? "700" : "500"}
@@ -404,6 +413,7 @@ const WorkflowDiagram: React.FC<{
   diagramId: string;
 }> = ({ config, isPlaying, step, diagramId }) => {
   const { width, height, nodes, edges, steps, groupBox, accentColor } = config;
+  const labelScale = config.labelScale ?? 1;
 
   const visitedEdgeIds = new Set(edges.map((e) => e.id));
   const activeEdgeId =
@@ -432,8 +442,10 @@ const WorkflowDiagram: React.FC<{
             <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
             <span className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
           </div>
-          <span className="text-[10px] text-gray-400 tracking-wider">
-            {config.title.toLowerCase().replace(/ /g, "-")}.workflow
+          <span className="text-[11px] text-gray-400 tracking-wider">
+            <span style={{ fontSize: `${11 * labelScale}px` }}>
+              {config.title.toLowerCase().replace(/ /g, "-")}.workflow
+            </span>
           </span>
         </div>
         <div className="flex items-center gap-3">
@@ -442,8 +454,11 @@ const WorkflowDiagram: React.FC<{
             style={{ background: isPlaying ? accentColor : "#555" }}
           />
           <span
-            className="text-[9px] font-mono"
-            style={{ color: isPlaying ? accentColor : "accentColor" }}
+            className="text-[10px] font-mono"
+            style={{
+              color: isPlaying ? accentColor : "accentColor",
+              fontSize: `${10 * labelScale}px`,
+            }}
           >
             {isPlaying ? "LIVE" : "PAUSED"}
           </span>
@@ -482,7 +497,7 @@ const WorkflowDiagram: React.FC<{
                   x={groupBox.x + 24}
                   y={groupBox.y + 28}
                   textAnchor="start"
-                  fontSize={14}
+                  fontSize={14 * labelScale}
                   fill={groupBox.color}
                   fontFamily="'JetBrains Mono',monospace"
                   fontWeight="700"
@@ -508,6 +523,7 @@ const WorkflowDiagram: React.FC<{
                   visited={visitedEdgeIds.has(edge.id)}
                   accentColor={accentColor}
                   diagramId={diagramId}
+                  labelScale={labelScale}
                 />
               );
             })}
@@ -526,6 +542,7 @@ const WorkflowDiagram: React.FC<{
                   )
                 }
                 visited={visitedNodeIds.has(node.id) || step === -1}
+                labelScale={labelScale}
               />
             ))}
           </svg>
@@ -549,6 +566,7 @@ export const PRICE_INTEGRITY_CONFIG: WorkflowConfig = {
   title: "Price Integrity CRE Workflow",
   subtitle: "price-integrity-cre.workflow",
   accentColor: "#F472B6",
+  labelScale: 1.3,
   width: 1000,
   height: 650,
   groupBox: {
@@ -934,6 +952,7 @@ export const REGIME_MODEL_CONFIG: WorkflowConfig = {
   title: "Regime Model CRE Workflow",
   subtitle: "regime-model-cre.workflow",
   accentColor: "#FB923C",
+  labelScale: 1.3,
   width: 1000,
   height: 650,
   groupBox: {

@@ -55,7 +55,8 @@ const WorkflowDiagramTabs: React.FC = () => {
 
   return (
     <div>
-      <div className="flex flex-wrap gap-2 justify-center mb-6 relative">
+      <div className="flex flex-wrap gap-2 justify-center mb-6 pb-3 relative">
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-0 h-[1px] w-[min(92%,640px)] bg-white/10" />
         {WORKFLOW_TABS.map((tab, i) => (
           <button
             key={i}
@@ -63,16 +64,36 @@ const WorkflowDiagramTabs: React.FC = () => {
               setActive(i);
               setIsPaused(true);
             }}
-            className="px-4 py-1.5 rounded-lg text-[14px] font-bold font-mono tracking-wider transition-all border"
+            className={`relative px-4 py-1.5 rounded-lg text-[14px] font-mono tracking-wider transition-all border ${
+              active === i
+                ? "font-black scale-[1.05]"
+                : "font-semibold hover:text-white/90 hover:border-white/25 hover:bg-white/[0.06]"
+            }`}
             style={{
               background:
-                active === i ? `${tab.color}20` : "rgba(255,255,255,0.04)",
-              color: active === i ? tab.color : "#666",
+                active === i ? `${tab.color}44` : "rgba(255,255,255,0.04)",
+              color: active === i ? "#ffffff" : "#8f8f8f",
               borderColor:
-                active === i ? `${tab.color}50` : "rgba(255,255,255,0.08)",
+                active === i ? `${tab.color}AA` : "rgba(255,255,255,0.08)",
+              boxShadow:
+                active === i
+                  ? `0 0 0 1px ${tab.color}66, 0 10px 26px ${tab.color}55, inset 0 0 20px ${tab.color}33`
+                  : "none",
+              textShadow: active === i ? `0 0 10px ${tab.color}AA` : "none",
             }}
           >
             {tab.label}
+            {active === i && (
+              <motion.span
+                layoutId="workflow-active-tab-underline"
+                className="absolute -bottom-[10px] left-1.5 right-1.5 h-[3.5px] rounded-full"
+                style={{
+                  background: `linear-gradient(90deg, transparent 0%, ${tab.color} 22%, ${tab.color} 78%, transparent 100%)`,
+                  boxShadow: `0 0 16px ${tab.color}, 0 0 28px ${tab.color}AA`,
+                }}
+                transition={{ type: "spring", stiffness: 420, damping: 34 }}
+              />
+            )}
           </button>
         ))}
         {isPaused && (
