@@ -177,11 +177,11 @@ function PillBadge({
   );
 }
 
-function toBtcDisplay(value: number): string {
+function toLinkDisplay(value: number): string {
   return `${value.toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  })} BTC`;
+  })} LINK`;
 }
 
 function CompactWorkflow({ children }: { children: ReactNode }) {
@@ -197,7 +197,7 @@ export function PriceIntegrityChecksSection({
     const seed = `pi-mock-${index}`;
 
     return {
-      epochId: 120000 + index,
+      epochId: 1969000 + Math.floor(seededRange(`${seed}-epoch`, 0, 1000)),
       scoreBps: Math.round(seededRange(`${seed}-score`, 9720, 9992)),
       ohlcP95Bps: Math.round(seededRange(`${seed}-p95`, 6, 22)),
       isPassed: true,
@@ -313,15 +313,22 @@ export function CommittedSettlementsSection({
 }: WorkflowSectionProps) {
   const displayRows = ensureRows(rows, targetRows, (index) => {
     const seed = `settlement-mock-${index}`;
-    const totalPayout = seededRange(`${seed}-payout`, 12000, 110000);
-    const cap = totalPayout * seededRange(`${seed}-cap`, 1.05, 1.25);
+    const totalPayout = Number(
+      seededRange(`${seed}-payout`, -500, 500).toFixed(2),
+    );
+    const positivePayoutPressure = Math.max(totalPayout, 0) / 500;
+    const capBase = seededRange(`${seed}-cap`, 10, 30);
+    const cap = Math.min(
+      30,
+      Math.max(2, capBase * (1 - positivePayoutPressure * 0.4)),
+    );
     const windowEnd = NOW_SECONDS - index * 1800;
     const windowStart = windowEnd - 900;
 
     return {
       batchId: seededHex(`${seed}-batch`, 64),
       merkleRoot: seededHex(`${seed}-merkle`, 64),
-      totalPayout: Number(totalPayout.toFixed(2)),
+      totalPayout,
       withdrawableCap: Number(cap.toFixed(2)),
       windowStart,
       windowEnd,
@@ -374,16 +381,18 @@ export function CommittedSettlementsSection({
               {
                 key: "totalPayout",
                 label: "Total Payout",
-                render: (row) => (
-                  <span style={{ color: "#34D399" }}>
-                    {fmt(Number(row.totalPayout ?? 0))}
-                  </span>
-                ),
+                render: (row) => {
+                  const payout = Number(row.totalPayout ?? 0);
+                  const color =
+                    payout < 0 ? "#34D399" : payout > 0 ? "#f87171" : "#d0d0d0";
+                  return <span style={{ color }}>{fmt(payout)}</span>;
+                },
               },
               {
                 key: "withdrawableCap",
                 label: "Withdrawable Cap",
-                render: (row) => fmt(Number(row.withdrawableCap ?? 0)),
+                render: (row) =>
+                  toLinkDisplay(Number(row.withdrawableCap ?? 0)),
               },
               {
                 key: "windowStart",
@@ -419,20 +428,20 @@ export function PoolSolvencySection({
   targetRows,
 }: WorkflowSectionProps) {
   const displayRows = ensureRows(rows, targetRows, (index) => ({
-    epochId: 98000 + index,
-    maxSingleBetExposure: seededRange(`solv-mock-exp-${index}`, 8e18, 180e18),
+    epochId:
+      29536449 + Math.floor(seededRange(`solv-mock-epoch-${index}`, 0, 1_000)),
   })).map((row, index) => {
     const seed = rowSeed("solvency", row, index);
 
-    const poolBalance = seededRange(`${seed}-pool`, 1200, 7000);
+    const poolBalance = seededRange(`${seed}-pool`, 10, 30);
     const utilization = seededRange(`${seed}-util`, 0.9905, 0.9995);
     const totalLiability = poolBalance * utilization;
+    const derivedMaxExposure = seededRange(`${seed}-exp`, 1, 50);
 
     const maxExposureRaw = Number(row.maxSingleBetExposure ?? 0);
-    const maxExposure =
-      maxExposureRaw > 0
-        ? maxExposureRaw / 1e18
-        : seededRange(`${seed}-exp`, 8, 180);
+    const maxExposureBase =
+      maxExposureRaw > 0 ? maxExposureRaw / 1e18 : derivedMaxExposure;
+    const maxExposure = Math.min(maxExposureBase, 50);
 
     return {
       epochId: row.epochId ?? 98000 + index,
@@ -474,14 +483,14 @@ export function PoolSolvencySection({
                 label: "Pool Balance",
                 render: (row) => (
                   <span style={{ color: "#63B3ED" }}>
-                    {toBtcDisplay(Number(row.poolBalance ?? 0))}
+                    {toLinkDisplay(Number(row.poolBalance ?? 0))}
                   </span>
                 ),
               },
               {
                 key: "totalLiability",
                 label: "Total Liability",
-                render: (row) => toBtcDisplay(Number(row.totalLiability ?? 0)),
+                render: (row) => toLinkDisplay(Number(row.totalLiability ?? 0)),
               },
               {
                 key: "utilization",
@@ -502,7 +511,7 @@ export function PoolSolvencySection({
               {
                 key: "maxExposure",
                 label: "Max Bet Exposure",
-                render: (row) => toBtcDisplay(Number(row.maxExposure ?? 0)),
+                render: (row) => toLinkDisplay(Number(row.maxExposure ?? 0)),
               },
             ]}
             rows={displayRows}
@@ -521,18 +530,24 @@ export function VolatilityRegimeSection({
   isLoading,
   targetRows,
 }: WorkflowSectionProps) {
-  const displayRows = ensureRows(rows, targetRows, (index) => ({
-    regimeId: `R-${380 + index}`,
-    transactionHash: seededHex(`vol-mock-tx-${index}`, 64),
-  })).map((row, index) => {
+  const displayRows = ensureRows(rows, targetRows, (index) => {
+    const seed = `vol-mock-${index}`;
+    return {
+      regimeId:
+        1772187117578 + Math.floor(seededRange(`${seed}-regime-id`, 0, 1000)),
+      transactionHash: seededHex(`${seed}-tx`, 64),
+    };
+  }).map((row, index) => {
     const seed = rowSeed("volatility", row, index);
+    const fallbackRegimeId =
+      1772187117578 + Math.floor(seededRange(`${seed}-regime-id`, 0, 1000));
 
     const btcBand = seededJitter(`${seed}-btc-band`, 20, 0.15);
     const nearMultiplier = seededJitter(`${seed}-near-m`, 1.2, 0.12);
     const farMultiplier = seededJitter(`${seed}-far-m`, 100, 0.15);
 
     return {
-      regimeId: row.regimeId ?? `R-${380 + index}`,
+      regimeId: row.regimeId ?? fallbackRegimeId,
       bandWidth: `BTC $${btcBand.toFixed(2)}`,
       windowSec: Math.max(
         4,

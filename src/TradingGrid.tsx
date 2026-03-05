@@ -241,7 +241,6 @@ export const TradingGrid: React.FC = () => {
             cell: cellOrigin,
             userSignature: signature,
           };
-          console.log("payload: ", payload);
 
           socket.emit("place_bet", payload);
         }

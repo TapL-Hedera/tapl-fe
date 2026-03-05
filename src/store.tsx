@@ -380,7 +380,6 @@ export const useGameStore = create<GameState>((set) => ({
 
   updateGrid: (newCells) =>
     set((state) => {
-      console.log("updateGrid newCells: ", newCells);
       const now = Date.now();
 
       const remoteIds = new Set<string>();
@@ -452,7 +451,6 @@ export const useGameStore = create<GameState>((set) => ({
         return c.timeWindowEnd > now - 60000;
       });
 
-      console.log("finalCells", finalCells);
       return { cells: finalCells };
     }),
 
