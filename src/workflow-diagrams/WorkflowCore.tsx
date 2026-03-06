@@ -254,7 +254,9 @@ const WorkflowNode: React.FC<{
           x={x}
           y={
             y +
-            (lines.length === 1 ? 0 : (i - (lines.length - 1) / 2) * multiLineOffset)
+            (lines.length === 1
+              ? 0
+              : (i - (lines.length - 1) / 2) * multiLineOffset)
           }
           textAnchor="middle"
           dominantBaseline="middle"
@@ -614,7 +616,7 @@ export const PRICE_INTEGRITY_CONFIG: WorkflowConfig = {
     // Inside group – left: Chainlink monitor icon
     {
       id: "cps_icon",
-      label: "Chainlink Price Stream",
+      label: "Chainlink Price Feed API",
       x: 140,
       y: 330,
       w: 80,
