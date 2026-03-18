@@ -69,7 +69,7 @@ const operatingFlow = [
     step: "01",
     title: "Connect and authenticate",
     description:
-      "Start with wallet signature or demo mode so the product is understandable before capital is committed.",
+      "Start with a wallet signature so the product is tied directly to your on-chain account from the first session.",
   },
   {
     step: "02",

@@ -13,7 +13,6 @@ import {
   useSwitchChain,
 } from "wagmi";
 import { moonbaseAlpha } from "wagmi/chains";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { ChevronDown } from "lucide-react";
 import { BACKEND_URL } from "./constant";
 import {
@@ -80,20 +79,13 @@ export const Header: React.FC = () => {
   const setConnection = useGameStore((state) => state.setConnection);
   const updateOrder = useGameStore((state) => state.updateOrder);
   const updateBalance = useGameStore((state) => state.updateBalance);
-  const isDemoMode = useGameStore((state) => state.isDemoMode);
-  const demoAddress = useGameStore((state) => state.demoAddress);
-  const setDemoMode = useGameStore((state) => state.setDemoMode);
-  const setDemoAddress = useGameStore((state) => state.setDemoAddress);
 
   const location = useLocation();
   const {
-    address: realAddress,
-    isConnected: isRealConnected,
+    address,
+    isConnected,
     chain,
   } = useAccount();
-
-  const address = isDemoMode ? demoAddress : realAddress;
-  const isConnected = isDemoMode || isRealConnected;
 
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
@@ -102,7 +94,6 @@ export const Header: React.FC = () => {
   const queryClient = useQueryClient();
 
   const [walletMenuOpen, setWalletMenuOpen] = useState(false);
-  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("token"),
   );
@@ -115,6 +106,12 @@ export const Header: React.FC = () => {
 
   const { data: balanceData, refetch: refetchBalance } =
     useAccountControllerGetBalance();
+
+  useEffect(() => {
+    localStorage.removeItem("is-demo-mode");
+    localStorage.removeItem("demo-wallet-address");
+    localStorage.removeItem("demo-private-key");
+  }, []);
 
   useEffect(() => {
     if (
@@ -168,11 +165,7 @@ export const Header: React.FC = () => {
       const challenge = (challengeRes as unknown as { challenge: string })
         .challenge;
 
-      const signature = isDemoMode
-        ? await privateKeyToAccount(
-            localStorage.getItem("demo-private-key") as `0x${string}`,
-          ).signMessage({ message: challenge })
-        : await signMessageAsync({ message: challenge });
+      const signature = await signMessageAsync({ message: challenge });
 
       const loginRes = await authControllerLogin({
         method: "POST",
@@ -197,7 +190,7 @@ export const Header: React.FC = () => {
   useEffect(() => {
     handleLogin();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address, isDemoMode]);
+  }, [isConnected, address]);
 
   useEffect(() => {
     let socket: Socket | null = null;
@@ -295,69 +288,14 @@ export const Header: React.FC = () => {
     updatePrice,
   ]);
 
-  const startDemo = async () => {
-    try {
-      setIsDemoLoading(true);
-      const newPk = generatePrivateKey();
-      const account = privateKeyToAccount(newPk);
-      localStorage.setItem("demo-private-key", newPk);
-
-      const newAddress = account.address;
-      setDemoAddress(newAddress);
-
-      const challengeRes = await authControllerGetChallenge({
-        address: newAddress,
-      });
-      const challenge = (challengeRes as unknown as { challenge: string })
-        .challenge;
-      const signature = await account.signMessage({ message: challenge });
-
-      const loginRes = await authControllerLogin({
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: newAddress, signature }),
-      });
-      const accessToken = (loginRes as unknown as { accessToken: string })
-        .accessToken;
-
-      localStorage.setItem("token", accessToken);
-      localStorage.setItem("wallet-address", newAddress);
-      setToken(accessToken);
-
-      await fetch(`${BACKEND_URL}/api/payment/debug/deposit`, {
-        method: "POST",
-        headers: {
-          accept: "*/*",
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: "100",
-          txHash: `0x${Date.now()}`,
-          logIndex: 2,
-        }),
-      });
-
-      setDemoMode(true);
-      refetchBalance();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsDemoLoading(false);
-    }
-  };
-
   const handleDisconnect = () => {
-    if (isDemoMode) {
-      setDemoMode(false);
-      setDemoAddress(null);
-      localStorage.removeItem("demo-private-key");
-    } else {
-      disconnect();
-    }
+    disconnect();
 
     localStorage.removeItem("token");
     localStorage.removeItem("wallet-address");
+    localStorage.removeItem("is-demo-mode");
+    localStorage.removeItem("demo-wallet-address");
+    localStorage.removeItem("demo-private-key");
     setToken(null);
     promptedAddress.current = null;
     setWalletMenuOpen(false);
@@ -420,19 +358,12 @@ export const Header: React.FC = () => {
 
           <div className="ml-auto flex items-center gap-2">
             {!isConnected ? (
-              <>
-                <HeaderButton
-                  label={isDemoLoading ? "Starting demo" : "Demo mode"}
-                  onClick={startDemo}
-                  badge="beta"
-                />
-                <HeaderButton
-                  label="Connect wallet"
-                  onClick={() => connect({ connector: connectors[0] })}
-                  variant="primary"
-                />
-              </>
-            ) : chain?.id !== moonbaseAlpha.id && !isDemoMode ? (
+              <HeaderButton
+                label="Connect wallet"
+                onClick={() => connect({ connector: connectors[0] })}
+                variant="primary"
+              />
+            ) : chain?.id !== moonbaseAlpha.id ? (
               <HeaderButton
                 label={isPendingSwitch ? "Switching" : "Switch network"}
                 onClick={() => switchChain?.({ chainId: moonbaseAlpha.id })}
@@ -462,11 +393,6 @@ export const Header: React.FC = () => {
                     <span className="font-mono text-[13px]">
                       {address?.slice(0, 6)}...{address?.slice(-4)}
                     </span>
-                    {isDemoMode ? (
-                      <span className="rounded-md bg-[#f0b90b]/14 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0b90b]">
-                        Demo
-                      </span>
-                    ) : null}
                     <ChevronDown size={15} className="text-white/48" />
                   </button>
 
@@ -474,7 +400,7 @@ export const Header: React.FC = () => {
                     <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-64 overflow-hidden rounded-2xl border border-white/8 bg-[#101010] shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
                       <div className="border-b border-white/8 px-4 py-3">
                         <p className="text-[11px] font-medium text-white/42">
-                          {isDemoMode ? "Demo wallet" : "Connected wallet"}
+                          Connected wallet
                         </p>
                         <p className="mt-2 break-all font-mono text-xs text-white">
                           {address?.slice(0, 6)}...{address?.slice(-4)}

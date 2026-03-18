@@ -270,7 +270,7 @@ export const LandingPage: React.FC = () => {
 
           {/* Hero sub note */}
           <p className="mt-6 text-xs" style={{ color: "#a0a0a0" }}>
-            Demo mode available — no wallet required to get started.
+            Wallet connection is required to authenticate, fund, and start trading.
           </p>
         </motion.div>
 
@@ -495,7 +495,7 @@ export const LandingPage: React.FC = () => {
                 {
                   step: "01",
                   title: "Connect Your Wallet",
-                  desc: "Link any EVM-compatible wallet or start instantly with demo mode — no commitment required.",
+                  desc: "Link any EVM-compatible wallet to authenticate and start trading with your on-chain account.",
                 },
                 {
                   step: "02",

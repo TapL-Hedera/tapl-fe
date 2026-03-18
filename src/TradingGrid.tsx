@@ -53,10 +53,7 @@ export const TradingGrid: React.FC = () => {
   const betAmount = useGameStore((state) => state.betAmount);
   const balance = useGameStore((state) => state.balance);
 
-  const { address: realAddress } = useAccount();
-  const isDemoMode = useGameStore((state) => state.isDemoMode);
-  const demoAddress = useGameStore((state) => state.demoAddress);
-  const address = isDemoMode ? demoAddress : realAddress;
+  const { address } = useAccount();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });

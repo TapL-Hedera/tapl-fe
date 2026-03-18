@@ -43,8 +43,6 @@ interface GameState {
   socket: Socket | null;
   wssKey: string | null;
   betAmount: number;
-  isDemoMode: boolean;
-  demoAddress: string | null;
   serverTimeOffset: number; // diff between server ts and local Date.now()
 
   setConnection: (socket: Socket | null, wssKey: string | null) => void;
@@ -56,8 +54,6 @@ interface GameState {
   updateGrid: (newCells: RemoteCell[]) => void;
   updateBalance: (balance: number) => void;
   setBetAmount: (amount: number) => void;
-  setDemoMode: (isDemoMode: boolean) => void;
-  setDemoAddress: (address: string | null) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setOpenBets: (orders: any[]) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,8 +78,6 @@ export const useGameStore = create<GameState>((set) => ({
   socket: null,
   wssKey: null,
   betAmount: 10,
-  isDemoMode: localStorage.getItem("is-demo-mode") === "true",
-  demoAddress: localStorage.getItem("demo-wallet-address") || null,
   serverTimeOffset: 0,
 
   setConnection: (socket, wssKey) => set({ socket, wssKey }),
@@ -107,20 +101,6 @@ export const useGameStore = create<GameState>((set) => ({
     })),
 
   setBetAmount: (amount) => set({ betAmount: amount }),
-
-  setDemoMode: (isDemoMode) => {
-    localStorage.setItem("is-demo-mode", isDemoMode.toString());
-    set({ isDemoMode });
-  },
-
-  setDemoAddress: (demoAddress) => {
-    if (demoAddress) {
-      localStorage.setItem("demo-wallet-address", demoAddress);
-    } else {
-      localStorage.removeItem("demo-wallet-address");
-    }
-    set({ demoAddress });
-  },
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setOpenBets: (orders: any[]) =>
