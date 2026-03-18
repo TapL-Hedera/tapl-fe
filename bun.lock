@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "vite-project",
+      "name": "polkatap",
       "dependencies": {
         "@headlessui/react": "^2.2.9",
         "@tanstack/react-query": "^5.90.21",

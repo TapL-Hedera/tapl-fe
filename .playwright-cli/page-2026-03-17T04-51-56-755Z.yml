@@ -1,0 +1,110 @@
+- main [ref=e4]:
+  - generic [ref=e6]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - paragraph [ref=e10]: PolkaTap
+        - paragraph [ref=e11]: Polkadot tap trading
+      - navigation [ref=e12]:
+        - link "How it works" [ref=e13] [cursor=pointer]:
+          - /url: "#how-it-works"
+        - link "App" [ref=e14] [cursor=pointer]:
+          - /url: "#surfaces"
+      - generic [ref=e15]:
+        - link "Wallet" [ref=e16] [cursor=pointer]:
+          - /url: /wallet
+        - link "Launch trade" [ref=e17] [cursor=pointer]:
+          - /url: /trade
+          - text: Launch trade
+          - img [ref=e18]
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]: Polkadot ecosystem app
+        - heading "Tap into BTC rounds. Fund fast. Settle clean." [level=1] [ref=e23]
+        - paragraph [ref=e24]: PolkaTap is a Polkadot-focused trading app for quick directional rounds, instant in-app balance flow, and LP-backed settlement.
+        - generic [ref=e25]:
+          - link "Start tap trading" [ref=e26] [cursor=pointer]:
+            - /url: /trade
+            - text: Start tap trading
+            - img [ref=e27]
+          - link "Explore liquidity" [ref=e29] [cursor=pointer]:
+            - /url: /lp
+        - generic [ref=e30]:
+          - generic [ref=e31]:
+            - paragraph [ref=e32]: Network
+            - paragraph [ref=e33]: Moonbase Alpha
+          - generic [ref=e34]:
+            - paragraph [ref=e35]: Market
+            - paragraph [ref=e36]: BTC tap rounds
+          - generic [ref=e37]:
+            - paragraph [ref=e38]: Vault
+            - paragraph [ref=e39]: LP-backed
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - paragraph [ref=e44]: Product overview
+            - paragraph [ref=e45]: PolkaTap flow
+          - generic [ref=e46]: Live model
+        - generic [ref=e47]:
+          - generic [ref=e48]:
+            - paragraph [ref=e49]: What the app does
+            - paragraph [ref=e50]: Short flow
+          - generic [ref=e51]:
+            - generic [ref=e52]: $ connect_wallet()
+            - generic [ref=e53]: $ deposit_dev()
+            - generic [ref=e54]: $ tap_direction()
+            - generic [ref=e55]: $ settle_or_lp()
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - paragraph [ref=e58]: How it works
+        - heading "Four steps, no extra story." [level=2] [ref=e59]
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - paragraph [ref=e64]: Step 01
+              - heading "Connect" [level=3] [ref=e65]
+            - img [ref=e67]
+          - paragraph [ref=e70]: Wallet or demo mode.
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - generic [ref=e73]:
+              - paragraph [ref=e74]: Step 02
+              - heading "Fund" [level=3] [ref=e75]
+            - img [ref=e77]
+          - paragraph [ref=e80]: Deposit DEV into trading balance.
+        - generic [ref=e81]:
+          - generic [ref=e82]:
+            - generic [ref=e83]:
+              - paragraph [ref=e84]: Step 03
+              - heading "Tap trade" [level=3] [ref=e85]
+            - img [ref=e87]
+          - paragraph [ref=e93]: Pick direction and join the round.
+        - generic [ref=e94]:
+          - generic [ref=e95]:
+            - generic [ref=e96]:
+              - paragraph [ref=e97]: Step 04
+              - heading "Settle or LP" [level=3] [ref=e98]
+            - img [ref=e100]
+          - paragraph [ref=e104]: Withdraw winnings or provide liquidity.
+    - generic [ref=e106]:
+      - generic [ref=e107]:
+        - generic [ref=e108]:
+          - paragraph [ref=e109]: App surfaces
+          - heading "Trade, wallet, liquidity." [level=2] [ref=e110]
+        - link "Open app" [ref=e111] [cursor=pointer]:
+          - /url: /trade
+          - text: Open app
+          - img [ref=e112]
+      - generic [ref=e114]:
+        - link "Trade Fast directional BTC rounds." [ref=e115] [cursor=pointer]:
+          - /url: /trade
+          - heading "Trade" [level=3] [ref=e116]
+          - paragraph [ref=e117]: Fast directional BTC rounds.
+        - link "Wallet Move DEV in and out of the app." [ref=e118] [cursor=pointer]:
+          - /url: /wallet
+          - heading "Wallet" [level=3] [ref=e119]
+          - paragraph [ref=e120]: Move DEV in and out of the app.
+        - link "Liquidity Mint LP shares and back the vault." [ref=e121] [cursor=pointer]:
+          - /url: /lp
+          - heading "Liquidity" [level=3] [ref=e122]
+          - paragraph [ref=e123]: Mint LP shares and back the vault.

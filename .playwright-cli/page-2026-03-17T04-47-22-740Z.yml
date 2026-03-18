@@ -1,0 +1,163 @@
+- main [ref=e4]:
+  - generic [ref=e6]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - img [ref=e11]
+        - generic [ref=e14]:
+          - paragraph [ref=e15]: PolkaTap
+          - paragraph [ref=e16]: Polkadot tap trading experience
+      - navigation [ref=e17]:
+        - link "Product" [ref=e18] [cursor=pointer]:
+          - /url: "#product"
+        - link "How it works" [ref=e19] [cursor=pointer]:
+          - /url: "#how-it-works"
+        - link "App surfaces" [ref=e20] [cursor=pointer]:
+          - /url: "#surfaces"
+      - generic [ref=e21]:
+        - link "Wallet" [ref=e22] [cursor=pointer]:
+          - /url: /wallet
+        - link "Launch trade" [ref=e23] [cursor=pointer]:
+          - /url: /trade
+          - text: Launch trade
+          - img [ref=e24]
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - generic [ref=e28]: Polkadot ecosystem app for tap trading
+        - heading "Tap into fast BTC trading with a cleaner Polkadot-native story." [level=1] [ref=e29]
+        - paragraph [ref=e30]: "PolkaTap turns on-chain participation into a simpler product narrative: fund with DEV, trade directional BTC rounds, settle quickly, and optionally become the liquidity layer behind the app."
+        - generic [ref=e31]:
+          - link "Start tap trading" [ref=e32] [cursor=pointer]:
+            - /url: /trade
+            - text: Start tap trading
+            - img [ref=e33]
+          - link "Explore liquidity" [ref=e35] [cursor=pointer]:
+            - /url: /lp
+        - generic [ref=e36]:
+          - generic [ref=e37]:
+            - paragraph [ref=e38]: Settlement rail
+            - paragraph [ref=e39]: Moonbase Alpha
+          - generic [ref=e40]:
+            - paragraph [ref=e41]: Trading style
+            - paragraph [ref=e42]: Tap-to-trade BTC rounds
+          - generic [ref=e43]:
+            - paragraph [ref=e44]: Treasury model
+            - paragraph [ref=e45]: LP-backed vault
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - paragraph [ref=e51]: Product overview
+            - paragraph [ref=e52]: Operator flow for PolkaTap
+          - generic [ref=e53]: Live model
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - paragraph [ref=e56]: How the app works
+            - paragraph [ref=e57]: End-to-end
+          - generic [ref=e58]:
+            - generic [ref=e59]: $ connect_wallet("Moonbase Alpha")
+            - generic [ref=e60]: $ deposit_dev("25 DEV")
+            - generic [ref=e61]: $ tap_direction("UP", "BTC/USD")
+            - generic [ref=e62]: $ settle_round("credit balance")
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - img [ref=e65]
+            - paragraph [ref=e68]: Directional rounds settle against live BTC/USD pricing.
+          - generic [ref=e69]:
+            - img [ref=e70]
+            - paragraph [ref=e73]: Balances bridge between wallet custody and in-app speed.
+          - generic [ref=e74]:
+            - img [ref=e75]
+            - paragraph [ref=e78]: Liquidity providers support the reserve behind trader payouts.
+    - generic [ref=e80]:
+      - generic [ref=e81]:
+        - paragraph [ref=e82]: Product description
+        - heading "A homepage that explains what the app does in plain terms." [level=2] [ref=e83]
+        - paragraph [ref=e84]: "Instead of looking like a generic crypto dashboard, the new home page introduces PolkaTap as a Polkadot-adjacent trading product with a clear mechanism: fund once, tap into fast rounds, settle quickly, and optionally contribute liquidity."
+      - generic [ref=e85]:
+        - generic [ref=e86]:
+          - paragraph [ref=e87]: Polkadot-native product story
+          - paragraph [ref=e88]: PolkaTap is built for the Polkadot ecosystem through Moonbeam infrastructure, so the app feels on-chain first instead of bolted onto a web2 trading shell.
+        - generic [ref=e89]:
+          - paragraph [ref=e90]: Tap trading made simple
+          - paragraph [ref=e91]: Users pick a direction, tap into a round, and let the engine settle outcomes quickly. It is a lightweight trading loop designed for fast repetition and clear feedback.
+        - generic [ref=e92]:
+          - paragraph [ref=e93]: Wallet, vault, and LP in one flow
+          - paragraph [ref=e94]: The home page now explains how traders fund balances, place positions, withdraw winnings, and how liquidity providers support the vault behind the experience.
+    - generic [ref=e95]:
+      - generic [ref=e96]:
+        - paragraph [ref=e97]: How it works
+        - heading "From wallet connection to settlement in four clean steps." [level=2] [ref=e98]
+        - paragraph [ref=e99]: This section is written for first-time visitors, so they can understand the tap trading loop without opening the app first.
+      - generic [ref=e100]:
+        - generic [ref=e101]:
+          - generic [ref=e102]:
+            - generic [ref=e103]:
+              - paragraph [ref=e104]: Step 01
+              - heading "Connect or enter demo mode" [level=3] [ref=e105]
+            - img [ref=e107]
+          - paragraph [ref=e110]: Start with a wallet on Moonbase Alpha or jump in using the built-in demo wallet to understand the flow before moving real funds.
+        - generic [ref=e111]:
+          - generic [ref=e112]:
+            - generic [ref=e113]:
+              - paragraph [ref=e114]: Step 02
+              - heading "Fund your trading balance" [level=3] [ref=e115]
+            - img [ref=e117]
+          - paragraph [ref=e120]: Deposit DEV into the vault. The app mirrors that value into a fast in-app balance so each trading action feels instant.
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - generic [ref=e123]:
+              - paragraph [ref=e124]: Step 03
+              - heading "Tap a direction and execute" [level=3] [ref=e125]
+            - img [ref=e127]
+          - paragraph [ref=e133]: Choose the BTC price direction for the active round, submit the trade, and let the engine record results with live market context.
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - generic [ref=e136]:
+              - paragraph [ref=e137]: Step 04
+              - heading "Settle, withdraw, or provide liquidity" [level=3] [ref=e138]
+            - img [ref=e140]
+          - paragraph [ref=e144]: Winnings update the balance, withdrawals move value back on-chain, and LPs can deposit into the reserve to earn from protocol activity.
+    - generic [ref=e145]:
+      - generic [ref=e146]:
+        - generic [ref=e147]:
+          - paragraph [ref=e148]: App surfaces
+          - heading "Three flows users will actually use after landing." [level=2] [ref=e149]
+        - link "Open app" [ref=e150] [cursor=pointer]:
+          - /url: /trade
+          - text: Open app
+          - img [ref=e151]
+      - generic [ref=e153]:
+        - generic [ref=e154]:
+          - paragraph [ref=e155]: Fast rounds
+          - heading "Trading surface" [level=3] [ref=e156]
+          - paragraph [ref=e157]: A focused execution screen for directional tap trades, round timing, position sizing, and live BTC pricing.
+          - link "Open trading" [ref=e158] [cursor=pointer]:
+            - /url: /trade
+            - text: Open trading
+            - img [ref=e159]
+        - generic [ref=e161]:
+          - paragraph [ref=e162]: Fund and redeem
+          - heading "Wallet rail" [level=3] [ref=e163]
+          - paragraph [ref=e164]: Move DEV in and out of the app, monitor wallet balances, and manage the path between on-chain funds and in-app buying power.
+          - link "Open wallet" [ref=e165] [cursor=pointer]:
+            - /url: /wallet
+            - text: Open wallet
+            - img [ref=e166]
+        - generic [ref=e168]:
+          - paragraph [ref=e169]: LP participation
+          - heading "Liquidity vault" [level=3] [ref=e170]
+          - paragraph [ref=e171]: Supply liquidity to the reserve, mint LP shares, and backstop trader activity while tracking your position in the vault.
+          - link "Open liquidity" [ref=e172] [cursor=pointer]:
+            - /url: /lp
+            - text: Open liquidity
+            - img [ref=e173]
+    - generic [ref=e175]:
+      - paragraph [ref=e176]: Ready to ship
+      - heading "The new home page now sells the product before asking users to trade." [level=2] [ref=e177]
+      - paragraph [ref=e178]: It frames PolkaTap as a Polkadot-oriented trading app, explains tap trading clearly, and gives users direct paths into trading, wallet, and liquidity workflows.
+      - generic [ref=e179]:
+        - link "Launch trade" [ref=e180] [cursor=pointer]:
+          - /url: /trade
+          - text: Launch trade
+          - img [ref=e181]
+        - link "View wallet flow" [ref=e183] [cursor=pointer]:
+          - /url: /wallet

@@ -3,7 +3,6 @@ import { useGameStore, type CellData } from "./store";
 import { format } from "date-fns";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import CryptoJS from "crypto-js";
 import { useAccount } from "wagmi";
@@ -11,6 +10,29 @@ import toast from "react-hot-toast";
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
+}
+
+const THUNDER_DURATION_MS = 1800;
+const RENDER_INTERVAL_MS = 24;
+const CONFETTI_COLORS = ["#2ebd85", "#ffffff", "#eab308"];
+
+function fireWinConfetti(
+  winCount: number,
+  origin: { x: number; y: number } = { x: 0.5, y: 0.35 },
+) {
+  const burstScale = Math.min(Math.max(winCount, 1), 6);
+  const particleCount = 90 + burstScale * 18;
+
+  confetti({
+    particleCount,
+    spread: 80,
+    startVelocity: 42,
+    scalar: 0.7,
+    ticks: 70,
+    zIndex: 10000,
+    colors: CONFETTI_COLORS,
+    origin,
+  });
 }
 
 export const TradingGrid: React.FC = () => {
@@ -44,59 +66,96 @@ export const TradingGrid: React.FC = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(
     () => window.innerWidth < 1280,
   );
+  const [thunderCells, setThunderCells] = useState<Record<string, boolean>>({});
 
+  const cellElementsRef = useRef<Record<string, HTMLDivElement | null>>({});
   const triggeredWinsRef = useRef<Set<string>>(new Set());
+  const thunderTimeoutsRef = useRef<Record<string, number>>({});
+  const lastConfettiAtRef = useRef(0);
 
   useEffect(() => {
+    const thunderImage = new Image();
+    thunderImage.src = "/thunder.gif";
+  }, []);
+
+  useEffect(
+    () => () => {
+      Object.values(thunderTimeoutsRef.current).forEach((timeoutId) => {
+        window.clearTimeout(timeoutId);
+      });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const newWinIds: string[] = [];
+
     cells.forEach((cell) => {
       const isHit = cell.status === "hit";
       const hasBet =
         (bets[cell.id] || 0) > 0 || (pendingBets[cell.id] || 0) > 0;
-      if (isHit && hasBet) {
-        if (!triggeredWinsRef.current.has(cell.id)) {
-          triggeredWinsRef.current.add(cell.id);
-          // Vegas style confetti
-          const count = 200;
-          const defaults = {
-            origin: { y: 0.6 },
-            zIndex: 10000,
-            scalar: 0.5,
-            ticks: 60,
-          };
-          function fire(particleRatio: number, opts: confetti.Options) {
-            confetti(
-              Object.assign({}, defaults, opts, {
-                particleCount: Math.floor(count * particleRatio),
-              }),
-            );
-          }
-          fire(0.25, {
-            spread: 26,
-            startVelocity: 55,
-            colors: ["#2ebd85", "#ffffff", "#eab308"],
-          });
-          fire(0.2, { spread: 60, colors: ["#2ebd85", "#ffffff", "#eab308"] });
-          fire(0.35, {
-            spread: 100,
-            decay: 0.91,
-            scalar: 0.4,
-            colors: ["#2ebd85", "#ffffff", "#eab308"],
-          });
-          fire(0.1, {
-            spread: 120,
-            startVelocity: 25,
-            decay: 0.92,
-            scalar: 0.6,
-            colors: ["#2ebd85", "#ffffff", "#eab308"],
-          });
-          fire(0.1, {
-            spread: 120,
-            startVelocity: 45,
-            colors: ["#2ebd85", "#ffffff", "#eab308"],
-          });
-        }
+      if (isHit && hasBet && !triggeredWinsRef.current.has(cell.id)) {
+        triggeredWinsRef.current.add(cell.id);
+        newWinIds.push(cell.id);
       }
     });
+
+    if (newWinIds.length === 0) return;
+
+    window.requestAnimationFrame(() => {
+      setThunderCells((prev) => {
+        const next = { ...prev };
+        newWinIds.forEach((cellId) => {
+          next[cellId] = true;
+        });
+        return next;
+      });
+    });
+
+    newWinIds.forEach((cellId) => {
+      if (thunderTimeoutsRef.current[cellId]) {
+        window.clearTimeout(thunderTimeoutsRef.current[cellId]);
+      }
+      thunderTimeoutsRef.current[cellId] = window.setTimeout(() => {
+        setThunderCells((prev) => {
+          if (!prev[cellId]) return prev;
+          const next = { ...prev };
+          delete next[cellId];
+          return next;
+        });
+        delete thunderTimeoutsRef.current[cellId];
+      }, THUNDER_DURATION_MS);
+    });
+
+    const nowTs = performance.now();
+    if (nowTs - lastConfettiAtRef.current > 300) {
+      lastConfettiAtRef.current = nowTs;
+      window.requestAnimationFrame(() => {
+        const winRects = newWinIds
+          .map((cellId) => cellElementsRef.current[cellId]?.getBoundingClientRect())
+          .filter(
+            (rect): rect is DOMRect =>
+              rect !== undefined && rect.width > 0 && rect.height > 0,
+          );
+
+        if (winRects.length === 0) {
+          fireWinConfetti(newWinIds.length);
+          return;
+        }
+
+        const avgCenterX =
+          winRects.reduce((sum, rect) => sum + rect.left + rect.width / 2, 0) /
+          winRects.length;
+        const avgCenterY =
+          winRects.reduce((sum, rect) => sum + rect.top + rect.height / 2, 0) /
+          winRects.length;
+
+        fireWinConfetti(newWinIds.length, {
+          x: Math.min(0.98, Math.max(0.02, avgCenterX / window.innerWidth)),
+          y: Math.min(0.9, Math.max(0.08, avgCenterY / window.innerHeight)),
+        });
+      });
+    }
   }, [cells, bets, pendingBets]);
 
   // Animation loop for perfect smooth scrolling
@@ -117,8 +176,8 @@ export const TradingGrid: React.FC = () => {
         currentCameraPrice += (target - currentCameraPrice) * 0.1; // Smooth camera tracking, snappier follow
       }
 
-      // Throttle React renders to ~60fps (15ms) down from 30fps to make UI buttery smooth
-      if (n - lastRenderTime > 15) {
+      // Keep interpolation on every frame, but commit React updates at a lower cadence.
+      if (n - lastRenderTime > RENDER_INTERVAL_MS) {
         const state = useGameStore.getState();
         const serverSyncTime = n + state.serverTimeOffset;
         setNow(serverSyncTime);
@@ -168,9 +227,9 @@ export const TradingGrid: React.FC = () => {
             style: {
               background: "rgba(18, 20, 30, 0.95)",
               color: "#ffffff",
-              border: "1px solid rgba(8, 71, 247, 0.5)",
+              border: "1px solid rgba(240, 185, 11, 0.4)",
               boxShadow:
-                "0 4px 20px rgba(8, 71, 247, 0.25), inset 0 0 10px rgba(8, 71, 247, 0.1)",
+                "0 4px 20px rgba(240, 185, 11, 0.18), inset 0 0 10px rgba(240, 185, 11, 0.08)",
               backdropFilter: "blur(8px)",
               fontWeight: "bold",
               fontSize: "13px",
@@ -418,7 +477,7 @@ export const TradingGrid: React.FC = () => {
           className="absolute top-0 bottom-0 w-px z-20"
           style={{
             left: `${getTimeX(now)}%`,
-            background: "rgba(8, 71, 247, 0.4)",
+            background: "rgba(240, 185, 11, 0.38)",
           }}
         />
 
@@ -442,6 +501,11 @@ export const TradingGrid: React.FC = () => {
             const displayBetAmount = hasBet
               ? betAmountVal
               : pendingBetAmountVal;
+            const isSelected = !isPast && hasAnyBet;
+            const hasWon = isHit && hasAnyBet;
+            const showThunder = Boolean(thunderCells[cell.id]);
+            const showSelectedEffect = isSelected && !hasWon;
+            const showWinState = hasWon && !showThunder;
 
             // Khi chart chạm đến cột (tiến vào thời gian của cell) -> Ẩn toàn bộ ô không cược
             if (now >= cell.timeWindowStart && !hasAnyBet) return null;
@@ -459,21 +523,21 @@ export const TradingGrid: React.FC = () => {
             const canBet = isFuture && !isNext && !hasAnyBet;
 
             return (
-              <motion.div
-                whileHover={
-                  canBet && !hasAnyBet
-                    ? { scale: 0.95, backgroundColor: "rgba(255,255,255,0.1)" }
-                    : {}
-                }
-                whileTap={canBet && !hasAnyBet ? { scale: 0.9 } : {}}
+              <div
                 key={cell.id}
+                ref={(node) => {
+                  cellElementsRef.current[cell.id] = node;
+                }}
                 className={cn(
-                  "absolute border-t border-l flex flex-col items-center justify-center text-[10px] transition duration-300",
-                  canBet && !hasAnyBet && "hover:bg-white/5 cursor-pointer",
+                  "absolute border-t border-l flex flex-col items-center justify-center text-[10px] transition-[transform,background-color,box-shadow,opacity] duration-200 overflow-hidden isolate",
+                  canBet &&
+                    !hasAnyBet &&
+                    "hover:bg-white/5 hover:scale-[0.985] active:scale-[0.97] cursor-pointer",
                   isNext &&
                     !hasAnyBet &&
                     "opacity-30 cursor-not-allowed animate-pulse",
-                  !isPast && hasAnyBet && "cursor-pointer z-10",
+                  showSelectedEffect &&
+                    "cursor-pointer z-10 trading-grid-cell-selected",
                   !isPast && isPending && "animate-pulse",
                   isHit && hasAnyBet && "z-20",
                 )}
@@ -484,31 +548,49 @@ export const TradingGrid: React.FC = () => {
                   height: `${rowHeight}%`,
                   borderColor: "rgba(255, 255, 255, 0.05)",
                   background:
-                    isHit && hasAnyBet
+                    hasWon
                       ? "rgba(46,189,133,0.35)"
                       : !isPast && hasAnyBet
-                        ? "linear-gradient(180deg, rgba(22, 40, 81, 0.25) 0%, rgba(9, 22, 53, 0.35) 100%)"
+                        ? "linear-gradient(180deg, rgba(82, 62, 8, 0.25) 0%, rgba(46, 33, 3, 0.35) 100%)"
                         : isNext && !hasAnyBet
                           ? "rgba(246,70,93,0.06)"
                           : undefined,
                   boxShadow:
-                    isHit && hasAnyBet
+                    hasWon
                       ? "0 0 20px rgba(46,189,133,0.5), inset 0 0 30px rgba(46,189,133,0.35)"
-                      : !isPast && hasAnyBet
-                        ? "0 0 15px rgba(50, 110, 255, 0.3), inset 0 0 30px rgba(50, 110, 255, 0.3)"
+                      : showSelectedEffect
+                        ? "0 0 18px rgba(240, 185, 11, 0.28), inset 0 0 30px rgba(240, 185, 11, 0.2)"
                         : undefined,
                   outline:
-                    isHit && hasAnyBet
+                    hasWon
                       ? "1px solid #2EBD85"
-                      : !isPast && hasAnyBet
-                        ? "1px solid #0847F7"
+                      : showSelectedEffect
+                        ? "1px solid #f0b90b"
                         : undefined,
+                  ["--selected-cell-stripe-color" as string]:
+                    "rgba(255, 247, 206, 0.38)",
+                  ["--selected-cell-stripe-soft" as string]:
+                    "rgba(255, 226, 122, 0.1)",
+                  ["--selected-cell-glow" as string]:
+                    "rgba(255, 244, 191, 0.16)",
+                  willChange: hasWon || showSelectedEffect ? "transform" : undefined,
                 }}
                 onClick={() => handlePlaceBet(cell, canBet)}
               >
+                {showThunder && (
+                  <div className="trading-grid-cell-win-thunder">
+                    <img src="/thunder.gif" alt="" aria-hidden="true" />
+                  </div>
+                )}
+                {showSelectedEffect && (
+                  <>
+                    <div className="trading-grid-cell-selected__sheen" />
+                    <div className="trading-grid-cell-selected__stripes" />
+                  </>
+                )}
                 <div
                   className={cn(
-                    "transition-all duration-300 text-[9px] sm:text-[10px] font-mono",
+                    "relative z-[1] transition-all duration-300 text-[9px] sm:text-[10px] font-mono",
                     cell.multiplier >= 100
                       ? "font-bold"
                       : cell.multiplier >= 10
@@ -518,23 +600,24 @@ export const TradingGrid: React.FC = () => {
                   style={{
                     color:
                       hasAnyBet && !isHit
-                        ? "#0847F7"
-                        : isHit && hasAnyBet
+                        ? "#f0b90b"
+                        : hasWon
                           ? "#2EBD85"
-                          : isNext && !hasAnyBet
+                        : isNext && !hasAnyBet
                             ? "#F6465D"
                             : cell.multiplier >= 100
                               ? "#F6465D"
                               : cell.multiplier >= 10
-                                ? "#0847F7"
+                                ? "#f0b90b"
                                 : "#d0d0d0",
                     textShadow:
-                      isHit && hasAnyBet
+                      hasWon
                         ? "0 0 8px rgba(46,189,133,1)"
                         : hasAnyBet
-                          ? "0 0 5px rgba(8, 71, 247, 0.8)"
+                          ? "0 0 5px rgba(240, 185, 11, 0.8)"
                           : undefined,
-                    transform: hasAnyBet || isHit ? "scale(1.1)" : undefined,
+                    transform:
+                      hasAnyBet || hasWon ? "scale(1.1)" : undefined,
                   }}
                 >
                   {hasAnyBet
@@ -545,21 +628,20 @@ export const TradingGrid: React.FC = () => {
                 {hasAnyBet && !isHit && (
                   <div
                     className={cn(
-                      "text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 font-bold px-1.5 sm:px-2 py-0.5 shadow-md",
+                      "relative z-[1] text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 font-bold px-1.5 sm:px-2 py-0.5 shadow-md",
                       isPending ? "opacity-80 animate-pulse" : "",
                     )}
                     style={{
                       borderRadius: "6px",
-                      background: "#0847F7",
-                      color: "#ffffff",
-                      boxShadow: "0 0 8px rgba(8, 71, 247, 0.5)",
+                      background: "#f0b90b",
+                      color: "#050505",
+                      boxShadow: "0 0 8px rgba(240, 185, 11, 0.4)",
                     }}
                   >
                     ${displayBetAmount}
                   </div>
                 )}
-                {isHit &&
-                  hasAnyBet &&
+                {showWinState &&
                   (() => {
                     const winPayout =
                       displayBetAmount *
@@ -567,9 +649,9 @@ export const TradingGrid: React.FC = () => {
                         ? cell.multiplier
                         : 0);
                     return (
-                      <div className="flex flex-col items-center gap-0.5 mt-0.5">
+                      <div className="relative z-[1] flex flex-col items-center gap-0.5 mt-0.5">
                         <div
-                          className="text-[8px] sm:text-[9px] font-black tracking-widest animate-pulse"
+                          className="text-[8px] sm:text-[9px] font-black tracking-widest"
                           style={{
                             color: "#2EBD85",
                             textShadow:
@@ -580,7 +662,7 @@ export const TradingGrid: React.FC = () => {
                           WIN!
                         </div>
                         <div
-                          className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 shadow-md animate-bounce"
+                          className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 shadow-md"
                           style={{
                             borderRadius: "6px",
                             background: "#2EBD85",
@@ -597,7 +679,7 @@ export const TradingGrid: React.FC = () => {
                       </div>
                     );
                   })()}
-              </motion.div>
+              </div>
             );
           });
         })()}
@@ -615,7 +697,7 @@ export const TradingGrid: React.FC = () => {
             <path
               d={getSvgPath()}
               fill="none"
-              stroke="#8AA6F9"
+              stroke="#f0b90b"
               strokeWidth="2"
               strokeLinejoin="round"
               strokeLinecap="round"
@@ -627,7 +709,7 @@ export const TradingGrid: React.FC = () => {
                 cx={lPt.x}
                 cy={lPt.y}
                 r="3.5"
-                fill="#0847F7"
+                fill="#f0b90b"
                 className="animate-pulse"
               />
             )}

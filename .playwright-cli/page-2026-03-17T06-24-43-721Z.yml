@@ -1,0 +1,162 @@
+- main [ref=e4]:
+  - generic [ref=e6]:
+    - generic [ref=e8]:
+      - paragraph [ref=e10]: PolkaTap
+      - generic [ref=e11]:
+        - link "Wallet" [ref=e12] [cursor=pointer]:
+          - /url: /wallet
+        - link "Launch trade" [ref=e13] [cursor=pointer]:
+          - /url: /trade
+          - text: Launch trade
+          - img [ref=e14]
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: Polkadot ecosystem app
+        - heading "Tap into BTC rounds. Fund fast. Settle clean." [level=1] [ref=e19]
+        - paragraph [ref=e20]: PolkaTap is a Polkadot-focused trading app for quick directional rounds, instant in-app balance flow, and LP-backed settlement.
+        - link "Start tap trading" [ref=e22] [cursor=pointer]:
+          - /url: /trade
+          - text: Start tap trading
+          - img [ref=e23]
+        - generic [ref=e25]:
+          - generic [ref=e26]: Fast directional BTC rounds
+          - generic [ref=e27]: Instant in-app balance updates
+          - generic [ref=e28]: Wallet funding and LP participation
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - paragraph [ref=e31]: Network
+            - paragraph [ref=e32]: Polkadot EVM
+          - generic [ref=e33]:
+            - paragraph [ref=e34]: Market
+            - paragraph [ref=e35]: BTC tap rounds
+          - generic [ref=e36]:
+            - paragraph [ref=e37]: Vault
+            - paragraph [ref=e38]: LP-backed
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - paragraph [ref=e43]: Product overview
+            - paragraph [ref=e44]: PolkaTap flow
+          - generic [ref=e45]: Live model
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - paragraph [ref=e48]: What the app does
+            - paragraph [ref=e49]: Short flow
+          - generic [ref=e50]:
+            - generic [ref=e51]: $ connect_wallet()
+            - generic [ref=e52]: $ deposit()
+            - generic [ref=e53]: $ tap_direction()
+            - generic [ref=e54]: $ settle_or_lp()
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - paragraph [ref=e57]: Trader side
+            - paragraph [ref=e58]: Connect, fund, trade, settle.
+          - generic [ref=e59]:
+            - paragraph [ref=e60]: App side
+            - paragraph [ref=e61]: Track rounds, balance, and position flow.
+          - generic [ref=e62]:
+            - paragraph [ref=e63]: Vault side
+            - paragraph [ref=e64]: Liquidity backs the reserve behind payouts.
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - paragraph [ref=e67]: Core features
+        - heading "More context for what this app actually does." [level=2] [ref=e68]
+        - paragraph [ref=e69]: Homepage now explains both the user-facing loop and the product structure behind it, not just a single CTA into trading.
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - img [ref=e73]
+          - heading "Live BTC tap rounds" [level=3] [ref=e75]
+          - paragraph [ref=e76]: The trading screen is designed around quick directional rounds so users can react fast instead of navigating a complex exchange UI.
+        - generic [ref=e77]:
+          - img [ref=e79]
+          - heading "Fast balance rail" [level=3] [ref=e82]
+          - paragraph [ref=e83]: Deposits turn into an in-app balance flow that feels immediate, so trading actions are not slowed down by repeated wallet friction.
+        - generic [ref=e84]:
+          - img [ref=e86]
+          - heading "Wallet-first onboarding" [level=3] [ref=e89]
+          - paragraph [ref=e90]: Users can connect a wallet, authenticate with a signature, or enter demo mode to understand the loop before committing funds.
+        - generic [ref=e91]:
+          - img [ref=e93]
+          - heading "LP-backed reserve" [level=3] [ref=e97]
+          - paragraph [ref=e98]: Liquidity providers back the reserve, mint LP shares, and help support the vault that powers trader settlements.
+        - generic [ref=e99]:
+          - img [ref=e101]
+          - heading "Tap-to-trade UX" [level=3] [ref=e107]
+          - paragraph [ref=e108]: "The product keeps the action simple: choose a direction, enter the round, monitor balance changes, and keep moving."
+        - generic [ref=e109]:
+          - img [ref=e111]
+          - heading "Clear settlement path" [level=3] [ref=e114]
+          - paragraph [ref=e115]: "Homepage copy now explains where value moves next: into trades, back to wallet, or into the liquidity side of the product."
+    - generic [ref=e116]:
+      - generic [ref=e117]:
+        - paragraph [ref=e118]: How it works
+        - heading "Four steps, now explained with a bit more detail." [level=2] [ref=e119]
+      - generic [ref=e120]:
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - generic [ref=e123]:
+              - paragraph [ref=e124]: Step 01
+              - heading "Connect" [level=3] [ref=e125]
+            - img [ref=e127]
+          - paragraph [ref=e130]: Wallet or demo mode.
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - generic [ref=e133]:
+              - paragraph [ref=e134]: Step 02
+              - heading "Fund" [level=3] [ref=e135]
+            - img [ref=e137]
+          - paragraph [ref=e140]: Deposit DEV into trading balance.
+        - generic [ref=e141]:
+          - generic [ref=e142]:
+            - generic [ref=e143]:
+              - paragraph [ref=e144]: Step 03
+              - heading "Tap trade" [level=3] [ref=e145]
+            - img [ref=e147]
+          - paragraph [ref=e153]: Pick direction and join the round.
+        - generic [ref=e154]:
+          - generic [ref=e155]:
+            - generic [ref=e156]:
+              - paragraph [ref=e157]: Step 04
+              - heading "Settle or LP" [level=3] [ref=e158]
+            - img [ref=e160]
+          - paragraph [ref=e164]: Withdraw winnings or provide liquidity.
+    - generic [ref=e166]:
+      - generic [ref=e167]:
+        - generic [ref=e168]:
+          - paragraph [ref=e169]: App surfaces
+          - heading "Trade, wallet, and liquidity each have a job." [level=2] [ref=e170]
+        - link "Open app" [ref=e171] [cursor=pointer]:
+          - /url: /trade
+          - text: Open app
+          - img [ref=e172]
+      - generic [ref=e174]:
+        - link "Surface Trade The execution surface for BTC tap rounds, price timing, position flow, and instant balance feedback. Directional round entry Quick balance feedback" [ref=e175] [cursor=pointer]:
+          - /url: /trade
+          - generic [ref=e176]:
+            - img [ref=e177]
+            - text: Surface
+          - heading "Trade" [level=3] [ref=e180]
+          - paragraph [ref=e181]: The execution surface for BTC tap rounds, price timing, position flow, and instant balance feedback.
+          - generic [ref=e182]:
+            - generic [ref=e183]: Directional round entry
+            - generic [ref=e184]: Quick balance feedback
+        - link "Surface Wallet The funding layer for moving DEV into the app, checking balances, and redeeming value back out when needed. Deposit and withdraw rail On-chain to in-app flow" [ref=e185] [cursor=pointer]:
+          - /url: /wallet
+          - generic [ref=e186]:
+            - img [ref=e187]
+            - text: Surface
+          - heading "Wallet" [level=3] [ref=e190]
+          - paragraph [ref=e191]: The funding layer for moving DEV into the app, checking balances, and redeeming value back out when needed.
+          - generic [ref=e192]:
+            - generic [ref=e193]: Deposit and withdraw rail
+            - generic [ref=e194]: On-chain to in-app flow
+        - link "Surface Liquidity The vault view for LP deposits, share minting, and understanding how the reserve supports the trading product. LP share lifecycle Reserve participation" [ref=e195] [cursor=pointer]:
+          - /url: /lp
+          - generic [ref=e196]:
+            - img [ref=e197]
+            - text: Surface
+          - heading "Liquidity" [level=3] [ref=e200]
+          - paragraph [ref=e201]: The vault view for LP deposits, share minting, and understanding how the reserve supports the trading product.
+          - generic [ref=e202]:
+            - generic [ref=e203]: LP share lifecycle
+            - generic [ref=e204]: Reserve participation

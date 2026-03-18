@@ -121,7 +121,7 @@ export function CREProofView() {
       />
 
       <p className="text-center text-[10px] pb-4" style={{ color: "#444" }}>
-        Data sourced from on-chain Chainlink CRE events · Indexed by Tapl worker
+        Data sourced from on-chain Chainlink CRE events · Indexed by PolkaTap worker
       </p>
     </div>
   );

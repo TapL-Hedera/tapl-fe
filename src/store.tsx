@@ -246,9 +246,11 @@ export const useGameStore = create<GameState>((set) => ({
       let changed = false;
       const newState = { ...state };
       const newPendingWins = { ...state.pendingWins };
+      const cellsById = new Map(state.cells.map((cell) => [cell.id, cell]));
+      const hitCellIds = new Set<string>();
 
       for (const [cellId, winAmount] of Object.entries(state.pendingWins)) {
-        const cell = newState.cells.find((c) => c.id === cellId);
+        const cell = cellsById.get(cellId);
 
         // Cleanup if cell is gone
         if (!cell) {
@@ -303,16 +305,20 @@ export const useGameStore = create<GameState>((set) => ({
             });
           }
 
-          newState.cells = newState.cells.map((c) =>
-            c.id === cellId ? { ...c, status: "hit" as const } : c,
-          );
-
+          hitCellIds.add(cellId);
           delete newPendingWins[cellId];
           changed = true;
         }
       }
 
       if (changed) {
+        if (hitCellIds.size > 0) {
+          newState.cells = state.cells.map((cell) =>
+            hitCellIds.has(cell.id)
+              ? { ...cell, status: "hit" as const }
+              : cell,
+          );
+        }
         newState.pendingWins = newPendingWins;
         newState.balance =
           newState.serverBalance -

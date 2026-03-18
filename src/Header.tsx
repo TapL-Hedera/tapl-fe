@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast";
 import { Dialog, DialogPanel } from "@headlessui/react";
+import { useQueryClient } from "@tanstack/react-query";
+import CryptoJS from "crypto-js";
+import { Link, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
+import { io, Socket } from "socket.io-client";
 import {
   useAccount,
   useConnect,
@@ -8,64 +12,109 @@ import {
   useSignMessage,
   useSwitchChain,
 } from "wagmi";
-import { sepolia } from "wagmi/chains";
-import { useGameStore } from "./store";
+import { moonbaseAlpha } from "wagmi/chains";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { ChevronDown } from "lucide-react";
+import { BACKEND_URL } from "./constant";
 import {
   authControllerGetChallenge,
-  authControllerLogin,
   authControllerGetWssKey,
+  authControllerLogin,
   getAccountControllerGetBalanceQueryKey,
   useAccountControllerGetBalance,
 } from "./services/queries";
-import { io, Socket } from "socket.io-client";
-import CryptoJS from "crypto-js";
-import { useQueryClient } from "@tanstack/react-query";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { BACKEND_URL } from "./constant";
+import { useGameStore } from "./store";
+
+const NAV_ITEMS = [
+  { label: "Trade", path: "/trade" },
+  { label: "History", path: "/history" },
+  { label: "Wallet", path: "/wallet" },
+  { label: "Liquidity", path: "/lp" },
+] as const;
+
+function HeaderButton({
+  label,
+  onClick,
+  variant = "secondary",
+  badge,
+}: {
+  label: string;
+  onClick: () => void;
+  variant?: "secondary" | "primary";
+  badge?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="inline-flex h-10 items-center gap-2 rounded-xl px-4 text-sm font-medium transition"
+      style={{
+        background:
+          variant === "primary"
+            ? "#f0b90b"
+            : "linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.02) 100%)",
+        color: variant === "primary" ? "#050505" : "#f5f5f5",
+        border:
+          variant === "primary"
+            ? "1px solid rgba(240, 185, 11, 0.34)"
+            : "1px solid rgba(255,255,255,0.08)",
+        boxShadow:
+          variant === "primary"
+            ? "0 10px 24px rgba(240, 185, 11, 0.18)"
+            : "none",
+      }}
+    >
+      {label}
+      {badge ? (
+        <span className="rounded-md bg-black/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em]">
+          {badge}
+        </span>
+      ) : null}
+    </button>
+  );
+}
 
 export const Header: React.FC = () => {
-  const balance = useGameStore((state) => state.balance);
-  const currentPrice = useGameStore((state) => state.currentPrice);
-  const betAmount = useGameStore((state) => state.betAmount);
-  const setBetAmount = useGameStore((state) => state.setBetAmount);
   const updatePrice = useGameStore((state) => state.updatePrice);
   const updateGrid = useGameStore((state) => state.updateGrid);
   const setConnection = useGameStore((state) => state.setConnection);
   const updateOrder = useGameStore((state) => state.updateOrder);
   const updateBalance = useGameStore((state) => state.updateBalance);
-
   const isDemoMode = useGameStore((state) => state.isDemoMode);
   const demoAddress = useGameStore((state) => state.demoAddress);
   const setDemoMode = useGameStore((state) => state.setDemoMode);
   const setDemoAddress = useGameStore((state) => state.setDemoAddress);
 
+  const location = useLocation();
   const {
     address: realAddress,
     isConnected: isRealConnected,
     chain,
   } = useAccount();
 
-  const isConnected = isDemoMode || isRealConnected;
   const address = isDemoMode ? demoAddress : realAddress;
+  const isConnected = isDemoMode || isRealConnected;
 
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { signMessageAsync } = useSignMessage();
   const { switchChain, isPending: isPendingSwitch } = useSwitchChain();
-  const isLoggingIn = useRef(false);
-  const promptedAddress = useRef<string | null>(null);
   const queryClient = useQueryClient();
+
+  const [walletMenuOpen, setWalletMenuOpen] = useState(false);
   const [isDemoLoading, setIsDemoLoading] = useState(false);
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("token"),
   );
-
-  const { data: balanceData, refetch: refetchBalance } =
-    useAccountControllerGetBalance();
-
   const [isFundModalOpen, setIsFundModalOpen] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isFunding, setIsFunding] = useState(false);
+
+  const promptedAddress = useRef<string | null>(null);
+  const isLoggingIn = useRef(false);
+
+  const { data: balanceData, refetch: refetchBalance } =
+    useAccountControllerGetBalance();
 
   useEffect(() => {
     if (
@@ -81,19 +130,15 @@ export const Header: React.FC = () => {
 
     const checkTime = () => {
       const storedTime = localStorage.getItem("last-fund-time");
-      if (storedTime) {
-        const lastTime = parseInt(storedTime, 10);
-        const targetTime = lastTime + 30 * 60 * 1000;
-        const now = Date.now();
-        const diff = targetTime - now;
-        if (diff > 0) {
-          setTimeRemaining(diff);
-        } else {
-          setTimeRemaining(0);
-        }
-      } else {
+      if (!storedTime) {
         setTimeRemaining(0);
+        return;
       }
+
+      const lastTime = parseInt(storedTime, 10);
+      const targetTime = lastTime + 30 * 60 * 1000;
+      const now = Date.now();
+      setTimeRemaining(Math.max(targetTime - now, 0));
     };
 
     if (isFundModalOpen) {
@@ -109,44 +154,38 @@ export const Header: React.FC = () => {
   const handleLogin = async () => {
     if (!isConnected || !address || isLoggingIn.current) return;
 
-    const token = localStorage.getItem("token");
+    const storedToken = localStorage.getItem("token");
     const storedAddress = localStorage.getItem("wallet-address");
 
-    if (token && storedAddress === address) return;
-
+    if (storedToken && storedAddress === address) return;
     if (promptedAddress.current === address) return;
 
     isLoggingIn.current = true;
     promptedAddress.current = address;
+
     try {
       const challengeRes = await authControllerGetChallenge({ address });
       const challenge = (challengeRes as unknown as { challenge: string })
         .challenge;
 
-      let signature: string;
-      if (isDemoMode) {
-        const demoPk = localStorage.getItem("demo-private-key");
-        if (!demoPk) {
-          setDemoMode(false);
-          return;
-        }
-        const account = privateKeyToAccount(demoPk as `0x${string}`);
-        signature = await account.signMessage({ message: challenge });
-      } else {
-        signature = await signMessageAsync({ message: challenge });
-      }
+      const signature = isDemoMode
+        ? await privateKeyToAccount(
+            localStorage.getItem("demo-private-key") as `0x${string}`,
+          ).signMessage({ message: challenge })
+        : await signMessageAsync({ message: challenge });
 
       const loginRes = await authControllerLogin({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ address, signature }),
       });
+
       const accessToken = (loginRes as unknown as { accessToken: string })
         .accessToken;
 
       localStorage.setItem("token", accessToken);
-      setToken(accessToken);
       localStorage.setItem("wallet-address", address);
+      setToken(accessToken);
       refetchBalance();
     } catch (error) {
       console.error("Login failed:", error);
@@ -170,7 +209,6 @@ export const Header: React.FC = () => {
 
         socket.on("connect", async () => {
           if (!isActive) return;
-          console.log("Header WSS Connected");
 
           try {
             if (token) {
@@ -182,7 +220,6 @@ export const Header: React.FC = () => {
                 const challengeRes = await authControllerGetChallenge({
                   address: address as string,
                 });
-                console.log("challengeRes: ", challengeRes);
                 const wssChallenge = (
                   challengeRes as unknown as { challenge: string }
                 ).challenge;
@@ -202,8 +239,8 @@ export const Header: React.FC = () => {
                 });
               }
             }
-          } catch (e) {
-            console.error("WSS Subscription Error:", e);
+          } catch (error) {
+            console.error("WSS subscription error:", error);
           }
         });
 
@@ -212,20 +249,16 @@ export const Header: React.FC = () => {
           "balance_update",
           "order_update",
           "price_now",
-        ];
+        ] as const;
 
-        events.forEach((evt) => {
-          socket?.on(evt, (data) => {
-            switch (evt) {
+        events.forEach((eventName) => {
+          socket?.on(eventName, (data) => {
+            switch (eventName) {
               case "price_now":
-                if (data?.price) {
-                  updatePrice(data.price, data.ts);
-                }
+                if (data?.price) updatePrice(data.price, data.ts);
                 break;
               case "grid_update":
-                if (Array.isArray(data)) {
-                  updateGrid(data);
-                }
+                if (Array.isArray(data)) updateGrid(data);
                 break;
               case "balance_update":
                 if (data) {
@@ -241,12 +274,8 @@ export const Header: React.FC = () => {
             }
           });
         });
-
-        socket.on("disconnect", () => {
-          console.log("Header WSS Disconnected");
-        });
-      } catch (err) {
-        console.error("WebSocket setup failed:", err);
+      } catch (error) {
+        console.error("WebSocket setup failed:", error);
       }
     };
 
@@ -254,22 +283,17 @@ export const Header: React.FC = () => {
 
     return () => {
       isActive = false;
-      if (socket) {
-        socket.disconnect();
-      }
+      socket?.disconnect();
     };
   }, [
-    isConnected,
     address,
-    updatePrice,
-    updateGrid,
     queryClient,
     setConnection,
-    updateOrder,
     token,
+    updateGrid,
+    updateOrder,
+    updatePrice,
   ]);
-
-  const [walletMenuOpen, setWalletMenuOpen] = useState(false);
 
   const startDemo = async () => {
     try {
@@ -297,10 +321,9 @@ export const Header: React.FC = () => {
         .accessToken;
 
       localStorage.setItem("token", accessToken);
-      setToken(accessToken);
       localStorage.setItem("wallet-address", newAddress);
+      setToken(accessToken);
 
-      // Auto faucet
       await fetch(`${BACKEND_URL}/api/payment/debug/deposit`, {
         method: "POST",
         headers: {
@@ -317,8 +340,8 @@ export const Header: React.FC = () => {
 
       setDemoMode(true);
       refetchBalance();
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     } finally {
       setIsDemoLoading(false);
     }
@@ -332,680 +355,190 @@ export const Header: React.FC = () => {
     } else {
       disconnect();
     }
+
     localStorage.removeItem("token");
-    setToken(null);
     localStorage.removeItem("wallet-address");
+    setToken(null);
     promptedAddress.current = null;
     setWalletMenuOpen(false);
   };
 
   return (
     <header
-      className="xl:h-14 flex flex-col xl:flex-row xl:items-center xl:justify-between px-3 sm:px-4 xl:px-6 sticky top-0 z-40 gap-0 py-2"
+      className="sticky top-0 z-40 border-b border-white/8 bg-[#090909]/94 backdrop-blur-xl"
       style={{
-        background: "rgba(22, 20, 42, 0.4)",
-        backdropFilter: "blur(20px)",
-        borderBottom: "2px solid rgba(255, 255, 255, 0.05)",
-        fontFamily: "'Manrope', sans-serif",
+        fontFamily: "'Space Grotesk', sans-serif",
+        borderTop: "1px solid rgba(240, 185, 11, 0.82)",
       }}
     >
-      {/* ── Row 1 (always visible): logo + market + price + wallet ── */}
-      <div className="flex items-center gap-3 h-14 xl:h-auto">
-        {/* tapl logo */}
-        <div className="flex items-center gap-2 mr-2">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center relative overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, #0847F7 0%, #002280 100%)",
-              boxShadow: "0 2px 8px rgba(8, 71, 247, 0.3)",
-            }}
-          >
-            <img
-              src="/tapl.png"
-              alt="tapl"
-              className="w-5 h-5 object-contain relative z-10"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
-            />
-          </div>
-          <span className="hidden sm:block text-lg font-black tracking-tighter italic mr-2">
-            TAPL<span style={{ color: "#0847F7" }}>.</span>
-          </span>
-        </div>
-
-        {/* Market badge */}
-        <div
-          className="flex items-center gap-1.5 px-3 py-1.5 shrink-0"
-          style={{
-            background: "rgba(255, 255, 255, 0.03)",
-            border: "1px solid rgba(255, 255, 255, 0.05)",
-            borderRadius: "4px",
-          }}
-        >
-          <span className="font-semibold text-xs" style={{ color: "#ffffff" }}>
-            BTC/USD
-          </span>
-        </div>
-
-        {/* Live price */}
-        <span className="text-sm xl:text-base font-bold font-mono text-white flex items-center gap-1.5 flex-1 min-w-0">
-          <span className="truncate" style={{ color: "#2EBD85" }}>
-            ${currentPrice.toFixed(2)}
-          </span>
-          <span className="flex h-1.5 w-1.5 relative shrink-0">
-            <span
-              className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-              style={{ background: "#2EBD85" }}
-            ></span>
-            <span
-              className="relative inline-flex rounded-full h-1.5 w-1.5"
-              style={{ background: "#2EBD85" }}
-            ></span>
-          </span>
-        </span>
-
-        {/* ── Mobile wallet section ── */}
-        <div className="xl:hidden ml-auto shrink-0 flex items-center gap-2">
-          {!isConnected ? (
-            <>
-              <button
-                onClick={startDemo}
-                disabled={isDemoLoading}
-                className="px-3 py-1.5 font-bold rounded border border-[#0847F7] text-[#0847F7] active:scale-95 transition-transform text-xs whitespace-nowrap disabled:opacity-50"
-              >
-                {isDemoLoading ? "STARTING..." : "DEMO"}
-              </button>
-              <button
-                onClick={() => connect({ connector: connectors[0] })}
-                className="px-3 py-1.5 font-bold rounded bg-[#0847F7] text-white active:scale-95 transition-transform text-xs whitespace-nowrap"
-              >
-                CONNECT
-              </button>
-            </>
-          ) : chain?.id !== sepolia.id && !isDemoMode ? (
-            <button
-              onClick={() => switchChain?.({ chainId: sepolia.id })}
-              disabled={isPendingSwitch}
-              className="px-3 py-1.5 font-bold rounded bg-[#0847F7] text-white active:scale-95 transition-transform text-[11px] whitespace-nowrap disabled:opacity-50"
-            >
-              {isPendingSwitch ? "SWITCHING..." : "SWITCH NETWORK"}
-            </button>
-          ) : !token ? (
-            <button
-              onClick={() => {
-                promptedAddress.current = null;
-                handleLogin();
-              }}
-              className="px-3 py-1.5 font-bold rounded bg-[#0847F7] text-white active:scale-95 transition-transform text-xs whitespace-nowrap"
-            >
-              LOGIN
-            </button>
-          ) : (
-            <div className="relative">
-              {walletMenuOpen && (
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setWalletMenuOpen(false)}
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="flex flex-wrap items-center gap-3 lg:flex-nowrap">
+          <div className="flex min-w-0 items-center gap-4">
+            <Link to="/" className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-[#111111] shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
+                <img
+                  src="/polkatap.png"
+                  alt="PolkaTap"
+                  className="h-6 w-6 object-contain"
                 />
-              )}
-              {/* Wallet chip button */}
-              <button
-                onClick={() => setWalletMenuOpen((v) => !v)}
-                className="relative z-50 font-semibold px-2.5 py-1.5 active:scale-95 transition-transform flex items-center gap-1.5 text-xs"
-                style={{
-                  background: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.05)",
-                  color: "#ffffff",
-                  borderRadius: "4px",
-                }}
-              >
-                {address?.slice(0, 4)}..{address?.slice(-3)}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="10"
-                  height="10"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className={`opacity-60 transition-transform duration-200 ${walletMenuOpen ? "rotate-180" : ""}`}
-                  style={{ color: "#d0d0d0" }}
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </button>
-              {/* Dropdown */}
-              {walletMenuOpen && (
-                <div
-                  className="absolute right-0 top-full mt-1 w-52 shadow-2xl overflow-hidden z-50"
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-[1.65rem] font-semibold tracking-[-0.06em] text-white">
+                  PolkaTap
+                </p>
+                <span className="hidden rounded-md border border-white/8 bg-white/[0.03] px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-white/48 lg:inline-flex">
+                  Beta
+                </span>
+              </div>
+            </Link>
+          </div>
+
+          <nav className="hidden items-center gap-1 rounded-2xl border border-white/8 bg-white/[0.02] p-1 lg:flex lg:ml-4">
+            {NAV_ITEMS.map((item) => {
+              const isActive = location.pathname === item.path;
+
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className="rounded-xl px-4 py-2 text-sm font-medium transition"
                   style={{
-                    background: "rgba(255, 255, 255, 0.03)",
-                    border: "1px solid rgba(255, 255, 255, 0.05)",
-                    borderRadius: "4px",
+                    background: isActive
+                      ? "rgba(255,255,255,0.06)"
+                      : "transparent",
+                    color: isActive ? "#ffffff" : "rgba(255,255,255,0.62)",
+                    border: isActive
+                      ? "1px solid rgba(255,255,255,0.08)"
+                      : "1px solid transparent",
                   }}
                 >
-                  <div
-                    className="px-3 pt-3 pb-2"
-                    style={{
-                      borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-                    }}
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className="ml-auto flex items-center gap-2">
+            {!isConnected ? (
+              <>
+                <HeaderButton
+                  label={isDemoLoading ? "Starting demo" : "Demo mode"}
+                  onClick={startDemo}
+                  badge="beta"
+                />
+                <HeaderButton
+                  label="Connect wallet"
+                  onClick={() => connect({ connector: connectors[0] })}
+                  variant="primary"
+                />
+              </>
+            ) : chain?.id !== moonbaseAlpha.id && !isDemoMode ? (
+              <HeaderButton
+                label={isPendingSwitch ? "Switching" : "Switch network"}
+                onClick={() => switchChain?.({ chainId: moonbaseAlpha.id })}
+                variant="primary"
+              />
+            ) : !token ? (
+              <HeaderButton
+                label="Sign in"
+                onClick={() => {
+                  promptedAddress.current = null;
+                  handleLogin();
+                }}
+                badge="wallet"
+              />
+            ) : (
+              <>
+                <HeaderButton
+                  label="Faucet"
+                  onClick={() => setIsFundModalOpen(true)}
+                />
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setWalletMenuOpen((value) => !value)}
+                    className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/8 bg-white/[0.03] px-4 text-sm font-medium text-white transition hover:bg-white/[0.06]"
                   >
-                    <p
-                      className="text-[9px] uppercase tracking-wider font-semibold mb-1"
-                      style={{ color: "#a0a0a0" }}
-                    >
-                      {isDemoMode ? "Demo Wallet" : "Connected"}
-                    </p>
-                    <div className="flex items-center justify-between gap-2">
-                      <p
-                        className="font-mono text-[11px] truncate min-w-0"
-                        style={{ color: "#ffffff" }}
-                      >
-                        {address?.slice(0, 10)}...{address?.slice(-6)}
-                      </p>
-                      <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="font-mono text-[13px]">
+                      {address?.slice(0, 6)}...{address?.slice(-4)}
+                    </span>
+                    {isDemoMode ? (
+                      <span className="rounded-md bg-[#f0b90b]/14 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#f0b90b]">
+                        Demo
+                      </span>
+                    ) : null}
+                    <ChevronDown size={15} className="text-white/48" />
+                  </button>
+
+                  {walletMenuOpen && (
+                    <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-64 overflow-hidden rounded-2xl border border-white/8 bg-[#101010] shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
+                      <div className="border-b border-white/8 px-4 py-3">
+                        <p className="text-[11px] font-medium text-white/42">
+                          {isDemoMode ? "Demo wallet" : "Connected wallet"}
+                        </p>
+                        <p className="mt-2 break-all font-mono text-xs text-white">
+                          {address?.slice(0, 6)}...{address?.slice(-4)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 border-b border-white/8 px-4 py-3">
                         <button
-                          onClick={(e: React.MouseEvent) => {
-                            e.stopPropagation();
+                          type="button"
+                          className="rounded-xl border border-white/8 bg-white/4 px-3 py-2 text-xs font-medium text-white/75 transition hover:bg-white/[0.06] hover:text-white"
+                          onClick={() => {
                             if (address) {
                               navigator.clipboard.writeText(address);
-                              toast.success("Address copied!", {
-                                id: "copy-address-mobile",
-                                style: {
-                                  background: "rgba(255, 255, 255, 0.03)",
-                                  color: "#ffffff",
-                                  border: "1px solid rgba(255, 255, 255, 0.05)",
-                                  fontSize: "12px",
-                                },
-                                iconTheme: {
-                                  primary: "#2EBD85",
-                                  secondary: "#ffffff",
-                                },
-                              });
+                              toast.success("Address copied!");
                             }
                           }}
-                          className="p-1 hover:bg-white/10 rounded transition-colors"
-                          title="Copy Address"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            style={{ color: "#d0d0d0" }}
-                          >
-                            <rect
-                              width="14"
-                              height="14"
-                              x="8"
-                              y="8"
-                              rx="2"
-                              ry="2"
-                            />
-                            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                          </svg>
+                          Copy
                         </button>
                         <a
-                          href={`https://sepolia.etherscan.io/address/${address}`}
+                          href={`https://moonbase.moonscan.io/address/${address}`}
                           target="_blank"
                           rel="noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="p-1 hover:bg-white/10 rounded transition-colors"
-                          title="View on Explorer"
+                          className="rounded-xl border border-white/8 bg-white/4 px-3 py-2 text-xs font-medium text-white/75 transition hover:bg-white/[0.06] hover:text-white"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            style={{ color: "#d0d0d0" }}
-                          >
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                            <polyline points="15 3 21 3 21 9" />
-                            <line x1="10" y1="14" x2="21" y2="3" />
-                          </svg>
+                          Explorer
                         </a>
                       </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleDisconnect}
-                    className="w-full text-left px-4 py-3 font-medium transition-colors flex items-center gap-2.5 text-xs"
-                    style={{ color: "#F6465D" }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.background =
-                        "rgba(246,70,93,0.06)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.background =
-                        "transparent";
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                      <polyline points="16 17 21 12 16 7" />
-                      <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                    Disconnect
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ── Row 2 (mobile only): bet + balance + faucet ── */}
-      {isConnected && (
-        <div
-          className="xl:hidden flex items-center gap-2 h-10 overflow-x-auto scrollbar-none"
-          style={{ borderTop: "1px solid rgba(255, 255, 255, 0.05)" }}
-        >
-          {/* Bet selector */}
-          <div
-            className="flex px-2.5 py-1.5 items-center gap-1.5 shrink-0"
-            style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.05)",
-              borderRadius: "4px",
-            }}
-          >
-            <span
-              className="text-[10px] font-medium"
-              style={{ color: "#d0d0d0" }}
-            >
-              Bet
-            </span>
-            <div className="relative flex items-center">
-              <select
-                value={betAmount}
-                onChange={(e) => setBetAmount(Number(e.target.value))}
-                className="bg-transparent font-bold font-mono text-xs outline-none cursor-pointer appearance-none pr-4"
-                style={{ color: "#0847F7" }}
-              >
-                <option
-                  style={{ background: "#080A0C", color: "#0847F7" }}
-                  value={10}
-                >
-                  $10
-                </option>
-                <option
-                  style={{ background: "#080A0C", color: "#0847F7" }}
-                  value={50}
-                >
-                  $50
-                </option>
-                <option
-                  style={{ background: "#080A0C", color: "#0847F7" }}
-                  value={100}
-                >
-                  $100
-                </option>
-              </select>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="10"
-                height="10"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#0847F7"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="absolute right-0 pointer-events-none"
-              >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </div>
-          </div>
-
-          {/* Balance */}
-          <div
-            className="flex px-2.5 py-1.5 items-center gap-1.5 shrink-0"
-            style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.05)",
-              borderRadius: "4px",
-            }}
-          >
-            <span
-              className="text-[10px] font-medium"
-              style={{ color: "#d0d0d0" }}
-            >
-              Balance
-            </span>
-            <span
-              className="font-bold font-mono text-xs"
-              style={{ color: "#ffffff" }}
-            >
-              {"$"}
-              {Number(balance).toFixed(2)}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* ── Desktop right side (xl+): all in one row ── */}
-      <div className="hidden xl:flex items-center gap-3">
-        {isConnected && (
-          <>
-            <div
-              className="px-3 py-1.5 flex items-center gap-2"
-              style={{
-                background: "rgba(255, 255, 255, 0.03)",
-                border: "1px solid rgba(255, 255, 255, 0.05)",
-                borderRadius: "4px",
-              }}
-            >
-              <span
-                className="text-xs font-medium"
-                style={{ color: "#d0d0d0" }}
-              >
-                Bet:
-              </span>
-              <div className="relative flex items-center">
-                <select
-                  value={betAmount}
-                  onChange={(e) => setBetAmount(Number(e.target.value))}
-                  className="bg-transparent font-bold font-mono text-sm outline-none cursor-pointer appearance-none pr-5"
-                  style={{ color: "#0847F7" }}
-                >
-                  <option
-                    style={{ background: "#080A0C", color: "#0847F7" }}
-                    value={10}
-                  >
-                    $10
-                  </option>
-                  <option
-                    style={{ background: "#080A0C", color: "#0847F7" }}
-                    value={50}
-                  >
-                    $50
-                  </option>
-                  <option
-                    style={{ background: "#080A0C", color: "#0847F7" }}
-                    value={100}
-                  >
-                    $100
-                  </option>
-                </select>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#0847F7"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="absolute right-0 pointer-events-none"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </div>
-            </div>
-
-            <div
-              className="px-4 py-1.5 flex items-center gap-2"
-              style={{
-                background: "rgba(255, 255, 255, 0.03)",
-                border: "1px solid rgba(255, 255, 255, 0.05)",
-                borderRadius: "4px",
-              }}
-            >
-              <span
-                className="text-xs font-medium"
-                style={{ color: "#d0d0d0" }}
-              >
-                Balance
-              </span>
-              <span
-                className="font-bold font-mono text-sm"
-                style={{ color: "#0847F7" }}
-              >
-                {"$"}
-                {Number(balance).toFixed(2)}
-              </span>
-            </div>
-
-            <button
-              onClick={() => setIsFundModalOpen(true)}
-              className="px-4 py-1.5 font-bold rounded bg-[#0847F7] text-white transition-all text-sm"
-            >
-              FAUCET
-            </button>
-          </>
-        )}
-
-        {isConnected ? (
-          chain?.id !== sepolia.id && !isDemoMode ? (
-            <button
-              onClick={() => switchChain({ chainId: sepolia.id })}
-              disabled={isPendingSwitch}
-              className="flex items-center gap-2 px-4 py-1.5 font-bold rounded bg-[#0847F7] text-white text-sm disabled:opacity-50"
-            >
-              {isPendingSwitch ? "SWITCHING..." : "SWITCH NETWORK"}
-            </button>
-          ) : !token ? (
-            <button
-              onClick={() => {
-                promptedAddress.current = null;
-                handleLogin();
-              }}
-              className="flex items-center gap-2 px-4 py-1.5 font-bold rounded bg-[#0847F7] text-white text-sm"
-            >
-              LOGIN
-            </button>
-          ) : (
-            <div className="relative group">
-              <button
-                className="font-semibold px-4 py-2 transition-all active:scale-95 flex items-center gap-2 text-sm"
-                style={{
-                  background: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.05)",
-                  color: "#ffffff",
-                  borderRadius: "4px",
-                }}
-              >
-                {address?.slice(0, 6)}...{address?.slice(-4)}
-                {isDemoMode && (
-                  <span
-                    className="text-[9px] px-1.5 py-0.5 rounded font-bold"
-                    style={{
-                      background: "rgba(8, 71, 247,0.1)",
-                      color: "#0847F7",
-                      border: "1px solid rgba(8, 71, 247,0.2)",
-                    }}
-                  >
-                    DEMO
-                  </span>
-                )}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="transition-transform group-hover:rotate-180"
-                  style={{ color: "#d0d0d0" }}
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </button>
-
-              <div
-                className="absolute right-0 top-full mt-1 w-52 shadow-2xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50"
-                style={{
-                  background: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.05)",
-                  borderRadius: "4px",
-                }}
-              >
-                <div
-                  className="px-4 pt-3 pb-2"
-                  style={{
-                    borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-                  }}
-                >
-                  <p
-                    className="text-[10px] uppercase tracking-wider font-semibold mb-1"
-                    style={{ color: "#a0a0a0" }}
-                  >
-                    {isDemoMode ? "Demo Wallet" : "Connected"}
-                  </p>
-                  <div className="flex items-center justify-between gap-2">
-                    <p
-                      className="font-mono text-xs truncate min-w-0"
-                      style={{ color: "#ffffff" }}
-                    >
-                      {address}
-                    </p>
-                    <div className="flex items-center gap-1.5 shrink-0">
                       <button
-                        onClick={(e: React.MouseEvent) => {
-                          e.stopPropagation();
-                          if (address) {
-                            navigator.clipboard.writeText(address);
-                            toast.success("Address copied!", {
-                              id: "copy-address-desktop",
-                              style: {
-                                background: "rgba(255, 255, 255, 0.03)",
-                                color: "#ffffff",
-                                border: "1px solid rgba(255, 255, 255, 0.05)",
-                                fontSize: "12px",
-                              },
-                              iconTheme: {
-                                primary: "#2EBD85",
-                                secondary: "#ffffff",
-                              },
-                            });
-                          }
-                        }}
-                        className="p-1 hover:bg-white/10 rounded transition-colors"
-                        title="Copy Address"
+                        type="button"
+                        onClick={handleDisconnect}
+                        className="w-full px-4 py-3 text-left text-sm font-medium text-[#f87171] transition hover:bg-[#f87171]/8"
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          style={{ color: "#d0d0d0" }}
-                        >
-                          <rect
-                            width="14"
-                            height="14"
-                            x="8"
-                            y="8"
-                            rx="2"
-                            ry="2"
-                          />
-                          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-                        </svg>
+                        Disconnect
                       </button>
-                      <a
-                        href={`https://sepolia.etherscan.io/address/${address}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="p-1 hover:bg-white/10 rounded transition-colors"
-                        title="View on Explorer"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          style={{ color: "#d0d0d0" }}
-                        >
-                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                          <polyline points="15 3 21 3 21 9" />
-                          <line x1="10" y1="14" x2="21" y2="3" />
-                        </svg>
-                      </a>
                     </div>
-                  </div>
+                  )}
                 </div>
-                <button
-                  onClick={handleDisconnect}
-                  className="w-full text-left px-4 py-3 font-medium transition-colors flex items-center gap-2 text-sm"
-                  style={{ color: "#F6465D" }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(246,70,93,0.06)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background =
-                      "transparent";
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                    <polyline points="16 17 21 12 16 7" />
-                    <line x1="21" y1="12" x2="9" y2="12" />
-                  </svg>
-                  Disconnect
-                </button>
-              </div>
-            </div>
-          )
-        ) : (
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => connect({ connector: connectors[0] })}
-              className="flex items-center gap-2 px-4 py-2 font-bold rounded bg-[#0847F7] text-white text-sm"
-            >
-              CONNECT WALLET
-            </button>
+              </>
+            )}
           </div>
-        )}
+        </div>
+
+        <nav className="flex items-center gap-2 overflow-x-auto pb-1 lg:hidden">
+          {NAV_ITEMS.map((item) => {
+            const isActive = location.pathname === item.path;
+
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className="shrink-0 rounded-xl px-4 py-2 text-sm font-medium transition"
+                style={{
+                  background: isActive
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(255,255,255,0.03)",
+                  color: isActive ? "#ffffff" : "rgba(255,255,255,0.68)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                }}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
 
       <Dialog
@@ -1018,76 +551,24 @@ export const Header: React.FC = () => {
           aria-hidden="true"
         />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel
-            className="p-6 max-w-md w-full mx-4 relative"
-            style={{
-              background: "rgba(255, 255, 255, 0.03)",
-              border: "1px solid rgba(255, 255, 255, 0.05)",
-              borderRadius: "8px",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
-            }}
-          >
+          <DialogPanel className="relative mx-4 w-full max-w-md rounded-2xl border border-white/8 bg-[#101010] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
             <button
+              type="button"
               onClick={() => setIsFundModalOpen(false)}
-              className="absolute top-4 right-4 transition-colors"
-              style={{ color: "#a0a0a0" }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "#ffffff";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "#a0a0a0";
-              }}
+              className="absolute right-4 top-4 text-white/50 transition hover:text-white"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M18 6 6 18" />
-                <path d="m6 6 12 12" />
-              </svg>
+              x
             </button>
 
-            <h2 className="text-lg font-bold mb-1" style={{ color: "#ffffff" }}>
-              Faucet Account
-            </h2>
-            <p className="text-sm mb-6" style={{ color: "#d0d0d0" }}>
-              Claim $100 in test funds. Request additional funds every 30
+            <h2 className="text-lg font-bold text-white">Faucet account</h2>
+            <p className="mt-2 text-sm leading-6 text-white/65">
+              Claim $100 in test funds. Additional requests unlock every 30
               minutes.
             </p>
 
-            <div className="flex flex-col items-center gap-4">
+            <div className="mt-6">
               {timeRemaining > 0 ? (
-                <div
-                  className="px-6 py-3 font-mono text-lg font-bold flex items-center gap-2 w-full justify-center"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.05)",
-                    color: "#ffffff",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "4px",
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{ color: "#d0d0d0" }}
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
-                  </svg>
+                <div className="rounded-2xl border border-white/8 bg-white/4 px-5 py-4 text-center font-mono text-lg text-white">
                   Next in {Math.floor(timeRemaining / 1000 / 60)}:
                   {String(Math.floor((timeRemaining / 1000) % 60)).padStart(
                     2,
@@ -1096,16 +577,18 @@ export const Header: React.FC = () => {
                 </div>
               ) : (
                 <button
+                  type="button"
                   onClick={async () => {
-                    const token = localStorage.getItem("token");
-                    if (!token) return;
+                    const authToken = localStorage.getItem("token");
+                    if (!authToken) return;
+
                     setIsFunding(true);
                     try {
                       await fetch(`${BACKEND_URL}/api/payment/debug/deposit`, {
                         method: "POST",
                         headers: {
                           accept: "*/*",
-                          Authorization: `Bearer ${token}`,
+                          Authorization: `Bearer ${authToken}`,
                           "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
@@ -1126,30 +609,9 @@ export const Header: React.FC = () => {
                     }
                   }}
                   disabled={isFunding}
-                  className="w-full font-semibold px-6 py-3 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 text-sm"
-                  style={{
-                    background: "#0847F7",
-                    color: "#ffffff",
-                    borderRadius: "4px",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isFunding)
-                      (e.currentTarget as HTMLElement).style.background =
-                        "#8AA6F9";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background =
-                      "#0847F7";
-                  }}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f0b90b] px-5 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-black transition disabled:opacity-50"
                 >
-                  {isFunding ? (
-                    <>
-                      <div className="h-4 w-4 rounded-full border-2 border-black/20 border-t-black animate-spin" />
-                      Funding...
-                    </>
-                  ) : (
-                    "Fund $100 Now"
-                  )}
+                  {isFunding ? "Funding..." : "Fund $100 now"}
                 </button>
               )}
             </div>

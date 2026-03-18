@@ -1,7 +1,7 @@
 import Axios, { AxiosError } from "axios";
 
 export const AXIOS_INSTANCE = Axios.create({
-  baseURL: "https://api-tap-fun-chainlink.nysm.work",
+  baseURL: "https://api-tap-fun-polkadot.nysm.work/",
 });
 
 AXIOS_INSTANCE.interceptors.request.use((config) => {

@@ -1,16 +1,16 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { WagmiProvider, createConfig, http } from "wagmi";
-import { sepolia } from "wagmi/chains";
+import { moonbaseAlpha } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
 
 const queryClient = new QueryClient();
 
 const config = createConfig({
-  chains: [sepolia],
+  chains: [moonbaseAlpha],
   connectors: [injected()],
   transports: {
-    [sepolia.id]: http(),
+    [moonbaseAlpha.id]: http(),
   },
 });
 

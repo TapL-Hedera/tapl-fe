@@ -24,7 +24,7 @@ const features = [
     icon: Shield,
     title: "On-chain Security",
     highlight: "Security",
-    desc: "Every deposit and withdrawal is trustlessly settled via audited smart contracts on Sepolia.",
+    desc: "Every deposit and withdrawal is trustlessly settled via audited smart contracts on Moonbase Alpha.",
   },
   {
     icon: Zap,
@@ -109,8 +109,8 @@ export const LandingPage: React.FC = () => {
               }}
             >
               <img
-                src="/tapl.png"
-                alt="tapl"
+                src="/polkatap.png"
+                alt="PolkaTap"
                 className="w-6 h-6 object-contain relative z-10"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
@@ -119,7 +119,7 @@ export const LandingPage: React.FC = () => {
               <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <span className="text-lg font-black tracking-tighter uppercase italic text-white">
-              TAPL<span style={{ color: "#0847F7" }}>.</span>
+              PolkaTap<span style={{ color: "#0847F7" }}>.</span>
             </span>
           </Link>
 
@@ -663,7 +663,7 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5">
             <span className="text-sm font-bold" style={{ color: "#0847F7" }}>
-              TAPL
+              PolkaTap
             </span>
             <span className="text-xs" style={{ color: "#a0a0a0" }}>
               · Powered by Chainlink
@@ -684,7 +684,7 @@ export const LandingPage: React.FC = () => {
             </Link>
           </div>
           <div className="text-xs" style={{ color: "#a0a0a0" }}>
-            © 2024 TAPL. All rights reserved.
+            © 2024 PolkaTap. All rights reserved.
           </div>
         </div>
       </footer>

@@ -3,7 +3,6 @@ import { TradingView } from "./TradingView";
 import { HistoryView } from "./HistoryView";
 import { WalletView } from "./WalletView";
 import { LPView } from "./LPView";
-import { CREProofView } from "./CREProofView";
 import { IntroView } from "./IntroView";
 import { Toaster } from "react-hot-toast";
 
@@ -20,7 +19,6 @@ function App() {
           <Route path="/history" element={<HistoryView />} />
           <Route path="/wallet" element={<WalletView />} />
           <Route path="/lp" element={<LPView />} />
-          <Route path="/cre-workflows" element={<CREProofView />} />
         </Route>
       </Routes>
     </Router>

@@ -1,109 +1,184 @@
-import React, { useState, useEffect } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  ArrowDownLeft,
+  ArrowUpRight,
+  Coins,
+  Landmark,
+  RefreshCw,
+  ShieldCheck,
+  Sparkles,
+  Wallet,
+} from "lucide-react";
 import {
   useAccount,
-  useReadContract,
-  useWriteContract,
-  useWaitForTransactionReceipt,
+  useBalance,
   useSwitchChain,
+  useWaitForTransactionReceipt,
+  useWriteContract,
 } from "wagmi";
-import { sepolia } from "wagmi/chains";
-import { parseUnits, formatUnits, maxUint256 } from "viem";
+import { moonbaseAlpha } from "wagmi/chains";
+import { formatUnits, parseUnits } from "viem";
 import { toast } from "react-hot-toast";
+import { POOL_RESERVE_ADDRESS, POOL_RESERVE_ABI } from "./contracts/abi";
 import {
-  POOL_RESERVE_ADDRESS,
-  POOL_RESERVE_ABI,
-  ERC20_ABI,
-} from "./contracts/abi";
+  formatTokenSymbol,
+  showTransactionSubmittedToast,
+} from "./utils/moonbase";
 import {
   paymentControllerDebugDeposit,
-  paymentControllerRequestWithdrawal,
-  paymentControllerGetActiveWithdrawalSession,
   paymentControllerDebugFinalizeWithdrawal,
+  paymentControllerGetActiveWithdrawalSession,
+  paymentControllerRequestWithdrawal,
   useAccountControllerGetBalance,
 } from "./services/queries";
 
-// Conversion rate: 0.001 token = 1000 in-app balance
-// => 1 token = 1,000,000 in-app balance
-// => 1 in-app balance = 0.000001 token
 const IN_APP_PER_TOKEN = 1_000_000;
+const NATIVE_SYMBOL = "$DEV";
+const NATIVE_DECIMALS = 18;
+const ACCENT = "#f0b90b";
+const ACCENT_SOFT = "rgba(240, 185, 11, 0.14)";
+const BORDER = "rgba(255, 255, 255, 0.08)";
+
+type TabKey = "deposit" | "withdraw";
+
+interface MetricCardProps {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  sub?: string;
+}
+
+interface ActionButtonProps {
+  disabled?: boolean;
+  onClick: () => void;
+  pending?: boolean;
+  pendingLabel: string;
+  idleLabel: string;
+}
+
+function MetricCard({ icon: Icon, label, value, sub }: MetricCardProps) {
+  return (
+    <div
+      className="relative overflow-hidden rounded-[22px] p-5"
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(18,18,18,0.98) 0%, rgba(11,11,11,0.96) 100%)",
+        border: `1px solid ${BORDER}`,
+        boxShadow: "0 24px 64px rgba(0, 0, 0, 0.34)",
+      }}
+    >
+      <div
+        className="absolute inset-x-0 top-0 h-px"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent 0%, rgba(240,185,11,0.4) 50%, transparent 100%)",
+        }}
+      />
+      <div className="mb-4 flex items-center gap-3">
+        <div
+          className="flex h-11 w-11 items-center justify-center rounded-2xl"
+          style={{
+            background: ACCENT_SOFT,
+            border: "1px solid rgba(240, 185, 11, 0.18)",
+            color: ACCENT,
+          }}
+        >
+          <Icon size={18} />
+        </div>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+            {label}
+          </p>
+          {sub ? <p className="mt-1 text-[13px] text-white/70">{sub}</p> : null}
+        </div>
+      </div>
+      <p className="text-[1.85rem] font-bold tracking-[-0.04em] text-white">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function ActionButton({
+  disabled,
+  onClick,
+  pending,
+  pendingLabel,
+  idleLabel,
+}: ActionButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-semibold tracking-[0.16em] text-black transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+      style={{
+        background:
+          "linear-gradient(135deg, rgba(240,185,11,1) 0%, rgba(255,205,52,1) 100%)",
+        boxShadow: "0 18px 40px rgba(240, 185, 11, 0.18)",
+      }}
+    >
+      {pending && <RefreshCw size={15} className="animate-spin" />}
+      {pending ? pendingLabel : idleLabel}
+    </button>
+  );
+}
+
+function formatAmount(
+  value: bigint | undefined,
+  decimals: number,
+  digits = 4,
+  fallback = "—",
+) {
+  if (value === undefined) return fallback;
+
+  return Number(formatUnits(value, decimals)).toLocaleString(undefined, {
+    maximumFractionDigits: digits,
+  });
+}
+
+function formatCompactNumber(value: number, digits = 2) {
+  return value.toLocaleString(undefined, {
+    maximumFractionDigits: digits,
+  });
+}
+
+function safeParseUnits(value: string, decimals: number) {
+  if (!value) return 0n;
+
+  try {
+    return parseUnits(value, decimals);
+  } catch {
+    return 0n;
+  }
+}
 
 export const WalletView: React.FC = () => {
   const { address, isConnected, chain } = useAccount();
   const { switchChain, isPending: isPendingSwitch } = useSwitchChain();
-  const [activeTab, setActiveTab] = useState<"deposit" | "withdraw">("deposit");
-
-  // Deposit tab: token amount string
+  const [activeTab, setActiveTab] = useState<TabKey>("deposit");
   const [depositAmountStr, setDepositAmountStr] = useState("");
-  // Withdraw tab: in-app balance amount string
   const [withdrawInAppStr, setWithdrawInAppStr] = useState("");
+  const pendingDepositAmountRef = useRef<string | null>(null);
+  const handledDepositTxHashRef = useRef<string | null>(null);
 
-  // Get asset address
-  const { data: assetAddress } = useReadContract({
-    address: POOL_RESERVE_ADDRESS,
-    abi: POOL_RESERVE_ABI,
-    functionName: "asset",
-  });
-
-  // Get asset info
-  const { data: decimals = 18 } = useReadContract({
-    address: assetAddress as `0x${string}`,
-    abi: ERC20_ABI,
-    functionName: "decimals",
-    query: {
-      enabled: !!assetAddress,
-    },
-  });
-  const { data: symbol } = useReadContract({
-    address: assetAddress as `0x${string}`,
-    abi: ERC20_ABI,
-    functionName: "symbol",
-    query: {
-      enabled: !!assetAddress,
-    },
-  });
-  const { data: name } = useReadContract({
-    address: assetAddress as `0x${string}`,
-    abi: ERC20_ABI,
-    functionName: "name",
-    query: {
-      enabled: !!assetAddress,
-    },
-  });
-
-  const { data: balance, refetch: refetchBalance } = useReadContract({
-    address: assetAddress as `0x${string}`,
-    abi: ERC20_ABI,
-    functionName: "balanceOf",
-    args: address ? [address] : undefined,
-    query: {
-      enabled: !!assetAddress && !!address,
-    },
-  });
-
-  const { data: allowance, refetch: refetchAllowance } = useReadContract({
-    address: assetAddress as `0x${string}`,
-    abi: ERC20_ABI,
-    functionName: "allowance",
-    args: address ? [address, POOL_RESERVE_ADDRESS] : undefined,
-    query: {
-      enabled: !!assetAddress && !!address,
-    },
+  const { data: nativeBalance, refetch: refetchNativeBalance } = useBalance({
+    address,
+    chainId: moonbaseAlpha.id,
+    query: { enabled: !!address },
   });
 
   const { data: offChainBalanceData, refetch: refetchOffChainBalance } =
     useAccountControllerGetBalance();
   const offChainBalance = Number(
-    (offChainBalanceData as { free?: string })?.free ?? 0,
+    (offChainBalanceData as { free?: string } | undefined)?.free ?? 0,
   );
-
-  // Contract Writes
-  const {
-    writeContract: writeApprove,
-    data: approveTxHash,
-    isPending: isApproving,
-  } = useWriteContract();
-  const { isLoading: isWaitingApprove, isSuccess: isApproveSuccess } =
-    useWaitForTransactionReceipt({ hash: approveTxHash });
 
   const {
     writeContract: writeDepositTrader,
@@ -121,96 +196,117 @@ export const WalletView: React.FC = () => {
 
   const [isSubmittingApi, setIsSubmittingApi] = useState(false);
 
-  // --------------- Computed values ---------------
+  const depositTokenAmountRaw = safeParseUnits(
+    depositAmountStr,
+    NATIVE_DECIMALS,
+  );
+  const rawDepositAmount = depositAmountStr
+    ? Number.parseFloat(depositAmountStr)
+    : 0;
+  const isValidDepositAmount =
+    Number.isFinite(rawDepositAmount) &&
+    rawDepositAmount > 0 &&
+    depositTokenAmountRaw > 0n;
 
-  // Deposit: token amount
-  const depositTokenAmountRaw = depositAmountStr
-    ? parseUnits(depositAmountStr, decimals as number)
-    : 0n;
-  const rawDepositAmount = depositAmountStr ? parseFloat(depositAmountStr) : 0;
-
-  // Deposit: equivalent in-app balance display
   const depositInAppEquivalent = depositAmountStr
-    ? (parseFloat(depositAmountStr) * IN_APP_PER_TOKEN).toLocaleString()
+    ? formatCompactNumber(rawDepositAmount * IN_APP_PER_TOKEN, 0)
     : "0";
 
-  // Withdraw: user inputs in-app balance
-  const rawWithdrawInApp = withdrawInAppStr ? parseFloat(withdrawInAppStr) : 0;
-
-  // Withdraw: convert in-app balance → token amount (for smart contract)
-  // tokenAmount = inAppBalance / IN_APP_PER_TOKEN
+  const rawWithdrawInApp = withdrawInAppStr
+    ? Number.parseFloat(withdrawInAppStr)
+    : 0;
+  const isValidWithdrawAmount =
+    Number.isFinite(rawWithdrawInApp) && rawWithdrawInApp > 0;
   const withdrawTokenFloat = rawWithdrawInApp / IN_APP_PER_TOKEN;
-  // Format to 18 decimals for parseUnits (avoid floating point issues with toFixed)
   const withdrawTokenStr = withdrawTokenFloat.toFixed(18);
   const withdrawTokenAmountRaw =
-    rawWithdrawInApp > 0
-      ? parseUnits(withdrawTokenStr, decimals as number)
+    isValidWithdrawAmount
+      ? parseUnits(withdrawTokenStr, NATIVE_DECIMALS)
       : 0n;
-
-  // Withdraw: display equivalent token amount
   const withdrawTokenEquivalent =
-    rawWithdrawInApp > 0 ? withdrawTokenFloat.toFixed(6) : "0";
+    isValidWithdrawAmount ? withdrawTokenFloat.toFixed(6) : "0";
 
-  const needApproval =
-    activeTab === "deposit" &&
-    allowance !== undefined &&
-    (allowance as bigint) < depositTokenAmountRaw;
+  const refreshAll = useCallback(() => {
+    refetchNativeBalance();
+    refetchOffChainBalance();
+  }, [refetchNativeBalance, refetchOffChainBalance]);
 
-  // --------------- Effect: approval success ---------------
   useEffect(() => {
-    if (isApproveSuccess) {
-      refetchAllowance();
-      toast.success("Approval successful!");
-    }
-  }, [isApproveSuccess, refetchAllowance]);
+    if (!depositTxHash) return;
 
-  // --------------- Effect: deposit tx confirmed → call API ---------------
-  useEffect(() => {
-    const handleDepositApi = async () => {
-      if (depositTxHash && depositTokenAmountRaw > 0n) {
-        try {
-          setIsSubmittingApi(true);
-
-          const tokenAmountFloat = parseFloat(depositAmountStr);
-          // Rate: 0.001 token = 1000 in-app balance → in-app balance = tokenAmount * 1,000,000
-          const apiAmount = Math.floor(
-            tokenAmountFloat * IN_APP_PER_TOKEN,
-          ).toString();
-
-          const token = localStorage.getItem("token");
-
-          await paymentControllerDebugDeposit(
-            {
-              amount: apiAmount,
-              txHash: depositTxHash,
-              logIndex: 0,
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
-          toast.success("Deposit processed off-chain successfully!");
-          refetchBalance();
-          refetchOffChainBalance();
-          setDepositAmountStr("");
-        } catch (error) {
-          console.error("API error", error);
-          toast.error("Transaction sent but API call failed.");
-        } finally {
-          setIsSubmittingApi(false);
-        }
-      }
-    };
-    if (depositTxHash) {
-      handleDepositApi();
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    showTransactionSubmittedToast({
+      hash: depositTxHash,
+      title: "Deposit transaction submitted",
+      description: "Your wallet has broadcast the deposit transaction.",
+    });
   }, [depositTxHash]);
 
-  // --------------- Effect: claim (withdraw) tx confirmed → finalize ---------------
+  useEffect(() => {
+    if (!claimTxHash) return;
+
+    showTransactionSubmittedToast({
+      hash: claimTxHash,
+      title: "Withdrawal claim transaction submitted",
+      description:
+        "Your wallet has broadcast the withdrawal claim transaction.",
+    });
+  }, [claimTxHash]);
+
+  useEffect(() => {
+    const handleDepositApi = async () => {
+      if (!depositTxHash || handledDepositTxHashRef.current === depositTxHash) {
+        return;
+      }
+
+      const submittedAmountStr = pendingDepositAmountRef.current;
+      const tokenAmountFloat = submittedAmountStr
+        ? Number.parseFloat(submittedAmountStr)
+        : NaN;
+
+      if (!Number.isFinite(tokenAmountFloat) || tokenAmountFloat <= 0) {
+        pendingDepositAmountRef.current = null;
+        handledDepositTxHashRef.current = depositTxHash;
+        return;
+      }
+
+      handledDepositTxHashRef.current = depositTxHash;
+
+      try {
+        setIsSubmittingApi(true);
+
+        const apiAmount = Math.floor(
+          tokenAmountFloat * IN_APP_PER_TOKEN,
+        ).toString();
+
+        const token = localStorage.getItem("token");
+
+        await paymentControllerDebugDeposit(
+          {
+            amount: apiAmount,
+            txHash: depositTxHash,
+            logIndex: 0,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        refreshAll();
+        setDepositAmountStr("");
+        pendingDepositAmountRef.current = null;
+      } catch (error) {
+        console.error("API error", error);
+        toast.error("Transaction sent but API call failed.");
+      } finally {
+        setIsSubmittingApi(false);
+      }
+    };
+
+    handleDepositApi();
+  }, [depositTxHash, refreshAll]);
+
   useEffect(() => {
     if (!isClaimSuccess || !claimTxHash) return;
 
@@ -221,16 +317,12 @@ export const WalletView: React.FC = () => {
         const token = localStorage.getItem("token");
         const authHeader = { Authorization: `Bearer ${token}` };
 
-        // Step 3a: Get active withdrawal session to obtain sessionId
         const sessionResponse =
           await paymentControllerGetActiveWithdrawalSession({
             headers: authHeader,
           });
 
-        // The session data is in sessionResponse.data (typed as void by generated code,
-        // but at runtime it contains the actual object)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const sessionData = sessionResponse as any as
+        const sessionData = sessionResponse as unknown as
           | { sessionId: string }
           | null
           | undefined;
@@ -240,12 +332,9 @@ export const WalletView: React.FC = () => {
           return;
         }
 
-        const sessionId = sessionData.sessionId;
-
-        // Step 3b: Finalize withdrawal
         await paymentControllerDebugFinalizeWithdrawal(
           {
-            sessionId,
+            sessionId: sessionData.sessionId,
             txHash: claimTxHash,
             logIndex: 0,
           },
@@ -258,8 +347,7 @@ export const WalletView: React.FC = () => {
         );
 
         toast.success("Withdrawal finalized successfully!");
-        refetchBalance();
-        refetchOffChainBalance();
+        refreshAll();
         setWithdrawInAppStr("");
       } catch (error) {
         console.error("Finalize withdrawal error", error);
@@ -270,39 +358,33 @@ export const WalletView: React.FC = () => {
     };
 
     handleFinalizeWithdrawal();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClaimSuccess, claimTxHash]);
+  }, [claimTxHash, isClaimSuccess, refreshAll]);
 
-  // --------------- Handlers ---------------
-
-  const handleDeposit = async () => {
-    if (!depositAmountStr || rawDepositAmount <= 0) {
-      return toast.error("Enter a valid amount");
-    }
-    if ((balance as bigint) < depositTokenAmountRaw) {
-      return toast.error("Insufficient balance");
+  const handleDeposit = () => {
+    if (!depositAmountStr || !isValidDepositAmount) {
+      toast.error("Enter a valid amount");
+      return;
     }
 
-    if (needApproval) {
-      writeApprove({
-        address: assetAddress as `0x${string}`,
-        abi: ERC20_ABI,
-        functionName: "approve",
-        args: [POOL_RESERVE_ADDRESS, maxUint256],
-      });
-    } else {
-      writeDepositTrader({
-        address: POOL_RESERVE_ADDRESS,
-        abi: POOL_RESERVE_ABI,
-        functionName: "depositTrader",
-        args: [depositTokenAmountRaw],
-      });
+    if ((nativeBalance?.value ?? 0n) < depositTokenAmountRaw) {
+      toast.error("Insufficient balance");
+      return;
     }
+
+    pendingDepositAmountRef.current = depositAmountStr;
+
+    writeDepositTrader({
+      address: POOL_RESERVE_ADDRESS,
+      abi: POOL_RESERVE_ABI,
+      functionName: "depositTrader",
+      value: depositTokenAmountRaw,
+    });
   };
 
   const handleWithdraw = async () => {
-    if (!withdrawInAppStr || rawWithdrawInApp <= 0) {
-      return toast.error("Enter a valid in-app balance amount");
+    if (!withdrawInAppStr || !isValidWithdrawAmount) {
+      toast.error("Enter a valid in-app balance amount");
+      return;
     }
 
     const token = localStorage.getItem("token");
@@ -311,7 +393,6 @@ export const WalletView: React.FC = () => {
     try {
       setIsSubmittingApi(true);
 
-      // Step 1: Request withdrawal via API
       await paymentControllerRequestWithdrawal(
         { amount: withdrawInAppStr },
         { headers: { ...authHeader, "Content-Type": "application/json" } },
@@ -327,7 +408,6 @@ export const WalletView: React.FC = () => {
       setIsSubmittingApi(false);
     }
 
-    // Step 2: Call smart contract claimTrader with converted token amount
     writeClaimTrader({
       address: POOL_RESERVE_ADDRESS,
       abi: POOL_RESERVE_ABI,
@@ -336,591 +416,443 @@ export const WalletView: React.FC = () => {
     });
   };
 
+  const handleMaxDeposit = () => {
+    if (!nativeBalance?.value) return;
+
+    setDepositAmountStr(formatUnits(nativeBalance.value, NATIVE_DECIMALS));
+  };
+
+  const handleMaxWithdraw = () => {
+    if (offChainBalance <= 0) return;
+
+    setWithdrawInAppStr(offChainBalance.toString());
+  };
+
+  const chainMismatch = isConnected && chain?.id !== moonbaseAlpha.id;
   const isInsufficientDeposit =
-    activeTab === "deposit" &&
-    depositTokenAmountRaw > (balance ? (balance as bigint) : 0n);
-  const isInsufficientWithdraw =
-    activeTab === "withdraw" && rawWithdrawInApp > offChainBalance;
+    depositTokenAmountRaw > (nativeBalance?.value ?? 0n);
+  const isInsufficientWithdraw = rawWithdrawInApp > offChainBalance;
 
-  const isPending =
-    isApproving ||
-    isWaitingApprove ||
-    isDepositingOnChain ||
-    isClaimingTrader ||
-    isWaitingClaim ||
-    isSubmittingApi;
+  const depositPending = isDepositingOnChain || isSubmittingApi;
+  const withdrawPending = isSubmittingApi || isClaimingTrader || isWaitingClaim;
 
-  const isDisabled =
-    !isConnected ||
-    isPending ||
-    (activeTab === "deposit"
-      ? isInsufficientDeposit
-      : isInsufficientWithdraw) ||
-    (activeTab === "deposit" ? rawDepositAmount <= 0 : rawWithdrawInApp <= 0);
+  const activeRailLabel = useMemo(
+    () =>
+      activeTab === "deposit" ? "Chain → App balance" : "App balance → Chain",
+    [activeTab],
+  );
 
   return (
-    <div className="flex-1 p-4 lg:p-8 max-w-4xl mx-auto w-full relative z-10">
-      {/* Page heading */}
-      <div className="flex items-center gap-4 mb-8 pt-4 lg:pt-0">
-        <h1
-          className="text-3xl font-extrabold tracking-tight"
-          style={{ color: "#FFFFFF" }}
-        >
-          Wallet
-        </h1>
-        <span
-          className="text-xs px-2.5 py-1 font-semibold uppercase tracking-wider backdrop-blur-md"
+    <div className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
+      <div
+        className="absolute left-1/2 top-10 h-[420px] w-[420px] -translate-x-1/2 rounded-full blur-[140px]"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(240,185,11,0.16) 0%, transparent 72%)",
+        }}
+      />
+
+      <section className="relative overflow-hidden rounded-[28px] border border-white/8 bg-[#0b0b0b]/95 px-6 py-6 shadow-[0_36px_90px_rgba(0,0,0,0.38)] lg:px-8">
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em]"
+              style={{
+                background: ACCENT_SOFT,
+                color: ACCENT,
+                border: "1px solid rgba(240, 185, 11, 0.2)",
+              }}
+            >
+              <Sparkles size={13} />
+              Wallet
+            </div>
+            <h1 className="mt-4 text-3xl font-bold tracking-[-0.05em] text-white md:text-5xl">
+              Balance funding
+            </h1>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-3">
+            <div className="rounded-full border border-white/8 bg-white/[0.03] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
+              Moonbase Alpha
+            </div>
+            <button
+              type="button"
+              onClick={refreshAll}
+              className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
+            >
+              <RefreshCw size={14} />
+              Refresh
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <MetricCard
+          icon={Wallet}
+          label="On-Chain"
+          value={`${formatAmount(nativeBalance?.value, NATIVE_DECIMALS)} ${NATIVE_SYMBOL}`}
+          sub="Native wallet balance"
+        />
+        <MetricCard
+          icon={Coins}
+          label="App Balance"
+          value={formatCompactNumber(offChainBalance, 0)}
+          sub="Available for trading"
+        />
+        <MetricCard
+          icon={Landmark}
+          label="Conversion"
+          value={`1 ${NATIVE_SYMBOL}`}
+          sub={`${IN_APP_PER_TOKEN.toLocaleString()} in-app units`}
+        />
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.45fr_0.85fr]">
+        <div
+          className="relative overflow-hidden rounded-[28px] p-6 lg:p-7"
           style={{
-            background: "rgba(55,91,210,0.15)",
-            color: "#d0d0d0",
-            border: "1px solid rgba(55,91,210,0.3)",
-            borderRadius: "6px",
+            background:
+              "linear-gradient(180deg, rgba(14,14,14,0.98) 0%, rgba(9,9,9,0.98) 100%)",
+            border: `1px solid ${BORDER}`,
+            boxShadow: "0 24px 70px rgba(0, 0, 0, 0.3)",
           }}
         >
-          Testnet
-        </span>
-      </div>
+          <div
+            className="absolute right-6 top-6 h-28 w-28 rounded-full blur-3xl"
+            style={{ background: "rgba(240, 185, 11, 0.12)" }}
+          />
 
-      {/* Balance overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
-        <div className="p-6 sci-card group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-[#0847F7] opacity-5 rounded-full blur-3xl group-hover:opacity-10 transition-opacity"></div>
-          <p className="text-sm mb-2 font-medium" style={{ color: "#d0d0d0" }}>
-            On-Chain Token Balance
-          </p>
-          <p
-            className="text-4xl font-black font-mono tracking-tight"
-            style={{ color: "#FFFFFF" }}
-          >
-            {balance !== undefined
-              ? Number(
-                  formatUnits(balance as bigint, decimals as number),
-                ).toLocaleString(undefined, { maximumFractionDigits: 6 })
-              : "—"}
-          </p>
-        </div>
-        <div className="p-6 sci-card group">
-          <div className="absolute bottom-0 right-0 w-32 h-32 bg-[#0847F7] opacity-5 rounded-full blur-3xl group-hover:opacity-10 transition-opacity"></div>
-          <p className="text-sm mb-2 font-medium" style={{ color: "#d0d0d0" }}>
-            Token Info
-          </p>
-          <p
-            className="text-lg font-bold truncate mb-3"
-            style={{ color: "#FFFFFF" }}
-          >
-            {name ? `${name} (${symbol})` : "—"}
-          </p>
-          <div className="flex items-center gap-2">
-            <span
-              className="text-[10px] uppercase font-bold tracking-widest py-1 px-2 rounded-md"
-              style={{
-                background: "rgba(255,255,255,0.05)",
-                color: "#d0d0d0",
-              }}
-            >
-              Contract
-            </span>
-            <div
-              className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-black/20 hover:bg-black/40 transition-colors cursor-pointer"
-              onClick={() => {
-                if (assetAddress) {
-                  navigator.clipboard.writeText(assetAddress as string);
-                  toast.success("Token address copied!");
-                }
-              }}
-            >
-              <p
-                className="text-[11px] font-mono truncate"
-                style={{ color: "#d0d0d0" }}
-              >
-                {(assetAddress as string)?.slice(0, 8)}...
-                {(assetAddress as string)?.slice(-6)}
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                Action
               </p>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#d0d0d0"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
+              <h2 className="mt-2 text-2xl font-bold tracking-[-0.04em] text-white">
+                {activeTab === "deposit"
+                  ? `Deposit ${NATIVE_SYMBOL}`
+                  : `Withdraw ${NATIVE_SYMBOL}`}
+              </h2>
+            </div>
+            <div
+              className="inline-flex rounded-full border border-white/8 bg-white/4 p-1"
+              role="tablist"
+              aria-label="Wallet actions"
+            >
+              {(["deposit", "withdraw"] as const).map((tab) => {
+                const active = activeTab === tab;
+
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => {
+                      setActiveTab(tab);
+                      setDepositAmountStr("");
+                      setWithdrawInAppStr("");
+                    }}
+                    className="rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition"
+                    style={{
+                      background: active ? ACCENT : "transparent",
+                      color: active ? "#050505" : "rgba(255,255,255,0.58)",
+                    }}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="sci-card">
-        {/* Tab switcher */}
-        <div
-          className="flex relative"
-          style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-        >
-          {(["deposit", "withdraw"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveTab(tab);
-                setDepositAmountStr("");
-                setWithdrawInAppStr("");
-              }}
-              className={`flex-1 py-4 px-6 text-sm font-bold transition-all duration-300 capitalize relative overflow-hidden
-                  ${activeTab === tab ? "text-white" : "text-[#a0a0a0] hover:text-[#d0d0d0]"}`}
-            >
-              {activeTab === tab && (
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0847F7]/20 to-transparent opacity-50"></div>
-              )}
-              <span className="relative z-10">{tab} Activity</span>
-              {activeTab === tab && (
-                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#0847F7] animate-pulse">
-                  <div className="absolute inset-0 bg-[#0847F7] blur-sm"></div>
-                </div>
-              )}
-            </button>
-          ))}
-        </div>
-
-        <div className="p-6 md:p-8 space-y-8 relative">
-          {/* Background elements inside the form */}
-          <div className="absolute top-1/2 left-0 w-64 h-64 bg-[#0847F7] rounded-full blur-[120px] opacity-10 pointer-events-none -translate-y-1/2"></div>
-
-          {/* ---- DEPOSIT TAB ---- */}
-          {activeTab === "deposit" && (
-            <div className="relative z-10 animate-[fadeIn_0.3s_ease-out]">
-              <div className="mb-6">
-                <div className="flex justify-between mb-3 items-end">
-                  <label
-                    className="text-xs font-bold uppercase tracking-widest"
-                    style={{ color: "#d0d0d0" }}
-                  >
-                    Amount to Deposit
-                  </label>
-                  {balance !== undefined && (
-                    <span
-                      className="text-xs font-medium"
-                      style={{ color: "#d0d0d0" }}
-                    >
-                      Available:{" "}
-                      <strong className="text-white font-mono">
-                        {Number(
-                          formatUnits(balance as bigint, decimals as number) ||
-                            0,
-                        ).toFixed(2)}
-                      </strong>{" "}
-                      {symbol}
-                    </span>
-                  )}
-                </div>
-                <div className="relative group">
-                  <input
-                    type="number"
-                    value={depositAmountStr}
-                    onChange={(e) => setDepositAmountStr(e.target.value)}
-                    placeholder="0.00"
-                    min="0"
-                    step="0.001"
-                    className="w-full p-4 pl-5 pr-20 text-2xl font-black font-mono outline-none transition-all duration-300"
+          <div className="relative z-10 mt-8 space-y-6">
+            {activeTab === "deposit" ? (
+              <>
+                <div>
+                  <div className="mb-3 flex items-end justify-between gap-3">
+                    <label className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                      Native amount
+                    </label>
+                    <p className="text-xs text-white/60">
+                      Available{" "}
+                      <span className="font-semibold text-white">
+                        {formatAmount(nativeBalance?.value, NATIVE_DECIMALS)}{" "}
+                        {NATIVE_SYMBOL}
+                      </span>
+                    </p>
+                  </div>
+                  <div
+                    className="flex items-center gap-3 rounded-[24px] px-5 py-4"
                     style={{
-                      background: "rgba(0,0,0,0.3)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: "12px",
-                      color: "#FFFFFF",
+                      background: "rgba(255,255,255,0.03)",
+                      border: `1px solid ${BORDER}`,
                     }}
-                    onFocus={(e) => {
-                      (e.target as HTMLElement).style.borderColor = "#0847F7";
-                      (e.target as HTMLElement).style.boxShadow =
-                        "0 0 0 3px rgba(8, 71, 247,0.2)";
-                    }}
-                    onBlur={(e) => {
-                      (e.target as HTMLElement).style.borderColor =
-                        "rgba(255,255,255,0.08)";
-                      (e.target as HTMLElement).style.boxShadow = "none";
-                    }}
-                  />
-                  <button
-                    className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 text-xs font-bold rounded-md bg-[#0847F7]/20 text-[#d0d0d0] hover:bg-[#0847F7]/40 transition-colors uppercase tracking-wider"
-                    onClick={() => {
-                      if (balance !== undefined && balance > 0n) {
-                        setDepositAmountStr(
-                          formatUnits(balance as bigint, decimals as number),
-                        );
+                  >
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.001"
+                      value={depositAmountStr}
+                      onChange={(event) =>
+                        setDepositAmountStr(event.target.value)
                       }
-                    }}
-                  >
-                    Max
-                  </button>
-                </div>
-
-                {depositAmountStr && parseFloat(depositAmountStr) > 0 && (
-                  <div className="mt-4 flex items-center justify-between text-sm p-3 rounded-lg bg-[#0847F7]/5 border border-[#0847F7]/10">
-                    <span className="text-[#d0d0d0]">You will receive:</span>
-                    <span className="font-bold text-[#d0d0d0] flex items-center gap-1.5">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                      placeholder="0.00"
+                      className="min-w-0 flex-1 bg-transparent text-3xl font-bold tracking-[-0.04em] text-white outline-none placeholder:text-white/20"
+                    />
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em]"
+                        style={{
+                          background: ACCENT_SOFT,
+                          color: ACCENT,
+                          border: "1px solid rgba(240, 185, 11, 0.18)",
+                        }}
                       >
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                      {depositInAppEquivalent} In-App Balance
-                    </span>
+                        {NATIVE_SYMBOL}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleMaxDeposit}
+                        className="rounded-full border border-white/8 bg-white/4 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70 transition hover:bg-white/7 hover:text-white"
+                      >
+                        Max
+                      </button>
+                    </div>
                   </div>
-                )}
-              </div>
-
-              {isConnected && chain?.id !== sepolia.id ? (
-                <button
-                  onClick={() => switchChain?.({ chainId: sepolia.id })}
-                  disabled={isPendingSwitch}
-                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
-                  style={{ background: "#0847F7", color: "#ffffff" }}
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21.5 2v6h-6M2.13 15.57a9 9 0 1 0 3.87-8.91L2 9"></path>
-                    </svg>
-                    {isPendingSwitch
-                      ? "Switching Network..."
-                      : "Switch to Sepolia"}
-                  </span>
-                </button>
-              ) : (
-                <button
-                  onClick={handleDeposit}
-                  disabled={!isConnected || isPending || isDisabled}
-                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
-                  style={{ background: "#0847F7", color: "#ffffff" }}
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    {!isConnected ? (
-                      "Wallet Not Connected"
-                    ) : isInsufficientDeposit ? (
-                      "Insufficient Balance"
-                    ) : isApproving || isWaitingApprove ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Approving...
-                      </>
-                    ) : isDepositingOnChain || isSubmittingApi ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Depositing...
-                      </>
-                    ) : needApproval ? (
-                      "Approve Tokens"
-                    ) : (
-                      "Confirm Deposit"
-                    )}
-                  </span>
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* ---- WITHDRAW TAB ---- */}
-          {activeTab === "withdraw" && (
-            <div className="relative z-10 animate-[fadeIn_0.3s_ease-out]">
-              <div className="mb-6">
-                <div className="flex justify-between mb-3 items-end">
-                  <label
-                    className="text-xs font-bold uppercase tracking-widest"
-                    style={{ color: "#d0d0d0" }}
-                  >
-                    Amount to Withdraw (In-App)
-                  </label>
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: "#d0d0d0" }}
-                  >
-                    App Balance:{" "}
-                    <strong className="text-white font-mono">
-                      {offChainBalance.toLocaleString()}
-                    </strong>
-                  </span>
                 </div>
-                <div className="relative group">
-                  <input
-                    type="number"
-                    value={withdrawInAppStr}
-                    onChange={(e) => setWithdrawInAppStr(e.target.value)}
-                    placeholder="0"
-                    min="0"
-                    step="1"
-                    className="w-full p-4 pl-5 pr-20 text-2xl font-black font-mono outline-none transition-all duration-300"
+
+                {depositTokenAmountRaw > 0n && (
+                  <div
+                    className="flex items-center justify-between rounded-[22px] px-4 py-4"
                     style={{
-                      background: "rgba(0,0,0,0.3)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                      borderRadius: "12px",
-                      color: "#FFFFFF",
-                    }}
-                    onFocus={(e) => {
-                      (e.target as HTMLElement).style.borderColor = "#0847F7";
-                      (e.target as HTMLElement).style.boxShadow =
-                        "0 0 0 3px rgba(8, 71, 247,0.2)";
-                    }}
-                    onBlur={(e) => {
-                      (e.target as HTMLElement).style.borderColor =
-                        "rgba(255,255,255,0.08)";
-                      (e.target as HTMLElement).style.boxShadow = "none";
-                    }}
-                  />
-                  <button
-                    className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1.5 text-xs font-bold rounded-md bg-[#0847F7]/20 text-[#d0d0d0] hover:bg-[#0847F7]/40 transition-colors uppercase tracking-wider"
-                    onClick={() => {
-                      setWithdrawInAppStr(offChainBalance.toString());
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(240, 185, 11, 0.16)",
                     }}
                   >
-                    Max
-                  </button>
-                </div>
-
-                {withdrawInAppStr && rawWithdrawInApp > 0 && (
-                  <div className="mt-4 flex flex-col gap-2 p-4 rounded-xl bg-black/40 border border-white/5">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-[#d0d0d0]">
-                        You will receive on-chain:
-                      </span>
-                      <span className="font-bold text-[#d0d0d0] font-mono text-base bg-[#0847F7]/10 px-2 py-1 rounded">
-                        ≈ {withdrawTokenEquivalent} {symbol}
-                      </span>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-2xl"
+                        style={{
+                          background: ACCENT_SOFT,
+                          color: ACCENT,
+                        }}
+                      >
+                        <ArrowUpRight size={16} />
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.18em] text-white/45">
+                          Preview
+                        </p>
+                        <p className="mt-1 text-sm text-white/65">
+                          In-app balance credited
+                        </p>
+                      </div>
                     </div>
-                    <div className="w-full h-px bg-white/5 my-1"></div>
-                    <div className="flex justify-between items-center text-xs text-[#a0a0a0]">
-                      <span>Conversion Rate</span>
-                      <span>1000 In-App = 0.001 {symbol}</span>
-                    </div>
+                    <p className="text-lg font-semibold text-white">
+                      {depositInAppEquivalent}
+                    </p>
                   </div>
                 )}
-              </div>
 
-              {isConnected && chain?.id !== sepolia.id ? (
-                <button
-                  onClick={() => switchChain?.({ chainId: sepolia.id })}
-                  disabled={isPendingSwitch}
-                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
-                  style={{ background: "#0847F7", color: "#ffffff" }}
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21.5 2v6h-6M2.13 15.57a9 9 0 1 0 3.87-8.91L2 9"></path>
-                    </svg>
-                    {isPendingSwitch ? "Switching..." : "Switch to Sepolia"}
-                  </span>
-                </button>
-              ) : (
-                <button
-                  onClick={handleWithdraw}
-                  disabled={!isConnected || isPending || isDisabled}
-                  className="w-full py-4 rounded-xl font-bold transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:scale-100 uppercase tracking-wider"
-                  style={{ background: "#0847F7", color: "#ffffff" }}
-                >
-                  <span className="flex items-center justify-center gap-2">
-                    {!isConnected ? (
-                      "Wallet Not Connected"
-                    ) : isInsufficientWithdraw ? (
-                      "Insufficient Balance"
-                    ) : isSubmittingApi ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Requesting...
-                      </>
-                    ) : isClaimingTrader ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Claiming On-Chain...
-                      </>
-                    ) : isWaitingClaim ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Confirming...
-                      </>
-                    ) : (
-                      "Confirm Withdraw"
-                    )}
-                  </span>
-                </button>
-              )}
-            </div>
-          )}
+                {isInsufficientDeposit && (
+                  <p className="text-right text-xs text-[#f87171]">
+                    Deposit amount exceeds the connected wallet balance.
+                  </p>
+                )}
 
+                {chainMismatch ? (
+                  <ActionButton
+                    onClick={() => switchChain?.({ chainId: moonbaseAlpha.id })}
+                    disabled={isPendingSwitch}
+                    pending={isPendingSwitch}
+                    pendingLabel="SWITCHING NETWORK"
+                    idleLabel="SWITCH TO MOONBASE ALPHA"
+                  />
+                ) : (
+                  <ActionButton
+                    onClick={handleDeposit}
+                    disabled={
+                      !isConnected ||
+                      depositPending ||
+                      !isValidDepositAmount ||
+                      isInsufficientDeposit
+                    }
+                    pending={depositPending}
+                    pendingLabel="PROCESSING DEPOSIT"
+                    idleLabel={
+                      isConnected
+                        ? `DEPOSIT ${NATIVE_SYMBOL}`
+                        : "CONNECT WALLET TO DEPOSIT"
+                    }
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                <div>
+                  <div className="mb-3 flex items-end justify-between gap-3">
+                    <label className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                      In-app amount
+                    </label>
+                    <p className="text-xs text-white/60">
+                      Available{" "}
+                      <span className="font-semibold text-white">
+                        {formatCompactNumber(offChainBalance, 0)}
+                      </span>
+                    </p>
+                  </div>
+                  <div
+                    className="flex items-center gap-3 rounded-[24px] px-5 py-4"
+                    style={{
+                      background: "rgba(255,255,255,0.03)",
+                      border: `1px solid ${BORDER}`,
+                    }}
+                  >
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={withdrawInAppStr}
+                      onChange={(event) =>
+                        setWithdrawInAppStr(event.target.value)
+                      }
+                      placeholder="0"
+                      className="min-w-0 flex-1 bg-transparent text-3xl font-bold tracking-[-0.04em] text-white outline-none placeholder:text-white/20"
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleMaxWithdraw}
+                        className="rounded-full border border-white/8 bg-white/4 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70 transition hover:bg-white/7 hover:text-white"
+                      >
+                        Max
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {withdrawTokenAmountRaw > 0n && (
+                  <div
+                    className="flex items-center justify-between rounded-[22px] px-4 py-4"
+                    style={{
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(240, 185, 11, 0.16)",
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-2xl"
+                        style={{
+                          background: ACCENT_SOFT,
+                          color: ACCENT,
+                        }}
+                      >
+                        <ArrowDownLeft size={16} />
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.18em] text-white/45">
+                          Preview
+                        </p>
+                        <p className="mt-1 text-sm text-white/65">
+                          Native amount returned on-chain
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-lg font-semibold text-white">
+                      {withdrawTokenEquivalent} {NATIVE_SYMBOL}
+                    </p>
+                  </div>
+                )}
+
+                {isInsufficientWithdraw && (
+                  <p className="text-right text-xs text-[#f87171]">
+                    Requested amount exceeds your in-app balance.
+                  </p>
+                )}
+
+                {chainMismatch ? (
+                  <ActionButton
+                    onClick={() => switchChain?.({ chainId: moonbaseAlpha.id })}
+                    disabled={isPendingSwitch}
+                    pending={isPendingSwitch}
+                    pendingLabel="SWITCHING NETWORK"
+                    idleLabel="SWITCH TO MOONBASE ALPHA"
+                  />
+                ) : (
+                  <ActionButton
+                    onClick={handleWithdraw}
+                    disabled={
+                      !isConnected ||
+                      withdrawPending ||
+                      !isValidWithdrawAmount ||
+                      isInsufficientWithdraw
+                    }
+                    pending={withdrawPending}
+                    pendingLabel="PROCESSING WITHDRAWAL"
+                    idleLabel={
+                      isConnected
+                        ? `WITHDRAW ${NATIVE_SYMBOL}`
+                        : "CONNECT WALLET TO WITHDRAW"
+                    }
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        <div>
           <div
-            className="mt-8 rounded-xl p-5 relative overflow-hidden"
+            className="rounded-[28px] p-6"
             style={{
               background:
-                "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
-              border: "1px solid rgba(255,255,255,0.05)",
+                "linear-gradient(180deg, rgba(16,16,16,0.98) 0%, rgba(10,10,10,0.98) 100%)",
+              border: `1px solid ${BORDER}`,
             }}
           >
-            <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-[#0847F7] to-transparent"></div>
-            <h3
-              className="text-xs font-bold mb-3 uppercase tracking-widest flex items-center gap-2"
-              style={{ color: "#d0d0d0" }}
-            >
-              <div className="p-1.5 rounded-md bg-[#0847F7]/10 text-[#d0d0d0]">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 16v-4" />
-                  <path d="M12 8h.01" />
-                </svg>
-              </div>
-              How it works
-            </h3>
-            <p className="text-[#d0d0d0] text-sm leading-relaxed pl-1">
-              Tokens deposited to the Pool Reserve will be updated on the
-              backend. By design,{" "}
-              <strong className="text-white">
-                0.001 token = 1000 in-app balance
-              </strong>
-              .
-              {activeTab === "withdraw"
-                ? " Enter your in-app balance to withdraw equivalent tokens from the pool."
-                : " Withdrawing tokens from Trader balance relies on demo mockings. Off-chain state must be claimed through API for production."}
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+              Rail
             </p>
+            <div className="mt-5 space-y-3">
+              {[
+                {
+                  icon: ShieldCheck,
+                  title: "Reserve contract",
+                  value: `${POOL_RESERVE_ADDRESS.slice(0, 8)}...${POOL_RESERVE_ADDRESS.slice(-6)}`,
+                },
+                {
+                  icon: Wallet,
+                  title: "Current mode",
+                  value: activeRailLabel,
+                },
+                {
+                  icon: Coins,
+                  title: "Convert rate",
+                  value: `1000 APP = 0.001 ${formatTokenSymbol("DEV")}`,
+                },
+              ].map(({ icon: Icon, title, value }) => (
+                <div
+                  key={title}
+                  className="flex items-center justify-between rounded-[22px] border border-white/8 bg-white/[0.03] px-4 py-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="flex h-10 w-10 items-center justify-center rounded-2xl"
+                      style={{
+                        background: ACCENT_SOFT,
+                        color: ACCENT,
+                      }}
+                    >
+                      <Icon size={16} />
+                    </div>
+                    <p className="text-sm font-semibold text-white">{title}</p>
+                  </div>
+                  <p className="text-sm text-white/60">{value}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+      </section>
     </div>
   );
 };

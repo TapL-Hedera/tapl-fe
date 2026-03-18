@@ -1,0 +1,1284 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - link "Pixeltable Pixeltable Logo" [ref=e9] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e10]: Pixeltable
+          - img "Pixeltable Logo" [ref=e11]
+        - navigation [ref=e12]:
+          - navigation "Main" [ref=e13]:
+            - list [ref=e15]:
+              - listitem [ref=e16]:
+                - button "Developers" [ref=e17] [cursor=pointer]:
+                  - text: Developers
+                  - img [ref=e18]
+              - listitem [ref=e20]:
+                - link "Pricing" [ref=e21] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e22]:
+                - link "Datasets" [ref=e23] [cursor=pointer]:
+                  - /url: /data-products
+                  - img [ref=e24]
+                  - text: Datasets
+      - generic [ref=e28]:
+        - link "Star Pixeltable on GitHub" [ref=e29] [cursor=pointer]:
+          - /url: https://github.com/pixeltable/pixeltable
+          - generic [ref=e30]: GitHub
+          - img [ref=e31]
+        - link "Join our Discord community" [ref=e34] [cursor=pointer]:
+          - /url: https://discord.gg/QPyqFYx2UN
+          - generic [ref=e35]: Discord
+          - img [ref=e36]
+        - button "Toggle theme" [ref=e38] [cursor=pointer]:
+          - generic [ref=e39]: Toggle theme
+          - img [ref=e41]
+  - main [ref=e50]:
+    - generic [ref=e52]:
+      - generic [ref=e54]:
+        - generic [ref=e57]:
+          - heading "Operational Data Infrastructure for Multimodal AI" [level=1] [ref=e58]:
+            - generic [ref=e59]: Operational Data Infrastructure
+            - generic [ref=e60]: for Multimodal AI
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - generic [ref=e64]: Declarative
+              - img [ref=e65]
+            - generic [ref=e67]:
+              - link "Storage" [ref=e68] [cursor=pointer]:
+                - /url: https://docs.pixeltable.com/datastore/tables-and-operations
+                - img [ref=e71]
+                - text: Storage
+              - link "Orchestration" [ref=e76] [cursor=pointer]:
+                - /url: https://docs.pixeltable.com/datastore/computed-columns
+                - img [ref=e77]
+                - text: Orchestration
+              - link "Retrieval" [ref=e82] [cursor=pointer]:
+                - /url: https://docs.pixeltable.com/tutorials/queries-and-expressions
+                - img [ref=e83]
+                - text: Retrieval
+            - generic [ref=e89]:
+              - img [ref=e90]
+              - generic [ref=e92]: Incremental
+          - generic [ref=e93]:
+            - generic [ref=e94]:
+              - generic [ref=e95]:
+                - generic [ref=e96]: 85% less
+                - generic [ref=e97]: pipeline code
+                - link "Obvio" [ref=e98] [cursor=pointer]:
+                  - /url: https://obvio.ai/
+                  - img "Obvio" [ref=e99]
+              - generic [ref=e100]:
+                - generic [ref=e101]: Shipped in 3 days
+                - generic [ref=e102]: not 3 weeks
+                - link "Variata" [ref=e103] [cursor=pointer]:
+                  - /url: https://variata.ai/
+                  - img "Variata" [ref=e104]
+            - generic [ref=e105]:
+              - generic [ref=e107]:
+                - text: From the creators of
+                - link "Apache Parquet" [ref=e108] [cursor=pointer]:
+                  - /url: https://en.wikipedia.org/wiki/Apache_Parquet
+                - text: and
+                - link "Impala" [ref=e109] [cursor=pointer]:
+                  - /url: https://en.wikipedia.org/wiki/Apache_Impala
+                - text: "and engineers who worked at:"
+              - generic [ref=e111]:
+                - img "Apple" [ref=e114]
+                - img "Google" [ref=e117]
+                - img [ref=e120]
+                - img "Amazon" [ref=e124]
+                - img "Facebook" [ref=e127]
+                - img "Airbnb" [ref=e130]
+                - img "Cloudera" [ref=e133]
+                - img "MapR" [ref=e136]
+                - generic [ref=e138]:
+                  - img "Dremio"
+                - img "Oracle" [ref=e141]
+                - generic [ref=e143]:
+                  - img "IBM"
+                - img "Apple" [ref=e146]
+                - img "Google" [ref=e149]
+                - img [ref=e152]
+                - img "Amazon" [ref=e156]
+                - img "Facebook" [ref=e159]
+                - img "Airbnb" [ref=e162]
+                - img "Cloudera" [ref=e165]
+                - img "MapR" [ref=e168]
+                - generic [ref=e170]:
+                  - img "Dremio"
+                - img "Oracle" [ref=e173]
+                - generic [ref=e175]:
+                  - img "IBM"
+                - img "Apple" [ref=e178]
+                - img "Google" [ref=e181]
+                - img [ref=e184]
+                - img "Amazon" [ref=e188]
+                - img "Facebook" [ref=e191]
+                - img "Airbnb" [ref=e194]
+                - img "Cloudera" [ref=e197]
+                - img "MapR" [ref=e200]
+                - generic [ref=e202]:
+                  - img "Dremio"
+                - img "Oracle" [ref=e205]
+                - generic [ref=e207]:
+                  - img "IBM"
+        - generic [ref=e208]:
+          - paragraph [ref=e209]: Iterate on your data, not your infrastructure.
+          - generic [ref=e211]:
+            - generic [ref=e212]:
+              - generic [ref=e213]:
+                - button "$ pip install pixeltable" [ref=e214] [cursor=pointer]:
+                  - generic [ref=e215]: $
+                  - text: pip install pixeltable
+                  - img [ref=e216]
+                - generic [ref=e219]: Apache 2.0
+              - generic [ref=e220]:
+                - button "Sign Up" [ref=e221] [cursor=pointer]
+                - link "▶ Demo" [ref=e222] [cursor=pointer]:
+                  - /url: https://www.youtube.com/watch?v=Y2_YwrlITuQ
+            - generic [ref=e224]:
+              - tablist "Code pattern selection" [ref=e230]:
+                - tab "Data Wrangling" [selected] [ref=e231] [cursor=pointer]:
+                  - img [ref=e232]
+                  - text: Data Wrangling
+                - tab "AI Apps" [ref=e236] [cursor=pointer]:
+                  - img [ref=e237]
+                  - text: AI Apps
+                - tab "Agents" [ref=e240] [cursor=pointer]:
+                  - img [ref=e241]
+                  - text: Agents
+              - button "Copy code to clipboard" [ref=e244] [cursor=pointer]:
+                - img [ref=e245]
+            - generic [ref=e248]:
+              - generic [ref=e251]:
+                - generic [ref=e252]:
+                  - generic [ref=e253]: "1"
+                  - generic [ref=e254]: "# Video → frames → detections → export"
+                - generic [ref=e255]:
+                  - generic [ref=e256]: "2"
+                  - generic [ref=e257]: import pixeltable as pxt
+                - generic [ref=e258]:
+                  - generic [ref=e259]: "3"
+                  - generic [ref=e260]: from pixeltable.functions import openai, yolox
+                - generic [ref=e261]:
+                  - generic [ref=e262]: "4"
+                  - generic [ref=e263]: from pixeltable.iterators import FrameIterator
+                - generic [ref=e265]: "5"
+                - generic [ref=e267]:
+                  - generic [ref=e268]: "6"
+                  - generic [ref=e269]: "# Native multimodal types"
+                - generic [ref=e270]:
+                  - generic [ref=e271]: "7"
+                  - generic [ref=e272]: "videos = pxt.create_table('content', {"
+                - generic [ref=e273]:
+                  - generic [ref=e274]: "8"
+                  - generic [ref=e275]: "'video': pxt.Video,"
+                - generic [ref=e276]:
+                  - generic [ref=e277]: "9"
+                  - generic [ref=e278]: "'title': pxt.String"
+                - generic [ref=e279]:
+                  - generic [ref=e280]: "10"
+                  - generic [ref=e281]: "})"
+                - generic [ref=e283]: "11"
+                - generic [ref=e285]:
+                  - generic [ref=e286]: "12"
+                  - generic [ref=e287]: "# Automatic frame extraction"
+                - generic [ref=e288]:
+                  - generic [ref=e289]: "13"
+                  - generic [ref=e290]: frames = pxt.create_view('frames', videos,
+                - generic [ref=e291]:
+                  - generic [ref=e292]: "14"
+                  - generic [ref=e293]: iterator=FrameIterator.create(video=videos.video, fps=1)
+                - generic [ref=e294]:
+                  - generic [ref=e295]: "15"
+                  - generic [ref=e296]: )
+                - generic [ref=e298]: "16"
+                - generic [ref=e300]:
+                  - generic [ref=e301]: "17"
+                  - generic [ref=e302]: "# Computed columns run automatically on insert"
+                - generic [ref=e303]:
+                  - generic [ref=e304]: "18"
+                  - generic [ref=e305]: frames.add_computed_column(
+                - generic [ref=e306]:
+                  - generic [ref=e307]: "19"
+                  - generic [ref=e308]: objects=yolox(frames.frame, model_id='yolox_s')
+                - generic [ref=e309]:
+                  - generic [ref=e310]: "20"
+                  - generic [ref=e311]: )
+                - generic [ref=e312]:
+                  - generic [ref=e313]: "21"
+                  - generic [ref=e314]: frames.add_computed_column(
+                - generic [ref=e315]:
+                  - generic [ref=e316]: "22"
+                  - generic [ref=e317]: description=openai.vision(
+                - generic [ref=e318]:
+                  - generic [ref=e319]: "23"
+                  - generic [ref=e320]: prompt='Describe this frame',
+                - generic [ref=e321]:
+                  - generic [ref=e322]: "24"
+                  - generic [ref=e323]: image=frames.frame, model='gpt-4o-mini'
+                - generic [ref=e324]:
+                  - generic [ref=e325]: "25"
+                  - generic [ref=e326]: )
+                - generic [ref=e327]:
+                  - generic [ref=e328]: "26"
+                  - generic [ref=e329]: )
+                - generic [ref=e331]: "27"
+                - generic [ref=e333]:
+                  - generic [ref=e334]: "28"
+                  - generic [ref=e335]: "# Export to ML formats"
+                - generic [ref=e336]:
+                  - generic [ref=e337]: "29"
+                  - generic [ref=e338]: pxt.io.export_parquet(frames, 'dataset.parquet')
+                - generic [ref=e339]:
+                  - generic [ref=e340]: "30"
+                  - generic [ref=e341]: df = frames.select(frames.frame, frames.objects).collect().to_pandas()
+              - generic [ref=e343]:
+                - generic [ref=e344]:
+                  - generic [ref=e347]: PXT.CREATE_TABLE
+                  - generic [ref=e348]:
+                    - generic [ref=e349]: videos
+                    - generic [ref=e350]: "├─ video: pxt.Video"
+                    - generic [ref=e351]: "└─ title: pxt.String"
+                - generic [ref=e352]:
+                  - img [ref=e354]
+                  - generic [ref=e356]: line 41
+                - generic [ref=e357]:
+                  - generic [ref=e358]:
+                    - generic [ref=e361]: PXT.CREATE_VIEW
+                    - generic [ref=e362]: auto
+                  - generic [ref=e363]:
+                    - generic [ref=e364]: frames
+                    - generic [ref=e365]: "├─ frame: pxt.Image"
+                    - generic [ref=e366]: └─ FrameIterator @ 1fps
+                - generic [ref=e367]:
+                  - img [ref=e369]
+                  - generic [ref=e371]: line 46
+                - generic [ref=e372]:
+                  - generic [ref=e375]: ADD_COMPUTED_COLUMN
+                  - generic [ref=e376]:
+                    - generic [ref=e377]:
+                      - generic [ref=e378]: objects
+                      - generic [ref=e379]: ← yolox()
+                    - generic [ref=e380]:
+                      - generic [ref=e381]: description
+                      - generic [ref=e382]: ← openai.vision()
+                - generic [ref=e383]:
+                  - img [ref=e385]
+                  - generic [ref=e387]: export
+                - generic [ref=e388]:
+                  - generic [ref=e391]: OUTPUT
+                  - generic [ref=e392]:
+                    - generic [ref=e393]: .parquet
+                    - generic [ref=e394]: pandas
+      - generic [ref=e397]:
+        - generic [ref=e398]:
+          - heading "Multimodal Data, Made Simple" [level=2] [ref=e399]
+          - paragraph [ref=e400]: Video, audio, images, and documents as first-class data types — with storage, orchestration, and retrieval unified under one table interface.
+        - generic [ref=e402]: Loading architecture diagram...
+      - generic [ref=e405]:
+        - generic [ref=e406]:
+          - heading "Replace Complexity with Declarative Simplicity" [level=2] [ref=e407]:
+            - text: Replace Complexity
+            - generic [ref=e408]: with Declarative Simplicity
+          - paragraph [ref=e409]: See how Pixeltable eliminates the need for separate storage, orchestration, and retrieval systems.
+        - generic [ref=e410]:
+          - generic [ref=e411]:
+            - generic [ref=e412]:
+              - generic [ref=e413]:
+                - generic [ref=e419]: traditional_pipeline.py
+                - generic [ref=e421]: 47 lines
+              - generic [ref=e423]:
+                - generic [ref=e424]:
+                  - generic [ref=e425]: "1"
+                  - generic [ref=e426]: "# Separate systems, manual wiring"
+                - generic [ref=e427]:
+                  - generic [ref=e428]: "2"
+                  - generic [ref=e429]: import boto3
+                - generic [ref=e430]:
+                  - generic [ref=e431]: "3"
+                  - generic [ref=e432]: import pinecone
+                - generic [ref=e433]:
+                  - generic [ref=e434]: "4"
+                  - generic [ref=e435]: import psycopg2
+                - generic [ref=e436]:
+                  - generic [ref=e437]: "5"
+                  - generic [ref=e438]: from airflow import DAG
+                - generic [ref=e440]: "6"
+                - generic [ref=e442]:
+                  - generic [ref=e443]: "7"
+                  - generic [ref=e444]: "# 1. Download from S3"
+                - generic [ref=e445]:
+                  - generic [ref=e446]: "8"
+                  - generic [ref=e447]: s3 = boto3.client('s3')
+                - generic [ref=e448]:
+                  - generic [ref=e449]: "9"
+                  - generic [ref=e450]: s3.download_file(bucket, key, local_path)
+                - generic [ref=e452]: "10"
+                - generic [ref=e454]:
+                  - generic [ref=e455]: "11"
+                  - generic [ref=e456]: "# 2. Extract frames manually"
+                - generic [ref=e457]:
+                  - generic [ref=e458]: "12"
+                  - generic [ref=e459]: frames = extract_frames(local_path, fps=1)
+                - generic [ref=e461]: "13"
+                - generic [ref=e463]:
+                  - generic [ref=e464]: "14"
+                  - generic [ref=e465]: "# 3. Run model, handle errors"
+                - generic [ref=e466]:
+                  - generic [ref=e467]: "15"
+                  - generic [ref=e468]: "for frame in frames:"
+                - generic [ref=e469]:
+                  - generic [ref=e470]: "16"
+                  - generic [ref=e471]: "try:"
+                - generic [ref=e472]:
+                  - generic [ref=e473]: "17"
+                  - generic [ref=e474]: embedding = model.encode(frame)
+                - generic [ref=e475]:
+                  - generic [ref=e476]: "18"
+                  - generic [ref=e477]: objects = yolox.detect(frame)
+                - generic [ref=e478]:
+                  - generic [ref=e479]: "19"
+                  - generic [ref=e480]: "except Exception as e:"
+                - generic [ref=e481]:
+                  - generic [ref=e482]: "20"
+                  - generic [ref=e483]: log_error(e)
+                - generic [ref=e484]:
+                  - generic [ref=e485]: "21"
+                  - generic [ref=e486]: continue
+                - generic [ref=e488]: "22"
+                - generic [ref=e490]:
+                  - generic [ref=e491]: "23"
+                  - generic [ref=e492]: "# 4. Store in Pinecone"
+                - generic [ref=e493]:
+                  - generic [ref=e494]: "24"
+                  - generic [ref=e495]: pinecone_index.upsert([(id, embedding)])
+                - generic [ref=e497]: "25"
+                - generic [ref=e499]:
+                  - generic [ref=e500]: "26"
+                  - generic [ref=e501]: "# 5. Store metadata in Postgres"
+                - generic [ref=e502]:
+                  - generic [ref=e503]: "27"
+                  - generic [ref=e504]: cursor.execute(
+                - generic [ref=e505]:
+                  - generic [ref=e506]: "28"
+                  - generic [ref=e507]: "\"INSERT INTO frames ...\","
+                - generic [ref=e508]:
+                  - generic [ref=e509]: "29"
+                  - generic [ref=e510]: (id, objects, timestamp)
+                - generic [ref=e511]:
+                  - generic [ref=e512]: "30"
+                  - generic [ref=e513]: )
+                - generic [ref=e515]: "31"
+                - generic [ref=e517]:
+                  - generic [ref=e518]: "32"
+                  - generic [ref=e519]: "# 6. Set up Airflow DAG for updates..."
+              - generic [ref=e521]:
+                - generic [ref=e522]: "Systems:"
+                - generic [ref=e523]: S3
+                - generic [ref=e524]: Pinecone
+                - generic [ref=e525]: Postgres
+                - generic [ref=e526]: Airflow
+                - generic [ref=e527]: Custom ETL
+            - generic [ref=e528]: Traditional Approach
+          - generic [ref=e529]:
+            - generic [ref=e530]:
+              - generic [ref=e531]:
+                - generic [ref=e537]: storage_orchestration_retrieval.py
+                - generic [ref=e538]:
+                  - generic [ref=e539]: 12 lines
+                  - generic [ref=e540]: 74% less
+              - generic [ref=e542]:
+                - generic [ref=e543]:
+                  - generic [ref=e544]: "1"
+                  - generic [ref=e545]: import pixeltable as pxt
+                - generic [ref=e546]:
+                  - generic [ref=e547]: "2"
+                  - generic [ref=e548]: from pixeltable.functions import openai, yolox
+                - generic [ref=e550]: "3"
+                - generic [ref=e552]:
+                  - generic [ref=e553]: "4"
+                  - generic [ref=e554]: "# One table, automatic orchestration"
+                - generic [ref=e555]:
+                  - generic [ref=e556]: "5"
+                  - generic [ref=e557]: "videos = pxt.create_table('content', {"
+                - generic [ref=e558]:
+                  - generic [ref=e559]: "6"
+                  - generic [ref=e560]: "'video': pxt.Video"
+                - generic [ref=e561]:
+                  - generic [ref=e562]: "7"
+                  - generic [ref=e563]: "})"
+                - generic [ref=e565]: "8"
+                - generic [ref=e567]:
+                  - generic [ref=e568]: "9"
+                  - generic [ref=e569]: "# Computed columns run automatically"
+                - generic [ref=e570]:
+                  - generic [ref=e571]: "10"
+                  - generic [ref=e572]: frames = pxt.create_view('frames', videos,
+                - generic [ref=e573]:
+                  - generic [ref=e574]: "11"
+                  - generic [ref=e575]: iterator=FrameIterator.create(fps=1))
+                - generic [ref=e577]: "12"
+                - generic [ref=e579]:
+                  - generic [ref=e580]: "13"
+                  - generic [ref=e581]: frames.add_computed_column(
+                - generic [ref=e582]:
+                  - generic [ref=e583]: "14"
+                  - generic [ref=e584]: objects=yolox(frames.frame))
+                - generic [ref=e585]:
+                  - generic [ref=e586]: "15"
+                  - generic [ref=e587]: frames.add_computed_column(
+                - generic [ref=e588]:
+                  - generic [ref=e589]: "16"
+                  - generic [ref=e590]: embedding=openai.embed(frames.frame))
+                - generic [ref=e591]:
+                  - generic [ref=e592]: "17"
+                  - generic [ref=e593]: frames.add_embedding_index('embedding')
+                - generic [ref=e595]: "18"
+                - generic [ref=e597]:
+                  - generic [ref=e598]: "19"
+                  - generic [ref=e599]: "# Insert triggers full pipeline"
+                - generic [ref=e600]:
+                  - generic [ref=e601]: "20"
+                  - generic [ref=e602]: "videos.insert([{'video': 'new.mp4'}])"
+              - generic [ref=e604]:
+                - generic [ref=e605]: "Built-in:"
+                - generic [ref=e606]:
+                  - img [ref=e607]
+                  - text: Auto-orchestration
+                - generic [ref=e609]:
+                  - img [ref=e610]
+                  - text: Incremental
+                - generic [ref=e612]:
+                  - img [ref=e613]
+                  - text: Versioned
+                - generic [ref=e615]:
+                  - img [ref=e616]
+                  - text: Queryable
+            - generic [ref=e618]: With Pixeltable
+        - generic [ref=e619]:
+          - generic [ref=e620]:
+            - generic [ref=e621]: 1 System
+            - generic [ref=e622]: vs 5+ separate tools
+          - generic [ref=e624]:
+            - generic [ref=e625]: 75% Less
+            - generic [ref=e626]: code to maintain
+          - generic [ref=e628]:
+            - generic [ref=e629]: Zero
+            - generic [ref=e630]: orchestration config
+        - link "See the full quickstart guide" [ref=e632] [cursor=pointer]:
+          - /url: https://docs.pixeltable.com/overview/quick-start
+          - text: See the full quickstart guide
+          - img [ref=e633]
+      - generic [ref=e637]:
+        - generic [ref=e638]:
+          - heading "The Anatomy of a Multimodal AI Agent" [level=2] [ref=e639]
+          - paragraph [ref=e640]:
+            - text: Explore the code behind
+            - link "Pixelbot" [ref=e641] [cursor=pointer]:
+              - /url: https://github.com/pixeltable/pixelbot
+            - text: ", built on Pixeltable. See how declarative data infrastructure simplifies workflows like RAG, tool use, and multimodal data handling."
+        - generic [ref=e643]:
+          - generic [ref=e646]:
+            - generic [ref=e648]:
+              - generic [ref=e649]:
+                - img [ref=e650]
+                - generic [ref=e654]: Multimodal AI Agent/
+              - generic [ref=e655]:
+                - link "Try Live Now" [ref=e656] [cursor=pointer]:
+                  - /url: https://github.com/pixeltable/pixelbot
+                  - img [ref=e657]
+                  - text: Try Live Now
+                - link "View Code" [ref=e659] [cursor=pointer]:
+                  - /url: https://github.com/pixeltable/pixelbot
+                  - img [ref=e660]
+                  - text: View Code
+            - generic [ref=e665]:
+              - generic [ref=e666] [cursor=pointer]:
+                - img [ref=e668]
+                - img [ref=e670]
+                - generic [ref=e672]: pixelbot
+              - generic:
+                - generic [ref=e673] [cursor=pointer]:
+                  - img [ref=e675]
+                  - generic [ref=e679]:
+                    - text: setup_pixeltable.py
+                    - generic [ref=e681]:
+                      - img [ref=e682]
+                      - text: Storage & Orchestration
+                - generic [ref=e684] [cursor=pointer]:
+                  - img [ref=e686]
+                  - generic [ref=e690]:
+                    - text: endpoint.py
+                    - generic [ref=e692]:
+                      - img [ref=e693]
+                      - generic [ref=e695]: Web Server & API Endpoints
+                - generic [ref=e696] [cursor=pointer]:
+                  - img [ref=e698]
+                  - generic [ref=e702]:
+                    - text: functions.py
+                    - generic [ref=e704]:
+                      - img [ref=e705]
+                      - generic [ref=e707]: UDFs and tool definitions
+                - generic [ref=e708] [cursor=pointer]:
+                  - img [ref=e710]
+                  - generic [ref=e714]:
+                    - text: config.py
+                    - generic [ref=e716]:
+                      - img [ref=e717]
+                      - generic [ref=e720]: Model settings and configuration
+                - generic [ref=e721] [cursor=pointer]:
+                  - img [ref=e723]
+                  - generic [ref=e726]:
+                    - text: requirements.txt
+                    - generic [ref=e728]:
+                      - img [ref=e729]
+                      - generic [ref=e733]: Dependencies
+                - generic [ref=e734] [cursor=pointer]:
+                  - img [ref=e736]
+                  - generic [ref=e738]:
+                    - text: .env
+                    - generic [ref=e740]:
+                      - img [ref=e741]
+                      - generic [ref=e744]: Environment variables
+                - generic [ref=e745]:
+                  - generic [ref=e746]: Standard web app files (not Pixeltable-specific)
+                  - generic [ref=e748] [cursor=pointer]:
+                    - img [ref=e750]
+                    - img [ref=e752]
+                    - generic [ref=e754]: data
+                  - generic [ref=e756] [cursor=pointer]:
+                    - img [ref=e758]
+                    - img [ref=e760]
+                    - generic [ref=e762]: static
+                  - generic [ref=e764] [cursor=pointer]:
+                    - img [ref=e766]
+                    - img [ref=e768]
+                    - generic [ref=e770]: templates
+                  - generic [ref=e772] [cursor=pointer]:
+                    - img [ref=e774]
+                    - img [ref=e776]
+                    - generic [ref=e778]: logs
+            - generic [ref=e779]:
+              - generic [ref=e780]:
+                - img [ref=e781]
+                - generic [ref=e784]: 6 Core Files
+              - generic [ref=e785]:
+                - generic [ref=e786]:
+                  - img [ref=e787]
+                  - generic [ref=e791]: Lineage, Versioning, Caching
+                - generic [ref=e792]:
+                  - img [ref=e793]
+                  - generic [ref=e795]: Built-in
+          - generic [ref=e800]:
+            - generic [ref=e801]:
+              - generic [ref=e807]: setup_pixeltable.py
+              - link "GitHub Project" [ref=e809] [cursor=pointer]:
+                - /url: https://github.com/pixeltable/pixelbot
+                - img [ref=e810]
+                - generic [ref=e813]: GitHub Project
+            - generic [ref=e816]:
+              - generic [ref=e817]:
+                - generic [ref=e818]: "1"
+                - generic [ref=e819]: pxt.create_dir("agents", if_exists="ignore")
+              - generic [ref=e821]: "2"
+              - generic [ref=e823]:
+                - generic [ref=e824]: "3"
+                - generic [ref=e825]: "# === DOCUMENT PROCESSING ==="
+              - generic [ref=e826]:
+                - generic [ref=e827]: "4"
+                - generic [ref=e828]: documents = pxt.create_table(
+              - generic [ref=e829]:
+                - generic [ref=e830]: "5"
+                - generic [ref=e831]: "\"agents.collection\","
+              - generic [ref=e832]:
+                - generic [ref=e833]: "6"
+                - generic [ref=e834]: "{"
+              - generic [ref=e835]:
+                - generic [ref=e836]: "7"
+                - generic [ref=e837]: "\"document\": pxt.Document,"
+              - generic [ref=e838]:
+                - generic [ref=e839]: "8"
+                - generic [ref=e840]: "\"uuid\": pxt.String,"
+              - generic [ref=e841]:
+                - generic [ref=e842]: "9"
+                - generic [ref=e843]: "\"timestamp\": pxt.Timestamp,"
+              - generic [ref=e844]:
+                - generic [ref=e845]: "10"
+                - generic [ref=e846]: "\"user_id\": pxt.String"
+              - generic [ref=e847]:
+                - generic [ref=e848]: "11"
+                - generic [ref=e849]: "},"
+              - generic [ref=e850]:
+                - generic [ref=e851]: "12"
+                - generic [ref=e852]: )
+              - generic [ref=e853]:
+                - generic [ref=e854]: "13"
+                - generic [ref=e855]: chunks = pxt.create_view(
+              - generic [ref=e856]:
+                - generic [ref=e857]: "14"
+                - generic [ref=e858]: "\"agents.chunks\","
+              - generic [ref=e859]:
+                - generic [ref=e860]: "15"
+                - generic [ref=e861]: documents,
+              - generic [ref=e862]:
+                - generic [ref=e863]: "16"
+                - generic [ref=e864]: iterator=DocumentSplitter.create(
+              - generic [ref=e865]:
+                - generic [ref=e866]: "17"
+                - generic [ref=e867]: document=documents.document,
+              - generic [ref=e868]:
+                - generic [ref=e869]: "18"
+                - generic [ref=e870]: separators="paragraph",
+              - generic [ref=e871]:
+                - generic [ref=e872]: "19"
+                - generic [ref=e873]: metadata="title, heading, page"
+              - generic [ref=e874]:
+                - generic [ref=e875]: "20"
+                - generic [ref=e876]: ),
+              - generic [ref=e877]:
+                - generic [ref=e878]: "21"
+                - generic [ref=e879]: )
+              - generic [ref=e880]:
+                - generic [ref=e881]: "22"
+                - generic [ref=e882]: chunks.add_embedding_index(
+              - generic [ref=e883]:
+                - generic [ref=e884]: "23"
+                - generic [ref=e885]: "\"text\","
+              - generic [ref=e886]:
+                - generic [ref=e887]: "24"
+                - generic [ref=e888]: string_embed=sentence_transformer.using(
+              - generic [ref=e889]:
+                - generic [ref=e890]: "25"
+                - generic [ref=e891]: model_id=config.EMBEDDING_MODEL_ID
+              - generic [ref=e892]:
+                - generic [ref=e893]: "26"
+                - generic [ref=e894]: ),
+              - generic [ref=e895]:
+                - generic [ref=e896]: "27"
+                - generic [ref=e897]: )
+              - generic [ref=e899]: "28"
+              - generic [ref=e901]:
+                - generic [ref=e902]: "29"
+                - generic [ref=e903]: "@pxt.query"
+              - generic [ref=e904]:
+                - generic [ref=e905]: "30"
+                - generic [ref=e906]: "def search_documents(query_text: str, user_id: str):"
+              - generic [ref=e907]:
+                - generic [ref=e908]: "31"
+                - generic [ref=e909]: sim = chunks.text.similarity(query_text)
+              - generic [ref=e910]:
+                - generic [ref=e911]: "32"
+                - generic [ref=e912]: return (
+              - generic [ref=e913]:
+                - generic [ref=e914]: "33"
+                - generic [ref=e915]: chunks
+              - generic [ref=e916]:
+                - generic [ref=e917]: "34"
+                - generic [ref=e918]: .where((chunks.user_id == user_id) & (sim > 0.5))
+              - generic [ref=e919]:
+                - generic [ref=e920]: "35"
+                - generic [ref=e921]: .order_by(sim, asc=False)
+              - generic [ref=e922]:
+                - generic [ref=e923]: "36"
+                - generic [ref=e924]: .select(
+              - generic [ref=e925]:
+                - generic [ref=e926]: "37"
+                - generic [ref=e927]: chunks.text,
+              - generic [ref=e928]:
+                - generic [ref=e929]: "38"
+                - generic [ref=e930]: source_doc=chunks.document,
+              - generic [ref=e931]:
+                - generic [ref=e932]: "39"
+                - generic [ref=e933]: sim=sim
+              - generic [ref=e934]:
+                - generic [ref=e935]: "40"
+                - generic [ref=e936]: )
+              - generic [ref=e937]:
+                - generic [ref=e938]: "41"
+                - generic [ref=e939]: .limit(20)
+              - generic [ref=e940]:
+                - generic [ref=e941]: "42"
+                - generic [ref=e942]: )
+              - generic [ref=e944]: "43"
+              - generic [ref=e946]:
+                - generic [ref=e947]: "44"
+                - generic [ref=e948]: "# === IMAGE PROCESSING ==="
+              - generic [ref=e949]:
+                - generic [ref=e950]: "45"
+                - generic [ref=e951]: images = pxt.create_table(
+              - generic [ref=e952]:
+                - generic [ref=e953]: "46"
+                - generic [ref=e954]: "\"agents.images\","
+              - generic [ref=e955]:
+                - generic [ref=e956]: "47"
+                - generic [ref=e957]: "{"
+              - generic [ref=e958]:
+                - generic [ref=e959]: "48"
+                - generic [ref=e960]: "\"image\": pxt.Image,"
+              - generic [ref=e961]:
+                - generic [ref=e962]: "49"
+                - generic [ref=e963]: "\"uuid\": pxt.String,"
+              - generic [ref=e964]:
+                - generic [ref=e965]: "50"
+                - generic [ref=e966]: "\"timestamp\": pxt.Timestamp,"
+              - generic [ref=e967]:
+                - generic [ref=e968]: "51"
+                - generic [ref=e969]: "\"user_id\": pxt.String"
+              - generic [ref=e970]:
+                - generic [ref=e971]: "52"
+                - generic [ref=e972]: "},"
+              - generic [ref=e973]:
+                - generic [ref=e974]: "53"
+                - generic [ref=e975]: )
+              - generic [ref=e976]:
+                - generic [ref=e977]: "54"
+                - generic [ref=e978]: images.add_computed_column(
+              - generic [ref=e979]:
+                - generic [ref=e980]: "55"
+                - generic [ref=e981]: thumbnail=pxt_image.b64_encode(
+              - generic [ref=e982]:
+                - generic [ref=e983]: "56"
+                - generic [ref=e984]: pxt_image.resize(images.image, size=(96, 96))
+              - generic [ref=e985]:
+                - generic [ref=e986]: "57"
+                - generic [ref=e987]: ),
+              - generic [ref=e988]:
+                - generic [ref=e989]: "58"
+                - generic [ref=e990]: )
+              - generic [ref=e991]:
+                - generic [ref=e992]: "59"
+                - generic [ref=e993]: images.add_embedding_index(
+              - generic [ref=e994]:
+                - generic [ref=e995]: "60"
+                - generic [ref=e996]: "\"image\","
+              - generic [ref=e997]:
+                - generic [ref=e998]: "61"
+                - generic [ref=e999]: embedding=clip.using(model_id=config.CLIP_MODEL_ID),
+              - generic [ref=e1000]:
+                - generic [ref=e1001]: "62"
+                - generic [ref=e1002]: )
+              - generic [ref=e1004]: "63"
+              - generic [ref=e1006]:
+                - generic [ref=e1007]: "64"
+                - generic [ref=e1008]: "# ... and so on for Video, Audio, Memory, Chat History, Personas, Image Generation ..."
+              - generic [ref=e1010]: "65"
+              - generic [ref=e1012]:
+                - generic [ref=e1013]: "66"
+                - generic [ref=e1014]: "# === AGENT WORKFLOW DEFINITION ==="
+              - generic [ref=e1015]:
+                - generic [ref=e1016]: "67"
+                - generic [ref=e1017]: tools = pxt.tools(
+              - generic [ref=e1018]:
+                - generic [ref=e1019]: "68"
+                - generic [ref=e1020]: functions.get_latest_news,
+              - generic [ref=e1021]:
+                - generic [ref=e1022]: "69"
+                - generic [ref=e1023]: functions.fetch_financial_data,
+              - generic [ref=e1024]:
+                - generic [ref=e1025]: "70"
+                - generic [ref=e1026]: search_video_transcripts,
+              - generic [ref=e1027]:
+                - generic [ref=e1028]: "71"
+                - generic [ref=e1029]: )
+              - generic [ref=e1031]: "72"
+              - generic [ref=e1033]:
+                - generic [ref=e1034]: "73"
+                - generic [ref=e1035]: tool_agent = pxt.create_table(
+              - generic [ref=e1036]:
+                - generic [ref=e1037]: "74"
+                - generic [ref=e1038]: "\"agents.tools\","
+              - generic [ref=e1039]:
+                - generic [ref=e1040]: "75"
+                - generic [ref=e1041]: "{"
+              - generic [ref=e1042]:
+                - generic [ref=e1043]: "76"
+                - generic [ref=e1044]: "\"prompt\": pxt.String,"
+              - generic [ref=e1045]:
+                - generic [ref=e1046]: "77"
+                - generic [ref=e1047]: "\"timestamp\": pxt.Timestamp,"
+              - generic [ref=e1048]:
+                - generic [ref=e1049]: "78"
+                - generic [ref=e1050]: "\"user_id\": pxt.String,"
+              - generic [ref=e1051]:
+                - generic [ref=e1052]: "79"
+                - generic [ref=e1053]: "\"initial_system_prompt\": pxt.String,"
+              - generic [ref=e1054]:
+                - generic [ref=e1055]: "80"
+                - generic [ref=e1056]: "\"final_system_prompt\": pxt.String,"
+              - generic [ref=e1057]:
+                - generic [ref=e1058]: "81"
+                - generic [ref=e1059]: "\"max_tokens\": pxt.Int,"
+              - generic [ref=e1060]:
+                - generic [ref=e1061]: "82"
+                - generic [ref=e1062]: "\"temperature\": pxt.Float,"
+              - generic [ref=e1063]:
+                - generic [ref=e1064]: "83"
+                - generic [ref=e1065]: "},"
+              - generic [ref=e1066]:
+                - generic [ref=e1067]: "84"
+                - generic [ref=e1068]: )
+              - generic [ref=e1070]: "85"
+              - generic [ref=e1072]:
+                - generic [ref=e1073]: "86"
+                - generic [ref=e1074]: "# === DECLARATIVE WORKFLOW WITH COMPUTED COLUMNS ==="
+              - generic [ref=e1075]:
+                - generic [ref=e1076]: "87"
+                - generic [ref=e1077]: "# Step 1: Initial LLM Reasoning (Tool Selection)"
+              - generic [ref=e1078]:
+                - generic [ref=e1079]: "88"
+                - generic [ref=e1080]: tool_agent.add_computed_column(
+              - generic [ref=e1081]:
+                - generic [ref=e1082]: "89"
+                - generic [ref=e1083]: initial_response=messages(
+              - generic [ref=e1084]:
+                - generic [ref=e1085]: "90"
+                - generic [ref=e1086]: model=config.CLAUDE_MODEL_ID,
+              - generic [ref=e1087]:
+                - generic [ref=e1088]: "91"
+                - generic [ref=e1089]: system=tool_agent.initial_system_prompt,
+              - generic [ref=e1090]:
+                - generic [ref=e1091]: "92"
+                - generic [ref=e1092]: "messages=[{\"role\": \"user\", \"content\": tool_agent.prompt}],"
+              - generic [ref=e1093]:
+                - generic [ref=e1094]: "93"
+                - generic [ref=e1095]: tools=tools,
+              - generic [ref=e1096]:
+                - generic [ref=e1097]: "94"
+                - generic [ref=e1098]: tool_choice=tools.choice(required=True),
+              - generic [ref=e1099]:
+                - generic [ref=e1100]: "95"
+                - generic [ref=e1101]: ),
+              - generic [ref=e1102]:
+                - generic [ref=e1103]: "96"
+                - generic [ref=e1104]: )
+              - generic [ref=e1106]: "97"
+              - generic [ref=e1108]:
+                - generic [ref=e1109]: "98"
+                - generic [ref=e1110]: "# Step 2: Tool Execution"
+              - generic [ref=e1111]:
+                - generic [ref=e1112]: "99"
+                - generic [ref=e1113]: tool_agent.add_computed_column(
+              - generic [ref=e1114]:
+                - generic [ref=e1115]: "100"
+                - generic [ref=e1116]: tool_output=invoke_tools(tools, tool_agent.initial_response)
+              - generic [ref=e1117]:
+                - generic [ref=e1118]: "101"
+                - generic [ref=e1119]: )
+              - generic [ref=e1121]: "102"
+              - generic [ref=e1123]:
+                - generic [ref=e1124]: "103"
+                - generic [ref=e1125]: "# Step 3: Context Retrieval (Parallel RAG)"
+              - generic [ref=e1126]:
+                - generic [ref=e1127]: "104"
+                - generic [ref=e1128]: tool_agent.add_computed_column(
+              - generic [ref=e1129]:
+                - generic [ref=e1130]: "105"
+                - generic [ref=e1131]: doc_context=search_documents(tool_agent.prompt, tool_agent.user_id)
+              - generic [ref=e1132]:
+                - generic [ref=e1133]: "106"
+                - generic [ref=e1134]: )
+              - generic [ref=e1135]:
+                - generic [ref=e1136]: "107"
+                - generic [ref=e1137]: "# ... other context retrieval steps ..."
+              - generic [ref=e1139]: "108"
+              - generic [ref=e1141]:
+                - generic [ref=e1142]: "109"
+                - generic [ref=e1143]: "# Step 7: Final LLM Reasoning (Answer Generation)"
+              - generic [ref=e1144]:
+                - generic [ref=e1145]: "110"
+                - generic [ref=e1146]: tool_agent.add_computed_column(
+              - generic [ref=e1147]:
+                - generic [ref=e1148]: "111"
+                - generic [ref=e1149]: final_response=messages(
+              - generic [ref=e1150]:
+                - generic [ref=e1151]: "112"
+                - generic [ref=e1152]: model=config.CLAUDE_MODEL_ID,
+              - generic [ref=e1153]:
+                - generic [ref=e1154]: "113"
+                - generic [ref=e1155]: system=tool_agent.final_system_prompt,
+              - generic [ref=e1156]:
+                - generic [ref=e1157]: "114"
+                - generic [ref=e1158]: messages=tool_agent.final_prompt_messages,
+              - generic [ref=e1159]:
+                - generic [ref=e1160]: "115"
+                - generic [ref=e1161]: ),
+              - generic [ref=e1162]:
+                - generic [ref=e1163]: "116"
+                - generic [ref=e1164]: )
+              - generic [ref=e1166]: "117"
+              - generic [ref=e1168]:
+                - generic [ref=e1169]: "118"
+                - generic [ref=e1170]: "# Step 8: Extract Final Answer Text"
+              - generic [ref=e1171]:
+                - generic [ref=e1172]: "119"
+                - generic [ref=e1173]: tool_agent.add_computed_column(
+              - generic [ref=e1174]:
+                - generic [ref=e1175]: "120"
+                - generic [ref=e1176]: answer=tool_agent.final_response.content[0].text
+              - generic [ref=e1177]:
+                - generic [ref=e1178]: "121"
+                - generic [ref=e1179]: )
+      - generic [ref=e1182]:
+        - generic [ref=e1183]:
+          - heading "How Pixeltable Works" [level=2] [ref=e1184]
+          - paragraph [ref=e1185]: Store multimodal data in tables, define transformations as computed columns, and query everything together. Pixeltable handles all the orchestration, caching, and model execution automatically.
+        - generic [ref=e1186]:
+          - generic [ref=e1188]:
+            - generic [ref=e1189]:
+              - button "Build" [pressed] [ref=e1190] [cursor=pointer]:
+                - generic [ref=e1191]: "1"
+              - generic [ref=e1192]: Build
+            - generic [ref=e1194]:
+              - button "Transform" [ref=e1195] [cursor=pointer]:
+                - generic [ref=e1196]: "2"
+              - generic [ref=e1197]: Transform
+            - generic [ref=e1199]:
+              - button "Retrieve" [ref=e1200] [cursor=pointer]:
+                - generic [ref=e1201]: "3"
+              - generic [ref=e1202]: Retrieve
+            - generic [ref=e1204]:
+              - button "Serve" [ref=e1205] [cursor=pointer]:
+                - generic [ref=e1206]: "4"
+              - generic [ref=e1207]: Serve
+          - generic [ref=e1208]:
+            - generic [ref=e1209]:
+              - generic [ref=e1210]:
+                - heading "1. Connect to Your Data" [level=3] [ref=e1211]
+                - paragraph [ref=e1212]: Connect directly to your existing object stores (S3, local) without moving or duplicating data. Pixeltable organizes your files into queryable, versioned tables, eliminating the need for separate databases or vector stores.
+              - generic [ref=e1213]:
+                - generic [ref=e1214]:
+                  - img [ref=e1215]
+                  - generic [ref=e1218]: Connect to Your Data In-Place (S3 & Local)
+                - generic [ref=e1219]:
+                  - img [ref=e1220]
+                  - generic [ref=e1223]: Zero-Duplication Design (References your files)
+                - generic [ref=e1224]:
+                  - img [ref=e1225]
+                  - generic [ref=e1228]: Persistent & Versioned Tables
+                - generic [ref=e1229]:
+                  - img [ref=e1230]
+                  - generic [ref=e1233]: Native Multimodal Types (Video, Image, Audio, etc.)
+              - generic [ref=e1234]:
+                - link "Explore Datasets" [ref=e1235] [cursor=pointer]:
+                  - /url: /data-products
+                  - img [ref=e1236]
+                  - text: Explore Datasets
+                - link "View Docs" [ref=e1240] [cursor=pointer]:
+                  - /url: https://docs.pixeltable.com/datastore/tables-and-operations
+                  - img [ref=e1241]
+                  - text: View Docs
+            - generic [ref=e1246]:
+              - generic [ref=e1247]:
+                - generic [ref=e1253]: pixeltable_workflow.py
+                - link "Docs" [ref=e1254] [cursor=pointer]:
+                  - /url: https://docs.pixeltable.com/datastore/tables-and-operations
+                  - generic [ref=e1255]: Docs
+                  - img [ref=e1256]
+              - generic [ref=e1261]:
+                - generic [ref=e1262]:
+                  - generic [ref=e1263]: "1"
+                  - generic [ref=e1264]: import pixeltable as pxt
+                - generic [ref=e1266]: "2"
+                - generic [ref=e1268]:
+                  - generic [ref=e1269]: "3"
+                  - generic [ref=e1270]: "# Create a directory for your tables"
+                - generic [ref=e1271]:
+                  - generic [ref=e1272]: "4"
+                  - generic [ref=e1273]: pxt.create_dir('demo_project')
+                - generic [ref=e1275]: "5"
+                - generic [ref=e1277]:
+                  - generic [ref=e1278]: "6"
+                  - generic [ref=e1279]: "# Define table with image and text columns"
+                - generic [ref=e1280]:
+                  - generic [ref=e1281]: "7"
+                  - generic [ref=e1282]: img_table = pxt.create_table(
+                - generic [ref=e1283]:
+                  - generic [ref=e1284]: "8"
+                  - generic [ref=e1285]: "'demo_project.images',"
+                - generic [ref=e1286]:
+                  - generic [ref=e1287]: "9"
+                  - generic [ref=e1288]: "{"
+                - generic [ref=e1289]:
+                  - generic [ref=e1290]: "10"
+                  - generic [ref=e1291]: "'input_img': pxt.Image,"
+                - generic [ref=e1292]:
+                  - generic [ref=e1293]: "11"
+                  - generic [ref=e1294]: "'raw_text': pxt.String # For UDF example"
+                - generic [ref=e1295]:
+                  - generic [ref=e1296]: "12"
+                  - generic [ref=e1297]: "}"
+                - generic [ref=e1298]:
+                  - generic [ref=e1299]: "13"
+                  - generic [ref=e1300]: )
+                - generic [ref=e1302]: "14"
+                - generic [ref=e1304]:
+                  - generic [ref=e1305]: "15"
+                  - generic [ref=e1306]: "# Insert data (paths or URLs and text)"
+                - generic [ref=e1307]:
+                  - generic [ref=e1308]: "16"
+                  - generic [ref=e1309]: img_table.insert([
+                - generic [ref=e1310]:
+                  - generic [ref=e1311]: "17"
+                  - generic [ref=e1312]: "{"
+                - generic [ref=e1313]:
+                  - generic [ref=e1314]: "18"
+                  - generic [ref=e1315]: "'input_img': 'image1.jpg',"
+                - generic [ref=e1316]:
+                  - generic [ref=e1317]: "19"
+                  - generic [ref=e1318]: "'raw_text': 'Text for image 1'"
+                - generic [ref=e1319]:
+                  - generic [ref=e1320]: "20"
+                  - generic [ref=e1321]: "},"
+                - generic [ref=e1322]:
+                  - generic [ref=e1323]: "21"
+                  - generic [ref=e1324]: "{"
+                - generic [ref=e1325]:
+                  - generic [ref=e1326]: "22"
+                  - generic [ref=e1327]: "'input_img': 'image2.png',"
+                - generic [ref=e1328]:
+                  - generic [ref=e1329]: "23"
+                  - generic [ref=e1330]: "'raw_text': 'Text for image 2'"
+                - generic [ref=e1331]:
+                  - generic [ref=e1332]: "24"
+                  - generic [ref=e1333]: "}"
+                - generic [ref=e1334]:
+                  - generic [ref=e1335]: "25"
+                  - generic [ref=e1336]: "])"
+      - generic [ref=e1339]:
+        - generic [ref=e1340]:
+          - heading "Your Backend for Multimodal AI" [level=2] [ref=e1341]
+          - generic [ref=e1342]:
+            - code [ref=e1343]: pip install pixeltable
+            - img [ref=e1344]
+            - generic [ref=e1346]: Your entire AI data stack
+        - generic [ref=e1347]:
+          - generic [ref=e1349]:
+            - generic [ref=e1350]: 90%
+            - heading "Reduction in pipeline complexity" [level=3] [ref=e1351]
+            - paragraph [ref=e1352]: Simplify your AI data pipelines with declarative processing
+          - generic [ref=e1354]:
+            - generic [ref=e1355]: 75%
+            - heading "Faster development cycles" [level=3] [ref=e1356]
+            - paragraph [ref=e1357]: Accelerate your ML development with automated workflows
+          - generic [ref=e1359]:
+            - generic [ref=e1360]: 60%
+            - heading "Lower infrastructure costs" [level=3] [ref=e1361]
+            - paragraph [ref=e1362]: Deploy serverless functions when you need them, all without leaving pixeltable
+      - generic [ref=e1365]:
+        - generic [ref=e1366]:
+          - generic [ref=e1367]: Use Cases
+          - heading "What Can You Build?" [level=2] [ref=e1368]
+          - paragraph [ref=e1369]: Pixeltable's primitives compose into any multimodal AI workflow
+        - generic [ref=e1370]:
+          - 'link "Data Wrangling for ML Curate, augment, and export training datasets. Pre-annotate with models, integrate Label Studio, export to PyTorch. example.py # Extract frames, run detection, export frames.add_computed_column( objects=yolox(frames.frame) ) pxt.io.export_parquet(frames) Curate & Augment Pre-annotate Export PyTorch Version Control Learn more" [ref=e1372] [cursor=pointer]':
+            - /url: https://docs.pixeltable.com/use-cases/ml-data-wrangling
+            - generic [ref=e1373]:
+              - generic [ref=e1374]:
+                - img [ref=e1377]
+                - generic [ref=e1381]:
+                  - heading "Data Wrangling for ML" [level=3] [ref=e1382]
+                  - paragraph [ref=e1383]: Curate, augment, and export training datasets. Pre-annotate with models, integrate Label Studio, export to PyTorch.
+              - generic [ref=e1385]:
+                - generic [ref=e1390]: example.py
+                - code [ref=e1392]: "# Extract frames, run detection, export frames.add_computed_column( objects=yolox(frames.frame) ) pxt.io.export_parquet(frames)"
+              - generic [ref=e1393]:
+                - generic [ref=e1394]: Curate & Augment
+                - generic [ref=e1395]: Pre-annotate
+                - generic [ref=e1396]: Export PyTorch
+                - generic [ref=e1397]: Version Control
+              - generic [ref=e1398]:
+                - generic [ref=e1399]: Learn more
+                - img [ref=e1400]
+          - 'link "Backend for AI Apps Build RAG systems, semantic search, and multimodal APIs. Pixeltable handles storage, retrieval, and orchestration. example.py # Add embedding index for search docs.add_embedding_index( ''content'', embedding=openai.embeddings() ) RAG Pipelines Vector Search Multimodal APIs Auto-sync Learn more" [ref=e1403] [cursor=pointer]':
+            - /url: https://docs.pixeltable.com/use-cases/ai-applications
+            - generic [ref=e1404]:
+              - generic [ref=e1405]:
+                - img [ref=e1408]
+                - generic [ref=e1420]:
+                  - heading "Backend for AI Apps" [level=3] [ref=e1421]
+                  - paragraph [ref=e1422]: Build RAG systems, semantic search, and multimodal APIs. Pixeltable handles storage, retrieval, and orchestration.
+              - generic [ref=e1424]:
+                - generic [ref=e1429]: example.py
+                - code [ref=e1431]: "# Add embedding index for search docs.add_embedding_index( 'content', embedding=openai.embeddings() )"
+              - generic [ref=e1432]:
+                - generic [ref=e1433]: RAG Pipelines
+                - generic [ref=e1434]: Vector Search
+                - generic [ref=e1435]: Multimodal APIs
+                - generic [ref=e1436]: Auto-sync
+              - generic [ref=e1437]:
+                - generic [ref=e1438]: Learn more
+                - img [ref=e1439]
+          - 'link "Agents & MCP The ultimate Agent Harness. Tool-calling agents with persistent memory, MCP server integration, and automatic conversation history. example.py # LLM with tools, Pixeltable executes t.add_computed_column( response=openai.chat_completions( messages=t.msgs, tools=tools )) Agent Harness Persistent Memory MCP Integration State Management Learn more" [ref=e1442] [cursor=pointer]':
+            - /url: https://docs.pixeltable.com/use-cases/agents-mcp
+            - generic [ref=e1443]:
+              - generic [ref=e1444]:
+                - img [ref=e1447]
+                - generic [ref=e1452]:
+                  - heading "Agents & MCP" [level=3] [ref=e1453]
+                  - paragraph [ref=e1454]: The ultimate Agent Harness. Tool-calling agents with persistent memory, MCP server integration, and automatic conversation history.
+              - generic [ref=e1456]:
+                - generic [ref=e1461]: example.py
+                - code [ref=e1463]: "# LLM with tools, Pixeltable executes t.add_computed_column( response=openai.chat_completions( messages=t.msgs, tools=tools ))"
+              - generic [ref=e1464]:
+                - generic [ref=e1465]: Agent Harness
+                - generic [ref=e1466]: Persistent Memory
+                - generic [ref=e1467]: MCP Integration
+                - generic [ref=e1468]: State Management
+              - generic [ref=e1469]:
+                - generic [ref=e1470]: Learn more
+                - img [ref=e1471]
+        - generic [ref=e1473]:
+          - link "Get Started in 5 Minutes" [ref=e1474] [cursor=pointer]:
+            - /url: https://docs.pixeltable.com/overview/quick-start
+            - text: Get Started in 5 Minutes
+            - img [ref=e1475]
+          - link "Explore Public Datasets" [ref=e1477] [cursor=pointer]:
+            - /url: /data-products
+            - text: Explore Public Datasets
+            - img [ref=e1478]
+      - generic [ref=e1482]:
+        - region "Everything You Need to Know" [ref=e1483]:
+          - generic [ref=e1484]:
+            - generic [ref=e1485]:
+              - heading "Everything You Need to Know" [level=2] [ref=e1486]
+              - paragraph [ref=e1487]: Common questions about building with Pixeltable
+            - generic [ref=e1489]:
+              - button "What is Pixeltable?" [ref=e1491] [cursor=pointer]:
+                - heading "What is Pixeltable?" [level=3] [ref=e1492]
+                - img [ref=e1493]
+              - button "Why use Pixeltable?" [ref=e1496] [cursor=pointer]:
+                - heading "Why use Pixeltable?" [level=3] [ref=e1497]
+                - img [ref=e1498]
+              - button "How does Pixeltable work?" [ref=e1501] [cursor=pointer]:
+                - heading "How does Pixeltable work?" [level=3] [ref=e1502]
+                - img [ref=e1503]
+              - button "What AI models can I use with Pixeltable?" [ref=e1506] [cursor=pointer]:
+                - heading "What AI models can I use with Pixeltable?" [level=3] [ref=e1507]
+                - img [ref=e1508]
+              - button "What types of data can Pixeltable handle?" [ref=e1511] [cursor=pointer]:
+                - heading "What types of data can Pixeltable handle?" [level=3] [ref=e1512]
+                - img [ref=e1513]
+              - button "Where do I put my data?" [ref=e1516] [cursor=pointer]:
+                - heading "Where do I put my data?" [level=3] [ref=e1517]
+                - img [ref=e1518]
+        - region "Every Era of Data Gets an Owner" [ref=e1520]:
+          - generic [ref=e1522]:
+            - heading "Every Era of Data Gets an Owner" [level=2] [ref=e1523]:
+              - generic [ref=e1524]: Every Era of Data
+              - generic [ref=e1525]: Gets an Owner
+            - paragraph [ref=e1526]:
+              - text: Oracle for relational. Snowflake for analytics. Databricks for batch.
+              - text: The multimodal data plane is next.
+            - generic [ref=e1527]:
+              - link "Start Building with Pixeltable" [ref=e1528] [cursor=pointer]:
+                - /url: https://github.com/pixeltable/pixeltable
+                - text: Start Building with Pixeltable
+                - img [ref=e1529]
+              - link "10-Min Quickstart" [ref=e1531] [cursor=pointer]:
+                - /url: https://docs.pixeltable.com/overview/quick-start
+    - region "Notifications Alt+T"
+  - contentinfo [ref=e1533]:
+    - generic [ref=e1534]:
+      - generic [ref=e1535]:
+        - generic [ref=e1536]:
+          - link "Pixeltable Pixeltable Logo" [ref=e1537] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e1538]: Pixeltable
+            - img "Pixeltable Logo" [ref=e1539]
+          - paragraph [ref=e1540]: The declarative data infrastructure for multimodal AI. Build production-ready video, image, and document workflows in minutes, not months.
+          - generic [ref=e1541]:
+            - link "GitHub" [ref=e1542] [cursor=pointer]:
+              - /url: https://github.com/pixeltable/pixeltable
+              - generic [ref=e1543]: GitHub
+              - img [ref=e1544]
+            - link "X" [ref=e1547] [cursor=pointer]:
+              - /url: https://twitter.com/pixeltablehq
+              - generic [ref=e1548]: X
+              - img [ref=e1549]
+            - link "Discord" [ref=e1551] [cursor=pointer]:
+              - /url: https://discord.gg/QPyqFYx2UN
+              - generic [ref=e1552]: Discord
+              - img [ref=e1553]
+            - link "YouTube" [ref=e1555] [cursor=pointer]:
+              - /url: https://www.youtube.com/@PixeltableHQ
+              - generic [ref=e1556]: YouTube
+              - img [ref=e1557]
+            - link "LinkedIn" [ref=e1559] [cursor=pointer]:
+              - /url: https://www.linkedin.com/company/104122229
+              - generic [ref=e1560]: LinkedIn
+              - img [ref=e1561]
+        - generic [ref=e1563]:
+          - generic [ref=e1564]:
+            - heading "Product" [level=3] [ref=e1565]
+            - list [ref=e1566]:
+              - listitem [ref=e1567]:
+                - link "Blog" [ref=e1568] [cursor=pointer]:
+                  - /url: /blog
+              - listitem [ref=e1569]:
+                - link "Pricing" [ref=e1570] [cursor=pointer]:
+                  - /url: /pricing
+              - listitem [ref=e1571]:
+                - link "Changelog" [ref=e1572] [cursor=pointer]:
+                  - /url: https://docs.pixeltable.com/changelog/changelog
+              - listitem [ref=e1573]:
+                - link "GitHub Open Source" [ref=e1574] [cursor=pointer]:
+                  - /url: https://github.com/pixeltable/pixeltable
+                  - text: GitHub
+                  - generic [ref=e1575]: Open Source
+          - generic [ref=e1576]:
+            - heading "Resources" [level=3] [ref=e1577]
+            - list [ref=e1578]:
+              - listitem [ref=e1579]:
+                - link "Examples" [ref=e1580] [cursor=pointer]:
+                  - /url: https://docs.pixeltable.com/examples/use-cases
+              - listitem [ref=e1581]:
+                - link "Tutorials" [ref=e1582] [cursor=pointer]:
+                  - /url: https://docs.pixeltable.com/howto/cookbooks
+              - listitem [ref=e1583]:
+                - link "API Reference" [ref=e1584] [cursor=pointer]:
+                  - /url: https://docs.pixeltable.com/sdk
+              - listitem [ref=e1585]:
+                - link "Pixelagent" [ref=e1586] [cursor=pointer]:
+                  - /url: https://github.com/pixeltable/pixelagent
+          - generic [ref=e1587]:
+            - heading "Company" [level=3] [ref=e1588]
+            - list [ref=e1589]:
+              - listitem [ref=e1590]:
+                - link "About" [ref=e1591] [cursor=pointer]:
+                  - /url: /about
+              - listitem [ref=e1592]:
+                - link "Careers Hiring" [ref=e1593] [cursor=pointer]:
+                  - /url: /careers
+                  - text: Careers
+                  - generic [ref=e1594]: Hiring
+              - listitem [ref=e1595]:
+                - link "Contact" [ref=e1596] [cursor=pointer]:
+                  - /url: /contact
+              - listitem [ref=e1597]:
+                - link "Privacy" [ref=e1598] [cursor=pointer]:
+                  - /url: /privacy
+          - generic [ref=e1599]:
+            - heading "Get Started" [level=3] [ref=e1600]
+            - list [ref=e1601]:
+              - listitem [ref=e1602]:
+                - link "Pixelbot" [ref=e1603] [cursor=pointer]:
+                  - /url: https://github.com/pixeltable/pixelbot
+              - listitem [ref=e1604]:
+                - link "Starter Kit" [ref=e1605] [cursor=pointer]:
+                  - /url: https://github.com/pixeltable/pixeltable-starter-kit
+              - listitem [ref=e1606]:
+                - link "Deployment Guide" [ref=e1607] [cursor=pointer]:
+                  - /url: https://docs.pixeltable.com/howto/deployment/overview
+      - generic [ref=e1608]:
+        - paragraph [ref=e1609]: © 2026 Pixeltable, Inc. All rights reserved.
+        - generic [ref=e1610]:
+          - link "Terms of Service" [ref=e1611] [cursor=pointer]:
+            - /url: /terms
+          - link "Privacy Policy" [ref=e1612] [cursor=pointer]:
+            - /url: /privacy
+          - link "Security" [ref=e1613] [cursor=pointer]:
+            - /url: /security
+  - button "Open Pixeltable cheat sheet (Cmd/Ctrl + .)" [ref=e1615] [cursor=pointer]:
+    - img [ref=e1616]

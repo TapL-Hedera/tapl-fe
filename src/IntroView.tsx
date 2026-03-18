@@ -1,491 +1,482 @@
-import React, { useState, useEffect } from "react";
-import { motion, type Variants } from "framer-motion";
+import React from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
-  ShieldCheck,
-  Zap,
-  Layers,
-  Activity,
-  ArrowRightLeft,
-  Lock,
-  Globe,
+  ArrowRight,
+  BarChart3,
   Database,
-  Network,
+  Lock,
+  ShieldCheck,
+  Sparkles,
+  Zap,
 } from "lucide-react";
-import { Squares } from "./Squares";
-import {
-  PriceIntegrityCREWorkflow,
-  ProofOfReserveWorkflow,
-  RegimeModelCREWorkflow,
-  SettlementCREWorkflow,
-} from "./WorkflowDiagrams";
 
-const WORKFLOW_TABS = [
+const accent = "#f0b90b";
+
+const platformPillars = [
   {
-    label: "Price Integrity",
-    color: "#F472B6",
-    Component: PriceIntegrityCREWorkflow,
+    eyebrow: "Storage",
+    title: "Hold positions, balances, and reserve state in one mental model.",
+    description:
+      "The homepage now frames wallet balance, trader activity, and LP reserve as one connected system.",
+    icon: Database,
   },
   {
-    label: "Proof of Reserve",
-    color: "#6EE7B7",
-    Component: ProofOfReserveWorkflow,
+    eyebrow: "Execution",
+    title: "Move from wallet connect to trade entry with less friction.",
+    description:
+      "Primary actions stay close to the headline and preview panel so the user understands where to click next.",
+    icon: Zap,
   },
   {
-    label: "Regime Model",
-    color: "#FB923C",
-    Component: RegimeModelCREWorkflow,
+    eyebrow: "Trust",
+    title: "Explain settlement clearly before the user ever opens the app.",
+    description:
+      "On-chain wording, reserve context, and round mechanics are simplified into readable cards instead of marketing noise.",
+    icon: ShieldCheck,
   },
-  { label: "Settlement", color: "#818CF8", Component: SettlementCREWorkflow },
 ];
 
-const WorkflowDiagramTabs: React.FC = () => {
-  const [active, setActive] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+const productSurfaces = [
+  {
+    title: "Trade cockpit",
+    href: "/trade",
+    summary:
+      "The fast surface for BTC directional rounds, price timing, entry flow, and quick status feedback.",
+    bullets: ["Open round", "Tap a direction", "Track round state"],
+    stat: "Low-latency entry",
+  },
+  {
+    title: "Wallet rail",
+    href: "/wallet",
+    summary:
+      "The movement layer for deposits, in-app balances, and withdrawals without making the user decode backend concepts.",
+    bullets: ["Deposit to app", "Watch available balance", "Withdraw cleanly"],
+    stat: "Funding clarity",
+  },
+  {
+    title: "Reserve layer",
+    href: "/lp",
+    summary:
+      "The LP surface for reserve participation, share minting, and understanding how liquidity supports payouts.",
+    bullets: ["Provide liquidity", "Mint LP shares", "Follow reserve health"],
+    stat: "Protocol support",
+  },
+];
 
-  useEffect(() => {
-    if (isPaused) return;
-    const timer = setInterval(() => {
-      setActive((prev) => (prev + 1) % WORKFLOW_TABS.length);
-    }, 7000);
-    return () => clearInterval(timer);
-  }, [isPaused]);
-
-  const { Component } = WORKFLOW_TABS[active];
-
-  return (
-    <div>
-      <div className="flex flex-wrap gap-2 justify-center mb-6 pb-3 relative">
-        <div className="absolute left-1/2 -translate-x-1/2 bottom-0 h-[1px] w-[min(92%,640px)] bg-white/10" />
-        {WORKFLOW_TABS.map((tab, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              setActive(i);
-              setIsPaused(true);
-            }}
-            className={`relative px-4 py-1.5 rounded-lg text-[14px] font-mono tracking-wider transition-all border ${
-              active === i
-                ? "font-black scale-[1.05]"
-                : "font-semibold hover:text-white/90 hover:border-white/25 hover:bg-white/[0.06]"
-            }`}
-            style={{
-              background:
-                active === i ? `${tab.color}44` : "rgba(255,255,255,0.04)",
-              color: active === i ? "#ffffff" : "#8f8f8f",
-              borderColor:
-                active === i ? `${tab.color}AA` : "rgba(255,255,255,0.08)",
-              boxShadow:
-                active === i
-                  ? `0 0 0 1px ${tab.color}66, 0 10px 26px ${tab.color}55, inset 0 0 20px ${tab.color}33`
-                  : "none",
-              textShadow: active === i ? `0 0 10px ${tab.color}AA` : "none",
-            }}
-          >
-            {tab.label}
-            {active === i && (
-              <motion.span
-                layoutId="workflow-active-tab-underline"
-                className="absolute -bottom-[10px] left-1.5 right-1.5 h-[3.5px] rounded-full"
-                style={{
-                  background: `linear-gradient(90deg, transparent 0%, ${tab.color} 22%, ${tab.color} 78%, transparent 100%)`,
-                  boxShadow: `0 0 16px ${tab.color}, 0 0 28px ${tab.color}AA`,
-                }}
-                transition={{ type: "spring", stiffness: 420, damping: 34 }}
-              />
-            )}
-          </button>
-        ))}
-        {isPaused && (
-          <button
-            onClick={() => setIsPaused(false)}
-            className="absolute px-3 py-1.5 rounded-lg text-[10px] font-bold font-mono tracking-wider transition-all border border-blue-500/30 text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 top-15 -right-[200px] z-99"
-          >
-            ▶ RESUME AUTO-SWITCH
-          </button>
-        )}
-      </div>
-      <Component key={active} />
-    </div>
-  );
-};
+const operatingFlow = [
+  {
+    step: "01",
+    title: "Connect and authenticate",
+    description:
+      "Start with wallet signature or demo mode so the product is understandable before capital is committed.",
+  },
+  {
+    step: "02",
+    title: "Fund the trading balance",
+    description:
+      "Move funds into the in-app balance layer, where round entry feels immediate and consistent.",
+  },
+  {
+    step: "03",
+    title: "Join live BTC rounds",
+    description:
+      "Choose a direction, monitor the round, and keep the action loop compact and readable.",
+  },
+  {
+    step: "04",
+    title: "Settle or support liquidity",
+    description:
+      "Profits can move back through the wallet rail, while LP capital continues to back reserve activity.",
+  },
+];
 
 export const IntroView: React.FC = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-    },
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
-
-  const workflows = [
-    {
-      icon: <Activity size={24} />,
-      title: "Price Integrity via Streams",
-      desc: "High-frequency sub-second BTC/USD market data pulled from Chainlink Data Streams directly to the matching engine.",
-      color: "#0847F7",
-    },
-    {
-      icon: <Database size={24} />,
-      title: "Batch Submissions",
-      desc: "Trades, liquidity events, and oracle reports are aggregated off-chain and submitted as verifiable batches to our smart contracts.",
-      color: "#A78BFA",
-    },
-    {
-      icon: <Layers size={24} />,
-      title: "Deterministic Settlement",
-      desc: "Settlement payloads are built off-chain safely and cleanly. Winners withdraw without locking up large on-chain gas fees per tx.",
-      color: "#34D399",
-    },
-    {
-      icon: <ShieldCheck size={24} />,
-      title: "Continuous Solvency",
-      desc: "Pools are audited constantly by the Chainlink Runtime Environment (CRE). Real-time Proof of Reserve ensures full collateralization.",
-      color: "#63B3ED",
-    },
-    {
-      icon: <ArrowRightLeft size={24} />,
-      title: "LP & Yield Distribution",
-      desc: "Cross-chain logic via CCIP to automatically balance liquidity provider distributions globally, maintaining capital efficiency.",
-      color: "#F6AD55",
-    },
-  ];
-
   return (
-    <div className="flex-1 overflow-y-auto w-full relative z-0">
-      <div className="absolute inset-0 z-0">
-        <Squares
-          speed={0.5}
-          squareSize={40}
-          direction="diagonal" // up, down, left, right, diagonal
-          borderColor="rgba(255, 255, 255, 0.05)"
-          hoverFillColor="rgba(8, 71, 247, 0.2)"
+    <div className="relative flex-1 overflow-y-auto overflow-x-hidden bg-[#050505] text-white">
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute inset-x-0 top-0 h-[480px]"
+          style={{
+            background:
+              "radial-gradient(circle at top, rgba(240,185,11,0.16) 0%, transparent 60%)",
+          }}
         />
+        <div
+          className="absolute inset-0 opacity-[0.18]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px)",
+            backgroundSize: "42px 42px",
+            maskImage:
+              "linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 42%, transparent 100%)",
+          }}
+        />
+        <div className="absolute left-[-8rem] top-44 h-72 w-72 rounded-full bg-[#f0b90b]/8 blur-3xl" />
+        <div className="absolute right-[-5rem] top-20 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
       </div>
-      <div
-        className="absolute top-1/4 left-1/3 w-[600px] h-[600px] px-0 opacity-10 pointer-events-none rounded-full blur-[120px] z-0"
-        style={{
-          background: "radial-gradient(circle, #0847F7 0%, transparent 70%)",
-        }}
-      />
-      <div
-        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] px-0 opacity-10 pointer-events-none rounded-full blur-[100px] z-0"
-        style={{
-          background: "radial-gradient(circle, #2EBD85 0%, transparent 70%)",
-        }}
-      />
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className="w-full max-w-6xl mx-auto px-4 sm:px-8 py-6 pb-24 lg:pb-12 relative z-10 pointer-events-none"
-      >
-        {/* Navigation Header */}
-        <div className="flex justify-between items-center mb-12 pointer-events-auto">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center relative overflow-hidden group"
-              style={{
-                background: "linear-gradient(135deg, #0847F7 0%, #002280 100%)",
-                boxShadow: "0 4px 15px rgba(8, 71, 247, 0.4)",
-              }}
-            >
-              <img
-                src="/tapl.png"
-                alt="tapl"
-                className="w-7 h-7 object-contain relative z-10"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
-              />
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col px-4 pb-18 pt-5 sm:px-6 lg:px-8">
+        <motion.header
+          initial={{ opacity: 0, y: -14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45 }}
+          className="sticky top-0 z-30 mb-10"
+        >
+          <div className="rounded-full border border-white/8 bg-[rgba(8,8,8,0.9)] px-4 py-3 shadow-[0_22px_50px_rgba(0,0,0,0.28)] backdrop-blur">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <Link to="/" className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">
+                  <img
+                    src="/polkatap.png"
+                    alt="PolkaTap"
+                    className="h-6 w-6 object-contain"
+                  />
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
+                    PolkaTap
+                  </p>
+                  <p className="text-sm text-white/72">Polkadot Hackathon</p>
+                </div>
+              </Link>
+
+              <div className="hidden items-center gap-6 text-sm text-white/54 md:flex">
+                <a href="#platform" className="transition hover:text-white">
+                  Platform
+                </a>
+                <a href="#surfaces" className="transition hover:text-white">
+                  Surfaces
+                </a>
+                <a href="#process" className="transition hover:text-white">
+                  Process
+                </a>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <Link
+                  to="/wallet"
+                  className="hidden rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white/68 transition hover:border-white/18 hover:text-white sm:inline-flex"
+                >
+                  Wallet
+                </Link>
+                <Link
+                  to="/trade"
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-black shadow-[0_18px_42px_rgba(240,185,11,0.18)] transition hover:-translate-y-0.5"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #f0b90b 0%, #ffcf4c 100%)",
+                  }}
+                >
+                  Launch trade
+                  <ArrowRight size={15} />
+                </Link>
+              </div>
             </div>
-            <span className="text-xl font-black tracking-tighter uppercase italic text-[#0847F7]">
-              TAPL
-            </span>
           </div>
-        </div>
+        </motion.header>
 
-        {/* Hero Section */}
-        <motion.div
-          variants={itemVariants}
-          className="text-center mb-16 mt-4 pointer-events-auto"
-        >
-          <div
-            className="inline-block px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest mb-6"
-            style={{
-              background: "rgba(8, 71, 247, 0.15)",
-              color: "#0847F7",
-              border: "1px solid rgba(8, 71, 247, 0.3)",
-            }}
+        <section className="py-10 md:py-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+            className="mx-auto flex max-w-5xl flex-col items-center text-center"
           >
-            Introducing TAPL Protocol
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-[1.15]">
-            On-chain Derivatives <br className="hidden md:block" />
-            <span style={{ color: "#0847F7" }}>Powered by Chainlink CRE</span>
-          </h1>
-          <p
-            className="max-w-2xl mx-auto text-sm md:text-base leading-relaxed"
-            style={{ color: "#a0a0a0" }}
-          >
-            TAPL brings sub-second market prediction to Web3. Trade without
-            limits, provide liquidity safely, and benefit from lightning-fast
-            Chainlink decentralized oracle networks executing off-chain
-            computations and returning verifiable results on-chain.
-          </p>
-          <div className="flex justify-center mt-10">
-            <Link
-              to="/trade"
-              className="px-5 py-2.5 rounded-lg text-xs font-bold font-mono tracking-wider transition-all hover:scale-105 active:scale-95 border border-[#0847F7]/30 hover:border-[#0847F7] w-[200px]"
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
               style={{
-                background: "rgba(8, 71, 247, 0.1)",
-                color: "#ffffff",
+                background: "rgba(240, 185, 11, 0.08)",
+                border: "1px solid rgba(240, 185, 11, 0.14)",
+                color: accent,
               }}
             >
-              LAUNCH APP
-            </Link>
-          </div>
-        </motion.div>
+              <Sparkles size={12} />
+              Operational trading UI
+            </div>
 
-        {/* CRE Workflow Diagrams — Tabbed */}
-        <motion.div
-          variants={itemVariants}
-          className="mt-20 mb-10 w-full max-w-5xl mx-auto pointer-events-auto"
-        >
-          <h2 className="text-3xl font-bold mb-2 text-center">
-            Powered by CRE{" "}
-          </h2>
+            <h1 className="mt-8 max-w-5xl text-5xl font-semibold leading-[0.95] tracking-[-0.08em] text-white md:text-7xl lg:text-[92px]">
+              Trading infrastructure
+              <span className="block text-white/58">
+                for BTC rounds on Polkadot
+              </span>
+            </h1>
 
-          <WorkflowDiagramTabs />
-        </motion.div>
+            <p className="mt-6 max-w-2xl text-base leading-8 text-white/52 md:text-lg">
+              Wallet funding, round execution, and reserve-backed settlement,
+              presented as one clean operating system instead of a noisy promo
+              page.
+            </p>
 
-        {/* How It Works */}
-        <motion.div
-          variants={itemVariants}
-          className="mb-20 pointer-events-auto"
-        >
-          <h2 className="text-2xl font-bold mb-3 text-center">How It Works</h2>
-          <p
-            className="max-w-3xl mx-auto text-center text-sm md:text-base leading-relaxed mb-8"
-            style={{ color: "#a0a0a0" }}
-          >
-            TAPL is a prediction trading app where you connect your wallet, pick
-            a market direction, and let Chainlink-powered infrastructure handle
-            fair pricing, execution, and settlement.
-          </p>
-
-          <div className="grid md:grid-cols-4 gap-4">
-            {[
-              {
-                step: "01",
-                title: "Connect Wallet",
-                desc: "Use any EVM-compatible wallet to access TAPL instantly with no account creation.",
-                color: "#0847F7",
-              },
-              {
-                step: "02",
-                title: "Place Prediction",
-                desc: "Choose market direction and submit your position with transparent on-chain intent.",
-                color: "#2EBD85",
-              },
-              {
-                step: "03",
-                title: "CRE Processing",
-                desc: "Chainlink CRE validates market data, computes outcomes, and prepares secure batches.",
-                color: "#A78BFA",
-              },
-              {
-                step: "04",
-                title: "Settle & Withdraw",
-                desc: "Final results are committed on-chain and eligible winnings can be withdrawn trustlessly.",
-                color: "#F6AD55",
-              },
-            ].map((item) => (
-              <div
-                key={item.step}
-                className="rounded-xl p-5"
-                style={{
-                  background: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.06)",
-                }}
+            <div className="mt-9 flex w-full max-w-3xl items-center justify-center gap-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#d9a300]/80">
+              <span className="hidden h-px flex-1 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.08))] md:block" />
+              <Link
+                to="/trade"
+                className="inline-flex rounded-full border border-white/8 bg-white/[0.02] p-1 shadow-[0_10px_34px_rgba(0,0,0,0.18)] transition hover:border-white/14"
               >
-                <div
-                  className="inline-flex items-center justify-center rounded px-2 py-1 text-[11px] font-bold mb-3"
+                <span
+                  className="rounded-full px-7 py-3 text-[13px] tracking-normal text-black"
                   style={{
-                    background: `${item.color}20`,
-                    color: item.color,
-                    border: `1px solid ${item.color}30`,
+                    background:
+                      "linear-gradient(135deg, #f0b90b 0%, #ffcf4c 100%)",
+                    boxShadow: "0 8px 24px rgba(240, 185, 11, 0.18)",
                   }}
                 >
-                  STEP {item.step}
-                </div>
-                <h3 className="text-sm font-semibold mb-2">{item.title}</h3>
-                <p
-                  className="text-xs leading-relaxed"
-                  style={{ color: "#a0a0a0" }}
-                >
-                  {item.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+                  Trading
+                </span>
+              </Link>
+              <span className="hidden h-px flex-1 bg-[linear-gradient(90deg,rgba(255,255,255,0.08),transparent)] md:block" />
+            </div>
 
-        {/* General App Features */}
-        <motion.div
-          variants={itemVariants}
-          className="mb-20 pointer-events-auto"
+            <div className="mt-12 h-px w-full max-w-5xl bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent)]" />
+          </motion.div>
+        </section>
+
+        <motion.section
+          id="platform"
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          className="py-12"
         >
-          <h2 className="text-2xl font-bold mb-8 text-center">Core Pillars</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: <Globe size={20} />,
-                title: "Permissionless Access",
-                desc: "No KYC, no signups. Connect any EVM-compatible wallet to trade transparently.",
-                color: "#0847F7",
-              },
-              {
-                icon: <Zap size={20} />,
-                title: "Instant Execution",
-                desc: "Orders bypass slow blockchain layers thanks to off-chain sequencer networks matching trades in real-time.",
-                color: "#2EBD85",
-              },
-              {
-                icon: <Lock size={20} />,
-                title: "Self-Custodial",
-                desc: "You retain full control over your funds via thoroughly tested, heavily audited EVM smart contracts.",
-                color: "#A78BFA",
-              },
-            ].map((feat, i) => (
-              <div
-                key={i}
-                className="rounded-xl p-6"
-                style={{
-                  background: "rgba(255, 255, 255, 0.03)",
-                  border: "1px solid rgba(255, 255, 255, 0.05)",
-                }}
-              >
-                <div
-                  className="w-10 h-10 rounded flex items-center justify-center mb-5"
-                  style={{
-                    background: `${feat.color}15`,
-                    color: feat.color,
-                    border: `1px solid ${feat.color}30`,
-                  }}
-                >
-                  {feat.icon}
-                </div>
-                <h3
-                  className="text-base font-semibold mb-2"
-                  style={{ color: "#ffffff" }}
-                >
-                  {feat.title}
-                </h3>
-                <p
-                  className="text-sm leading-relaxed"
-                  style={{ color: "#a0a0a0" }}
-                >
-                  {feat.desc}
-                </p>
-              </div>
-            ))}
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
+              Platform story
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.07em] text-white md:text-5xl">
+              A cleaner homepage for a product that already has real moving
+              parts.
+            </h2>
+            <p className="mt-4 text-base leading-8 text-white/56">
+              Instead of treating PolkaTap like a generic crypto promo page, the
+              new layout explains what happens operationally: where money
+              enters, how rounds execute, and how reserve liquidity supports
+              outcomes.
+            </p>
           </div>
-        </motion.div>
 
-        {/* Highlighted section for CRE Workflow */}
-        <motion.div
-          variants={itemVariants}
-          className="my-16 pointer-events-auto"
-        >
-          <div
-            className="rounded-2xl relative overflow-hidden p-8 md:p-12 border border-[#0847F7]/20"
-            style={{
-              background:
-                "linear-gradient(135deg, rgba(8, 71, 247, 0.08) 0%, rgba(22, 20, 42, 0.8) 100%)",
-            }}
-          >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#0847F7]/10 blur-[80px] rounded-full" />
-
-            <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h3 className="text-2xl md:text-3xl font-bold mb-5 flex items-center gap-3">
-                  <Network className="text-[#0847F7]" />
-                  How CRE Workflows Drive TAPL
-                </h3>
-                <p
-                  className="mb-6 text-sm md:text-base leading-relaxed"
-                  style={{ color: "#d0d0d0" }}
+          <div className="mt-8 grid gap-4 lg:grid-cols-3">
+            {platformPillars.map(
+              ({ eyebrow, title, description, icon: Icon }) => (
+                <motion.div
+                  key={title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.35 }}
+                  className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,#111111_0%,#0c0c0c_100%)] p-5 shadow-[0_16px_38px_rgba(0,0,0,0.24)]"
                 >
-                  Traditional DApps struggle with the blockchain trilemma —
-                  managing latency, data cost, and security. By integrating the{" "}
-                  <b>Chainlink Runtime Environment (CRE)</b>, we offload heavy
-                  validation and data ingestion processes into scalable worker
-                  networks.
-                </p>
-                <p
-                  className="text-sm md:text-base leading-relaxed"
-                  style={{ color: "#d0d0d0" }}
-                >
-                  This serverless execution layer handles price verification,
-                  calculates PnL synchronously, runs pool solvency reports, and
-                  compiles Merkle roots of user actions — committing them
-                  trustlessly onto the Sepolia blockchain.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {workflows.map((wf, idx) => (
-                  <motion.div
-                    key={idx}
-                    whileHover={{
-                      x: 5,
-                      backgroundColor: "rgba(255, 255, 255, 0.06)",
-                    }}
-                    className="flex items-start gap-4 p-4 rounded-lg transition-colors border border-transparent hover:border-white/10"
-                    style={{ background: "rgba(255, 255, 255, 0.02)" }}
-                  >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
+                      {eyebrow}
+                    </span>
                     <div
-                      className="w-10 h-10 rounded shrink-0 flex items-center justify-center mt-0.5"
+                      className="flex h-11 w-11 items-center justify-center rounded-2xl"
                       style={{
-                        background: `${wf.color}20`,
-                        color: wf.color,
+                        background: "rgba(240, 185, 11, 0.1)",
+                        color: accent,
+                        border: "1px solid rgba(240, 185, 11, 0.12)",
                       }}
                     >
-                      {wf.icon}
+                      <Icon size={18} />
+                    </div>
+                  </div>
+                  <h3 className="mt-5 text-2xl font-semibold tracking-[-0.05em] text-white">
+                    {title}
+                  </h3>
+                  <p className="mt-4 text-sm leading-7 text-white/56">
+                    {description}
+                  </p>
+                </motion.div>
+              ),
+            )}
+          </div>
+        </motion.section>
+
+        <section id="surfaces" className="py-8">
+          <div className="rounded-[34px] border border-white/8 bg-[linear-gradient(180deg,#101010_0%,#0b0b0b_100%)] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.3)] sm:p-8">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div className="max-w-2xl">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
+                  Product surfaces
+                </p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-white md:text-5xl">
+                  Three surfaces, one product language.
+                </h2>
+              </div>
+              <Link
+                to="/trade"
+                className="inline-flex items-center gap-2 self-start text-sm font-medium text-white/68 transition hover:text-white"
+              >
+                Open the app
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+
+            <div className="mt-8 grid gap-4 lg:grid-cols-3">
+              {productSurfaces.map((card) => (
+                <Link
+                  key={card.title}
+                  to={card.href}
+                  className="group rounded-[28px] border border-white/8 bg-white/[0.03] p-5 transition hover:border-white/16 hover:bg-white/[0.05]"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/32">
+                      <BarChart3 size={13} style={{ color: accent }} />
+                      Surface
+                    </div>
+                    <span
+                      className="rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]"
+                      style={{
+                        color: accent,
+                        background: "rgba(240, 185, 11, 0.08)",
+                      }}
+                    >
+                      {card.stat}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-white">
+                    {card.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-white/56">
+                    {card.summary}
+                  </p>
+                  <div className="mt-5 space-y-2">
+                    {card.bullets.map((point) => (
+                      <div
+                        key={point}
+                        className="flex items-center gap-2 text-sm text-white/68"
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#f0b90b]" />
+                        {point}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white/74 transition group-hover:text-white">
+                    Explore surface
+                    <ArrowRight size={14} />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="process" className="py-12">
+          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="max-w-xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
+                Operating flow
+              </p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.07em] text-white md:text-5xl">
+                Explain the loop before asking for trust.
+              </h2>
+              <p className="mt-4 text-base leading-8 text-white/56">
+                Pixeltable's homepage works because the product flow is visible.
+                This refactor follows that principle for PolkaTap: first show
+                the sequence, then ask the user to enter it.
+              </p>
+
+              <div className="mt-8 rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,#111111_0%,#0c0c0c_100%)] p-5 shadow-[0_16px_38px_rgba(0,0,0,0.24)]">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                    style={{
+                      background: "rgba(240, 185, 11, 0.1)",
+                      color: accent,
+                    }}
+                  >
+                    <Lock size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-white/86">
+                      Demo-first onboarding
+                    </p>
+                    <p className="mt-1 text-sm text-white/56">
+                      Users can understand the shape of the product before they
+                      move real funds.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {operatingFlow.map((item) => (
+                <motion.div
+                  key={item.step}
+                  initial={{ opacity: 0, x: 18 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,#111111_0%,#0c0c0c_100%)] p-5 shadow-[0_16px_38px_rgba(0,0,0,0.24)]"
+                >
+                  <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+                    <div
+                      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-sm font-semibold"
+                      style={{
+                        background: "rgba(240, 185, 11, 0.1)",
+                        color: accent,
+                        border: "1px solid rgba(240, 185, 11, 0.14)",
+                      }}
+                    >
+                      {item.step}
                     </div>
                     <div>
-                      <h4
-                        className="text-sm font-bold mb-1"
-                        style={{ color: "#ffffff" }}
-                      >
-                        {wf.title}
-                      </h4>
-                      <p
-                        className="text-xs leading-relaxed"
-                        style={{ color: "#a0a0a0" }}
-                      >
-                        {wf.desc}
+                      <h3 className="text-2xl font-semibold tracking-[-0.05em] text-white">
+                        {item.title}
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-white/56">
+                        {item.description}
                       </p>
                     </div>
-                  </motion.div>
-                ))}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="pb-12 pt-4">
+          <div className="rounded-[34px] border border-white/8 bg-[linear-gradient(180deg,#111111_0%,#0d0d0d_100%)] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.32)] sm:p-8">
+            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+              <div className="max-w-2xl">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
+                  Next step
+                </p>
+                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-white md:text-5xl">
+                  The homepage now feels like the front door of a product, not a
+                  placeholder promo screen.
+                </h2>
+                <p className="mt-4 text-base leading-8 text-white/56">
+                  Users can choose the trading loop, the wallet rail, or the LP
+                  side with much less cognitive load, while the rest of the app
+                  keeps its current routes and functionality.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  to="/trade"
+                  className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #f0b90b 0%, #ffcf4c 100%)",
+                  }}
+                >
+                  Start trading
+                  <ArrowRight size={15} />
+                </Link>
+                <Link
+                  to="/wallet"
+                  className="inline-flex items-center rounded-full border border-white/10 px-5 py-3 text-sm font-medium text-white/72 transition hover:border-white/18 hover:text-white"
+                >
+                  Open wallet
+                </Link>
               </div>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </section>
+      </div>
     </div>
   );
 };
