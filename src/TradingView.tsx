@@ -137,7 +137,7 @@ export const TradingView: React.FC = () => {
                   ${formatUsd(currentPrice)}
                 </p>
                 <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-white/26">
-                  BTC/USD market
+                  BTC/USD
                 </p>
               </div>
               <span className="inline-flex h-7 items-center rounded-full border border-[#f0b90b]/18 bg-[#f0b90b]/10 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#f0b90b]">
@@ -218,13 +218,13 @@ export const TradingView: React.FC = () => {
                 className="wallet-win-toast ml-3 mt-3 w-fit rounded-lg border px-2.5 py-1.5 backdrop-blur-md sm:px-3 sm:py-2"
                 style={{
                   background: "rgba(11, 16, 28, 0.8)",
-                  borderColor: "rgba(46, 189, 133, 0.4)",
+                  borderColor: "rgba(240, 185, 11, 0.42)",
                   boxShadow:
-                    "0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(46, 189, 133, 0.1)",
+                    "0 4px 12px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(240, 185, 11, 0.12)",
                 }}
               >
                 <div className="flex items-center gap-2 sm:gap-2.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded border border-bn-green/30 bg-bn-green/20 text-[12px] leading-none shadow-[0_0_10px_rgba(46,189,133,0.2)] sm:h-7 sm:w-7 sm:text-[14px]">
+                  <div className="flex h-6 w-6 items-center justify-center rounded border border-bn-yellow/35 bg-bn-yellow/18 text-[12px] leading-none shadow-[0_0_10px_rgba(240,185,11,0.24)] sm:h-7 sm:w-7 sm:text-[14px]">
                     🚀
                   </div>
 
@@ -232,7 +232,7 @@ export const TradingView: React.FC = () => {
                     {truncateAddress(feedNotification.user)}
                   </span>
 
-                  <span className="rounded bg-bn-green/20 px-1.5 py-0.5 text-[10px] font-bold leading-none text-bn-green sm:text-[11px]">
+                  <span className="rounded bg-bn-yellow/18 px-1.5 py-0.5 text-[10px] font-bold leading-none text-bn-yellow sm:text-[11px]">
                     WIN
                   </span>
 
