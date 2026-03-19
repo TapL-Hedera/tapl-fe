@@ -81,11 +81,7 @@ export const Header: React.FC = () => {
   const updateBalance = useGameStore((state) => state.updateBalance);
 
   const location = useLocation();
-  const {
-    address,
-    isConnected,
-    chain,
-  } = useAccount();
+  const { address, isConnected, chain } = useAccount();
 
   const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
@@ -317,7 +313,7 @@ export const Header: React.FC = () => {
                 <img
                   src="/polkatap.png"
                   alt="PolkaTap"
-                  className="h-6 w-6 object-contain"
+                  className="h-10 w-10 object-contain"
                 />
               </div>
               <div className="flex items-center gap-2">

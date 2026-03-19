@@ -130,7 +130,7 @@ export const IntroView: React.FC = () => {
                   <img
                     src="/polkatap.png"
                     alt="PolkaTap"
-                    className="h-6 w-6 object-contain"
+                    className="h-10 w-10 object-contain"
                   />
                 </div>
                 <div>
