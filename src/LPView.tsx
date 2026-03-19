@@ -190,7 +190,7 @@ export const LPView: React.FC = () => {
   const parsedDecimals =
     nativeBalance?.decimals ?? chain?.nativeCurrency.decimals ?? 18;
   const assetSymbolLabel = formatTokenSymbol(
-    nativeBalance?.symbol ?? chain?.nativeCurrency.symbol ?? "NATIVE",
+    nativeBalance?.symbol ?? chain?.nativeCurrency.symbol ?? "DEV",
   );
   const networkName = chain?.name ?? NETWORK_LABEL;
 
