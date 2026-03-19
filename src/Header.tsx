@@ -12,9 +12,9 @@ import {
   useSignMessage,
   useSwitchChain,
 } from "wagmi";
-import { moonbaseAlpha } from "wagmi/chains";
 import { ChevronDown } from "lucide-react";
 import { BACKEND_URL } from "./constant";
+import { polkadotHubTestnet } from "./config/chains";
 import {
   authControllerGetChallenge,
   authControllerGetWssKey,
@@ -23,6 +23,7 @@ import {
   useAccountControllerGetBalance,
 } from "./services/queries";
 import { useGameStore } from "./store";
+import { getExplorerAddressUrl } from "./utils/chain";
 
 const NAV_ITEMS = [
   { label: "Trade", path: "/trade" },
@@ -359,10 +360,10 @@ export const Header: React.FC = () => {
                 onClick={() => connect({ connector: connectors[0] })}
                 variant="primary"
               />
-            ) : chain?.id !== moonbaseAlpha.id ? (
+            ) : chain?.id !== polkadotHubTestnet.id ? (
               <HeaderButton
                 label={isPendingSwitch ? "Switching" : "Switch network"}
-                onClick={() => switchChain?.({ chainId: moonbaseAlpha.id })}
+                onClick={() => switchChain?.({ chainId: polkadotHubTestnet.id })}
                 variant="primary"
               />
             ) : !token ? (
@@ -416,7 +417,7 @@ export const Header: React.FC = () => {
                           Copy
                         </button>
                         <a
-                          href={`https://moonbase.moonscan.io/address/${address}`}
+                          href={getExplorerAddressUrl(address ?? "")}
                           target="_blank"
                           rel="noreferrer"
                           className="rounded-xl border border-white/8 bg-white/4 px-3 py-2 text-xs font-medium text-white/75 transition hover:bg-white/[0.06] hover:text-white"

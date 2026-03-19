@@ -18,19 +18,19 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { moonbaseAlpha } from "wagmi/chains";
 import { formatUnits, parseUnits } from "viem";
 import { toast } from "react-hot-toast";
+import { polkadotHubTestnet } from "./config/chains";
 import { POOL_RESERVE_ABI, POOL_RESERVE_ADDRESS } from "./contracts/abi";
 import {
   formatTokenSymbol,
   showTransactionSubmittedToast,
-} from "./utils/moonbase";
+} from "./utils/chain";
 
 const ACCENT = "#f0b90b";
 const ACCENT_SOFT = "rgba(240, 185, 11, 0.14)";
 const BORDER = "rgba(255, 255, 255, 0.08)";
-const NETWORK_LABEL = "Moonbase Alpha";
+const NETWORK_LABEL = polkadotHubTestnet.name;
 
 type TabKey = "deposit" | "withdraw";
 
@@ -154,6 +154,7 @@ export const LPView: React.FC = () => {
 
   const { data: nativeBalance, refetch: refetchNativeBalance } = useBalance({
     address,
+    chainId: polkadotHubTestnet.id,
     query: { enabled: !!address },
   });
 
@@ -190,7 +191,9 @@ export const LPView: React.FC = () => {
   const parsedDecimals =
     nativeBalance?.decimals ?? chain?.nativeCurrency.decimals ?? 18;
   const assetSymbolLabel = formatTokenSymbol(
-    nativeBalance?.symbol ?? chain?.nativeCurrency.symbol ?? "DEV",
+    nativeBalance?.symbol ??
+      chain?.nativeCurrency.symbol ??
+      polkadotHubTestnet.nativeCurrency.symbol,
   );
   const networkName = chain?.name ?? NETWORK_LABEL;
 
@@ -260,7 +263,7 @@ export const LPView: React.FC = () => {
     showTransactionSubmittedToast({
       hash: depositLPTxHash,
       title: "LP deposit transaction submitted",
-      description: "Your LP deposit is on the way to Moonbase Alpha.",
+      description: `Your LP deposit is on the way to ${NETWORK_LABEL}.`,
     });
   }, [depositLPTxHash]);
 
@@ -270,7 +273,7 @@ export const LPView: React.FC = () => {
     showTransactionSubmittedToast({
       hash: withdrawLPTxHash,
       title: "LP withdrawal transaction submitted",
-      description: "Your LP withdrawal is on the way to Moonbase Alpha.",
+      description: `Your LP withdrawal is on the way to ${NETWORK_LABEL}.`,
     });
   }, [withdrawLPTxHash]);
 
@@ -340,7 +343,7 @@ export const LPView: React.FC = () => {
     setWithdrawSharesStr(formatUnits(lpShares as bigint, parsedDecimals));
   };
 
-  const chainMismatch = isConnected && chain?.id !== moonbaseAlpha.id;
+  const chainMismatch = isConnected && chain?.id !== polkadotHubTestnet.id;
   const isPendingDeposit = isDepositingLP || isWaitingDeposit;
   const isPendingWithdraw = isWithdrawingLP || isWaitingWithdraw;
   const isInsufficientDeposit = depositAmountRaw > (nativeBalance?.value ?? 0n);
@@ -580,7 +583,9 @@ export const LPView: React.FC = () => {
 
                 {chainMismatch ? (
                   <ActionButton
-                    onClick={() => switchChain?.({ chainId: moonbaseAlpha.id })}
+                    onClick={() =>
+                      switchChain?.({ chainId: polkadotHubTestnet.id })
+                    }
                     disabled={isPendingSwitch}
                     pending={isPendingSwitch}
                     pendingLabel="SWITCHING NETWORK"
@@ -705,7 +710,9 @@ export const LPView: React.FC = () => {
 
                 {chainMismatch ? (
                   <ActionButton
-                    onClick={() => switchChain?.({ chainId: moonbaseAlpha.id })}
+                    onClick={() =>
+                      switchChain?.({ chainId: polkadotHubTestnet.id })
+                    }
                     disabled={isPendingSwitch}
                     pending={isPendingSwitch}
                     pendingLabel="SWITCHING NETWORK"

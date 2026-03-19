@@ -1,26 +1,36 @@
+/* eslint-disable react-refresh/only-export-components */
 import { ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
+import { POLKADOT_HUB_TESTNET_EXPLORER_BASE_URL } from "../config/chains";
 
-export const MOONBASE_EXPLORER_BASE_URL = "https://moonbase.moonscan.io";
+export const EXPLORER_BASE_URL = POLKADOT_HUB_TESTNET_EXPLORER_BASE_URL;
 
 export function formatTokenSymbol(symbol: string) {
   return symbol === "DEV" ? "$DEV" : symbol;
 }
 
-export function getMoonbaseTxUrl(hash: string) {
-  return `${MOONBASE_EXPLORER_BASE_URL}/tx/${hash}`;
+export function getExplorerTxUrl(hash: string) {
+  return `${EXPLORER_BASE_URL}/tx/${hash}`;
+}
+
+export function getExplorerAddressUrl(address: string) {
+  return `${EXPLORER_BASE_URL}/address/${address}`;
+}
+
+export function getExplorerSearchUrl(value: string) {
+  return `${EXPLORER_BASE_URL}/search?q=${value}`;
 }
 
 export function showTransactionSubmittedToast({
   hash,
   title,
-  description = "You can track this transaction on Moonscan.",
+  description = "You can track this transaction on Polkadot Hub Blockscout.",
 }: {
   hash: string;
   title: string;
   description?: string;
 }) {
-  const explorerUrl = getMoonbaseTxUrl(hash);
+  const explorerUrl = getExplorerTxUrl(hash);
 
   toast.custom(
     (t) => (

@@ -1,16 +1,19 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { WagmiProvider, createConfig, http } from "wagmi";
-import { moonbaseAlpha } from "wagmi/chains";
 import { injected } from "wagmi/connectors";
+import {
+  POLKADOT_HUB_TESTNET_RPC_URL,
+  polkadotHubTestnet,
+} from "../config/chains";
 
 const queryClient = new QueryClient();
 
 const config = createConfig({
-  chains: [moonbaseAlpha],
+  chains: [polkadotHubTestnet],
   connectors: [injected()],
   transports: {
-    [moonbaseAlpha.id]: http(),
+    [polkadotHubTestnet.id]: http(POLKADOT_HUB_TESTNET_RPC_URL),
   },
 });
 

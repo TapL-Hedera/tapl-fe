@@ -22,14 +22,14 @@ import {
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi";
-import { moonbaseAlpha } from "wagmi/chains";
 import { formatUnits, parseUnits } from "viem";
 import { toast } from "react-hot-toast";
+import { polkadotHubTestnet } from "./config/chains";
 import { POOL_RESERVE_ADDRESS, POOL_RESERVE_ABI } from "./contracts/abi";
 import {
   formatTokenSymbol,
   showTransactionSubmittedToast,
-} from "./utils/moonbase";
+} from "./utils/chain";
 import {
   paymentControllerDebugDeposit,
   paymentControllerDebugFinalizeWithdrawal,
@@ -39,8 +39,8 @@ import {
 } from "./services/queries";
 
 const IN_APP_PER_TOKEN = 1_000_000;
-const NATIVE_SYMBOL = "$DEV";
-const NATIVE_DECIMALS = 18;
+const NATIVE_SYMBOL = formatTokenSymbol(polkadotHubTestnet.nativeCurrency.symbol);
+const NATIVE_DECIMALS = polkadotHubTestnet.nativeCurrency.decimals;
 const ACCENT = "#f0b90b";
 const ACCENT_SOFT = "rgba(240, 185, 11, 0.14)";
 const BORDER = "rgba(255, 255, 255, 0.08)";
@@ -170,7 +170,7 @@ export const WalletView: React.FC = () => {
 
   const { data: nativeBalance, refetch: refetchNativeBalance } = useBalance({
     address,
-    chainId: moonbaseAlpha.id,
+    chainId: polkadotHubTestnet.id,
     query: { enabled: !!address },
   });
 
@@ -428,7 +428,7 @@ export const WalletView: React.FC = () => {
     setWithdrawInAppStr(offChainBalance.toString());
   };
 
-  const chainMismatch = isConnected && chain?.id !== moonbaseAlpha.id;
+  const chainMismatch = isConnected && chain?.id !== polkadotHubTestnet.id;
   const isInsufficientDeposit =
     depositTokenAmountRaw > (nativeBalance?.value ?? 0n);
   const isInsufficientWithdraw = rawWithdrawInApp > offChainBalance;
@@ -473,7 +473,7 @@ export const WalletView: React.FC = () => {
 
           <div className="flex shrink-0 items-center gap-3">
             <div className="rounded-full border border-white/8 bg-white/[0.03] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
-              Moonbase Alpha
+              {polkadotHubTestnet.name}
             </div>
             <button
               type="button"
@@ -661,11 +661,13 @@ export const WalletView: React.FC = () => {
 
                 {chainMismatch ? (
                   <ActionButton
-                    onClick={() => switchChain?.({ chainId: moonbaseAlpha.id })}
+                    onClick={() =>
+                      switchChain?.({ chainId: polkadotHubTestnet.id })
+                    }
                     disabled={isPendingSwitch}
                     pending={isPendingSwitch}
                     pendingLabel="SWITCHING NETWORK"
-                    idleLabel="SWITCH TO MOONBASE ALPHA"
+                    idleLabel={`SWITCH TO ${polkadotHubTestnet.name.toUpperCase()}`}
                   />
                 ) : (
                   <ActionButton
@@ -771,11 +773,13 @@ export const WalletView: React.FC = () => {
 
                 {chainMismatch ? (
                   <ActionButton
-                    onClick={() => switchChain?.({ chainId: moonbaseAlpha.id })}
+                    onClick={() =>
+                      switchChain?.({ chainId: polkadotHubTestnet.id })
+                    }
                     disabled={isPendingSwitch}
                     pending={isPendingSwitch}
                     pendingLabel="SWITCHING NETWORK"
-                    idleLabel="SWITCH TO MOONBASE ALPHA"
+                    idleLabel={`SWITCH TO ${polkadotHubTestnet.name.toUpperCase()}`}
                   />
                 ) : (
                   <ActionButton
@@ -827,7 +831,7 @@ export const WalletView: React.FC = () => {
                 {
                   icon: Coins,
                   title: "Convert rate",
-                  value: `1000 APP = 0.001 ${formatTokenSymbol("DEV")}`,
+                  value: `1000 APP = 0.001 ${NATIVE_SYMBOL}`,
                 },
               ].map(({ icon: Icon, title, value }) => (
                 <div

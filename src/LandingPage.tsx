@@ -24,7 +24,7 @@ const features = [
     icon: Shield,
     title: "On-chain Security",
     highlight: "Security",
-    desc: "Every deposit and withdrawal is trustlessly settled via audited smart contracts on Moonbase Alpha.",
+    desc: "Every deposit and withdrawal is trustlessly settled via audited smart contracts on Polkadot Hub TestNet.",
   },
   {
     icon: Zap,

@@ -6,6 +6,11 @@ import {
   RegimeModelCREWorkflow,
   SettlementCREWorkflow,
 } from "../WorkflowDiagrams";
+import {
+  getExplorerAddressUrl,
+  getExplorerSearchUrl,
+  getExplorerTxUrl,
+} from "../utils/chain";
 import { DataTable, Empty, Loader, PassBadge, Section } from "./ui";
 import { bpsToPercent, fmt, shortHash } from "./utils";
 import type { Row } from "./types";
@@ -17,7 +22,7 @@ interface WorkflowSectionProps {
 }
 
 const NOW_SECONDS = Math.floor(Date.now() / 1000);
-const SAMPLE_MOONBASE_TX_HASHES = [
+const SAMPLE_POLKADOT_HUB_TX_HASHES = [
   "0xd1a6cc31adff06b33b1fe7049118d813d285a2f19a8fed84678127b7479665d5",
   "0xf27e0dc75e6b89ea5e86f108776374294f3ab018baa2334c72ef9248037f72cb",
   "0x6e87eb9ed1aa1512070bf643bca9f89a921ad41c99a44b0fd3d72910d8fd9538",
@@ -73,9 +78,10 @@ function seededHex(seed: string, length: number): string {
 function realTxHashFromSeed(seed: string, index: number): string {
   const pick =
     Math.floor(
-      seededUnit(`${seed}-real-tx-${index}`) * SAMPLE_MOONBASE_TX_HASHES.length,
-    ) % SAMPLE_MOONBASE_TX_HASHES.length;
-  return SAMPLE_MOONBASE_TX_HASHES[pick];
+      seededUnit(`${seed}-real-tx-${index}`) *
+        SAMPLE_POLKADOT_HUB_TX_HASHES.length,
+    ) % SAMPLE_POLKADOT_HUB_TX_HASHES.length;
+  return SAMPLE_POLKADOT_HUB_TX_HASHES[pick];
 }
 
 function rowSeed(prefix: string, row: Row, index: number): string {
@@ -110,7 +116,7 @@ function renderTxLink(hash: string | undefined) {
 
   return (
     <a
-      href={`https://moonbase.moonscan.io/tx/${hash}`}
+      href={getExplorerTxUrl(hash)}
       target="_blank"
       rel="noreferrer"
       className="font-mono text-[10px] hover:underline"
@@ -127,7 +133,7 @@ function renderAddressLink(address: string | undefined) {
 
   return (
     <a
-      href={`https://moonbase.moonscan.io/address/${address}`}
+      href={getExplorerAddressUrl(address)}
       target="_blank"
       rel="noreferrer"
       className="font-mono text-[10px] hover:underline"
@@ -144,7 +150,7 @@ function renderSearchLink(value: string | undefined) {
 
   return (
     <a
-      href={`https://moonbase.moonscan.io/search?q=${value}`}
+      href={getExplorerSearchUrl(value)}
       target="_blank"
       rel="noreferrer"
       className="font-mono text-[10px] hover:underline"

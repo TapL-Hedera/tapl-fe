@@ -1,5 +1,5 @@
 export const POOL_RESERVE_ADDRESS =
-  "0xC74DA4c872d6e547aD2c2a98116bBdfc70754844";
+  "0x88F81Be219D5d742B3C8f05c699088c228159202";
 
 export const POOL_RESERVE_ABI = [
   { type: "receive", stateMutability: "payable" },
