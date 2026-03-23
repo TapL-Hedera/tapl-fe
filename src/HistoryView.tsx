@@ -123,6 +123,34 @@ function resolveOrderId(order: Order) {
   return undefined;
 }
 
+function getOrderProofKeys(order: Order) {
+  const keys = [order.orderId, order.id, order.order_id]
+    .map((value) => value?.trim())
+    .filter((value): value is string => Boolean(value));
+
+  return [...new Set(keys)];
+}
+
+function isOrderSettled(order: Order) {
+  const status = (order.status ?? "").toLowerCase();
+  return (
+    Boolean(order.settledAt) ||
+    order.settledWin !== null ||
+    status.includes("settled") ||
+    status.includes("resolved") ||
+    status.includes("complete")
+  );
+}
+
+function isOrderStillAnchoring(order: Order) {
+  const status = (order.status ?? "").toLowerCase();
+  return (
+    status.includes("pending") ||
+    status.includes("processing") ||
+    status.includes("anchoring")
+  );
+}
+
 function normalizeOrders(payload: unknown): Order[] {
   if (Array.isArray(payload)) {
     return payload as Order[];
@@ -161,6 +189,32 @@ function normalizeProof(payload: unknown): OrderProof | null {
   };
 }
 
+function isProofPendingError(error: unknown) {
+  const fallbackMessage =
+    error instanceof Error ? error.message.toLowerCase() : "";
+
+  if (!axios.isAxiosError(error)) {
+    return /(not ready|pending|processing|anchoring|not found|empty)/.test(
+      fallbackMessage,
+    );
+  }
+
+  const status = error.response?.status;
+  if (status === 202 || status === 204 || status === 404 || status === 409) {
+    return true;
+  }
+
+  const responseMessage = getResponsePayload(error.response?.data);
+  const details =
+    typeof responseMessage === "string"
+      ? responseMessage.toLowerCase()
+      : JSON.stringify(responseMessage ?? "").toLowerCase();
+
+  return /(not ready|pending|processing|anchoring|not found|no proof|empty)/.test(
+    `${details} ${fallbackMessage}`,
+  );
+}
+
 export const HistoryView: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
@@ -171,6 +225,12 @@ export const HistoryView: React.FC = () => {
   const [proofLoading, setProofLoading] = useState(false);
   const [proofError, setProofError] = useState<string | null>(null);
   const [proofData, setProofData] = useState<OrderProof | null>(null);
+  const [proofButtonLoadingOrderId, setProofButtonLoadingOrderId] = useState<
+    string | null
+  >(null);
+  const [pendingProofByOrderId, setPendingProofByOrderId] = useState<
+    Record<string, boolean>
+  >({});
 
   const fetchHistory = async (pageIdx: number) => {
     setLoading(true);
@@ -206,49 +266,92 @@ export const HistoryView: React.FC = () => {
     fetchHistory(page);
   }, [page]);
 
-  const fetchProof = useCallback(async (orderId: string) => {
-    setProofLoading(true);
-    setProofError(null);
-    setProofData(null);
+  const fetchProof = useCallback(
+    async (orderId: string, orderKeys: string[] = [orderId]) => {
+      const targetKeys = orderKeys.length ? orderKeys : [orderId];
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `${BACKEND_URL}/api/v1/hcs-anchor/orders/${encodeURIComponent(orderId)}/proof`,
-        {
-          headers: {
-            accept: "*/*",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      setProofLoading(true);
+      setProofError(null);
+      setProofData(null);
+
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `${BACKEND_URL}/api/v1/hcs-anchor/orders/${encodeURIComponent(orderId)}/proof`,
+          {
+            headers: {
+              accept: "*/*",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
           },
-        },
-      );
+        );
 
-      const payload = normalizeProof(getResponsePayload(response.data));
-      if (!payload) {
-        throw new Error("Proof payload is empty or malformed.");
+        const payload = normalizeProof(getResponsePayload(response.data));
+        if (!payload) {
+          throw new Error("Proof payload is empty or malformed.");
+        }
+
+        setProofData(payload);
+        setPendingProofByOrderId((current) => {
+          const hasAnyPending = targetKeys.some((key) => current[key]);
+          if (!hasAnyPending) return current;
+
+          const next = { ...current };
+          targetKeys.forEach((key) => {
+            delete next[key];
+          });
+          return next;
+        });
+      } catch (error) {
+        console.error("Failed to load order proof", error);
+        const isPending = isProofPendingError(error);
+        const message = isPending
+          ? "Proof is still anchoring on backend. Please try again shortly."
+          : error instanceof Error
+            ? error.message
+            : "Failed to fetch proof for this order.";
+        setProofError(message);
+        setPendingProofByOrderId((current) => {
+          if (isPending) {
+            const next = { ...current };
+            targetKeys.forEach((key) => {
+              next[key] = true;
+            });
+            return next;
+          }
+
+          const hasAnyPending = targetKeys.some((key) => current[key]);
+          if (!hasAnyPending) return current;
+
+          const next = { ...current };
+          targetKeys.forEach((key) => {
+            delete next[key];
+          });
+          return next;
+        });
+      } finally {
+        setProofLoading(false);
       }
-
-      setProofData(payload);
-    } catch (error) {
-      console.error("Failed to load order proof", error);
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to fetch proof for this order.";
-      setProofError(message);
-    } finally {
-      setProofLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   const openProof = useCallback(
     (order: Order) => {
+      if (!isOrderSettled(order)) return;
+
       const orderId = resolveOrderId(order);
       if (!orderId) return;
+      const orderProofKeys = getOrderProofKeys(order);
 
+      setProofButtonLoadingOrderId(orderId);
       setSelectedOrderId(orderId);
       setIsProofOpen(true);
-      void fetchProof(orderId);
+      void fetchProof(orderId, orderProofKeys).finally(() => {
+        setProofButtonLoadingOrderId((current) =>
+          current === orderId ? null : current,
+        );
+      });
     },
     [fetchProof],
   );
@@ -485,6 +588,16 @@ export const HistoryView: React.FC = () => {
               <div className="space-y-2.5 p-3 sm:p-4">
                 {orders.map((order, index) => {
                   const orderId = resolveOrderId(order);
+                  const orderProofKeys = getOrderProofKeys(order);
+                  const isSettledOrder = isOrderSettled(order);
+                  const isButtonLoading =
+                    !!orderId && proofButtonLoadingOrderId === orderId;
+                  const hasPendingProofFromError = orderProofKeys.some((key) =>
+                    Boolean(pendingProofByOrderId[key]),
+                  );
+                  const isProofPending =
+                    isSettledOrder &&
+                    (isOrderStillAnchoring(order) || hasPendingProofFromError);
                   const statusVariant =
                     order.settledWin === true
                       ? {
@@ -499,7 +612,7 @@ export const HistoryView: React.FC = () => {
                             color: "#F6465D",
                           }
                         : {
-                            label: order.status || "Pending",
+                            label: "Pending",
                             background: "rgba(148,163,184,0.12)",
                             color: "rgba(226,232,240,0.75)",
                           };
@@ -573,20 +686,32 @@ export const HistoryView: React.FC = () => {
                         </div>
 
                         <div className="md:justify-self-end">
-                          <button
-                            type="button"
-                            onClick={() => openProof(order)}
-                            disabled={!orderId}
-                            className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/80 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
-                            style={{
-                              borderColor: "rgba(45,132,235,0.42)",
-                              background:
-                                "linear-gradient(135deg, rgba(45,132,235,0.2) 0%, rgba(79,70,229,0.2) 100%)",
-                            }}
-                          >
-                            <ShieldCheck size={12} />
-                            Proof
-                          </button>
+                          {isSettledOrder ? (
+                            <button
+                              type="button"
+                              onClick={() => openProof(order)}
+                              disabled={
+                                !orderId || isButtonLoading || isProofPending
+                              }
+                              className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/80 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                              style={{
+                                borderColor: "rgba(45,132,235,0.42)",
+                                background:
+                                  "linear-gradient(135deg, rgba(45,132,235,0.2) 0%, rgba(79,70,229,0.2) 100%)",
+                              }}
+                            >
+                              {isButtonLoading || isProofPending ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : (
+                                <ShieldCheck size={12} />
+                              )}
+                              {isButtonLoading
+                                ? "Checking"
+                                : isProofPending
+                                  ? "Anchoring"
+                                  : "Proof"}
+                            </button>
+                          ) : null}
                         </div>
                       </div>
                     </article>

@@ -9,7 +9,6 @@ import {
   Check,
   ArrowDownToLine,
   ArrowUpFromLine,
-  PiggyBank,
 } from "lucide-react";
 
 const ACCENT = "#2D84EB";

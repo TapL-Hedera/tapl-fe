@@ -18,7 +18,6 @@ const ACCENT = "#2D84EB";
 const SECONDARY = "#4F46E5";
 const DEEP = "#00156E";
 const SOFT_BLUE = "#8EC1FF";
-const TEXT_MAIN = "#F8FAFF";
 const TEXT_DIM = "#D0D0D0";
 
 const EDGE_POINTS: {

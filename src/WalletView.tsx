@@ -38,7 +38,7 @@ import {
   useAccountControllerGetBalance,
 } from "./services/queries";
 
-const IN_APP_PER_TOKEN = 1_000_000;
+const IN_APP_PER_TOKEN = 10;
 const NATIVE_SYMBOL = formatTokenSymbol(hederaTestnet.nativeCurrency.symbol);
 const NATIVE_DECIMALS = hederaTestnet.nativeCurrency.decimals;
 const ACCENT = "#2D84EB";
@@ -112,8 +112,7 @@ function ActionButton({
       disabled={disabled}
       className="flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-semibold tracking-wide text-white transition duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
       style={{
-        background:
-          `linear-gradient(135deg, ${ACCENT} 0%, ${SECONDARY} 58%, ${DEEP} 100%)`,
+        background: `linear-gradient(135deg, ${ACCENT} 0%, ${SECONDARY} 58%, ${DEEP} 100%)`,
         boxShadow: "0 10px 22px rgba(45, 132, 235, 0.28)",
       }}
     >
