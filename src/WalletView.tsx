@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import {
   ArrowDownLeft,
+  ArrowDownUp,
   ArrowUpRight,
   CircleDollarSign,
   Coins,
@@ -52,7 +53,6 @@ const PANEL_BG =
 const TILE_BG =
   "linear-gradient(148deg, rgba(15, 18, 23, 0.94) 0%, rgba(9, 11, 14, 0.99) 100%)";
 const SUBTLE_BG = "rgba(255, 255, 255, 0.04)";
-const SOFT_TEXT = "rgba(226, 232, 240, 0.68)";
 
 type TabKey = "deposit" | "withdraw";
 
@@ -458,12 +458,29 @@ export const WalletView: React.FC = () => {
 
   const depositPending = isDepositingOnChain || isSubmittingApi;
   const withdrawPending = isSubmittingApi || isClaimingTrader || isWaitingClaim;
+  const isDepositFlow = activeTab === "deposit";
+  const fromAmount = isDepositFlow ? depositAmountStr : withdrawInAppStr;
+  const toAmount = isDepositFlow ? depositInAppEquivalent : withdrawTokenEquivalent;
+  const fromAsset = isDepositFlow ? NATIVE_SYMBOL : "APP";
+  const toAsset = isDepositFlow ? "APP" : NATIVE_SYMBOL;
+  const fromAssetBalance = isDepositFlow
+    ? `${formatAmount(nativeBalance?.value, NATIVE_DECIMALS)} ${NATIVE_SYMBOL}`
+    : `${formatCompactNumber(offChainBalance, 0)} APP`;
+  const toAssetBalance = isDepositFlow
+    ? `${formatCompactNumber(offChainBalance, 0)} APP`
+    : `${formatAmount(nativeBalance?.value, NATIVE_DECIMALS)} ${NATIVE_SYMBOL}`;
 
   const activeRailLabel = useMemo(
     () =>
       activeTab === "deposit" ? "Chain → App balance" : "App balance → Chain",
     [activeTab],
   );
+
+  const handleToggleDirection = () => {
+    setActiveTab((current) => (current === "deposit" ? "withdraw" : "deposit"));
+    setDepositAmountStr("");
+    setWithdrawInAppStr("");
+  };
 
   const shortAddress = address
     ? `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -651,10 +668,10 @@ export const WalletView: React.FC = () => {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-white/45">
-                You Deposit
+                Swap
               </p>
               <h2 className="mt-1 text-lg font-semibold text-white">
-                {activeTab === "deposit" ? NATIVE_SYMBOL : "In-App Balance"}
+                {activeRailLabel}
               </h2>
             </div>
             <div
@@ -665,99 +682,97 @@ export const WalletView: React.FC = () => {
             </div>
           </div>
 
-          <div
-            className="mt-4 inline-flex w-full rounded-xl p-1"
-            style={{
-              border: `1px solid ${BORDER}`,
-              background: SUBTLE_BG,
-            }}
-            role="tablist"
-            aria-label="Wallet actions"
-          >
-            {(["deposit", "withdraw"] as const).map((tab) => {
-              const active = activeTab === tab;
-
-              return (
+          <div className="mt-4 space-y-2">
+            <div
+              className="rounded-xl border p-3"
+              style={{
+                borderColor: BORDER,
+                background: "rgba(255,255,255,0.02)",
+              }}
+            >
+              <div className="flex items-center justify-between text-xs text-white/55">
+                <span>From</span>
                 <button
-                  key={tab}
                   type="button"
-                  onClick={() => {
-                    setActiveTab(tab);
-                    setDepositAmountStr("");
-                    setWithdrawInAppStr("");
-                  }}
-                  className="w-full rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] transition"
-                  style={{
-                    background: active
-                      ? "rgba(45, 132, 235, 0.22)"
-                      : "transparent",
-                    color: active ? "#b7d7ff" : SOFT_TEXT,
-                    boxShadow: active
-                      ? "inset 0 0 0 1px rgba(45, 132, 235, 0.35)"
-                      : "none",
-                  }}
+                  onClick={isDepositFlow ? handleMaxDeposit : handleMaxWithdraw}
+                  className="rounded-md border px-2 py-1 text-[11px] font-medium text-white/75 transition hover:text-white"
+                  style={{ borderColor: BORDER, background: SUBTLE_BG }}
                 >
-                  {tab}
+                  Max
                 </button>
-              );
-            })}
-          </div>
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  step={isDepositFlow ? "0.001" : "1"}
+                  value={fromAmount}
+                  onChange={(event) =>
+                    isDepositFlow
+                      ? setDepositAmountStr(event.target.value)
+                      : setWithdrawInAppStr(event.target.value)
+                  }
+                  placeholder="0"
+                  className="min-w-0 flex-1 bg-transparent text-left text-3xl font-semibold tracking-tight text-white outline-none placeholder:text-white/25"
+                />
+                <span
+                  className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold"
+                  style={{ borderColor: BORDER, background: SUBTLE_BG }}
+                >
+                  {isDepositFlow ? (
+                    <Wallet size={13} style={{ color: ACCENT }} />
+                  ) : (
+                    <Coins size={13} style={{ color: ACCENT }} />
+                  )}
+                  {fromAsset}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-white/55">
+                Balance: {fromAssetBalance}
+              </p>
+            </div>
 
-          <div
-            className="mt-4 rounded-xl border p-3"
-            style={{
-              borderColor: BORDER,
-              background: "rgba(255,255,255,0.02)",
-            }}
-          >
-            <div className="flex items-center justify-between text-xs text-white/55">
-              <span>{activeTab === "deposit" ? "Token" : "In-App Unit"}</span>
-              <span>
-                Available{" "}
-                {activeTab === "deposit"
-                  ? `${formatAmount(nativeBalance?.value, NATIVE_DECIMALS)} ${NATIVE_SYMBOL}`
-                  : formatCompactNumber(offChainBalance, 0)}
-              </span>
-            </div>
-            <div className="mt-3 flex items-center gap-2">
-              <span
-                className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold"
-                style={{ borderColor: BORDER, background: SUBTLE_BG }}
-              >
-                {activeTab === "deposit" ? (
-                  <Wallet size={13} style={{ color: ACCENT }} />
-                ) : (
-                  <Coins size={13} style={{ color: ACCENT }} />
-                )}
-                {activeTab === "deposit" ? NATIVE_SYMBOL : "APP"}
-              </span>
-              <input
-                type="number"
-                min="0"
-                step={activeTab === "deposit" ? "0.001" : "1"}
-                value={
-                  activeTab === "deposit" ? depositAmountStr : withdrawInAppStr
-                }
-                onChange={(event) =>
-                  activeTab === "deposit"
-                    ? setDepositAmountStr(event.target.value)
-                    : setWithdrawInAppStr(event.target.value)
-                }
-                placeholder="0"
-                className="min-w-0 flex-1 bg-transparent text-right text-2xl font-semibold tracking-tight text-white outline-none placeholder:text-white/25"
-              />
-            </div>
-            <div className="mt-3 flex items-center justify-end gap-2">
+            <div className="flex justify-center">
               <button
                 type="button"
-                onClick={
-                  activeTab === "deposit" ? handleMaxDeposit : handleMaxWithdraw
-                }
-                className="rounded-md border px-2 py-1 text-[11px] font-medium text-white/75 transition hover:text-white"
+                onClick={handleToggleDirection}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl border text-white/70 transition hover:text-white"
                 style={{ borderColor: BORDER, background: SUBTLE_BG }}
+                aria-label="Switch swap direction"
               >
-                Max
+                <ArrowDownUp size={16} />
               </button>
+            </div>
+
+            <div
+              className="rounded-xl border p-3"
+              style={{
+                borderColor: BORDER,
+                background: "rgba(255,255,255,0.02)",
+              }}
+            >
+              <div className="flex items-center justify-between text-xs text-white/55">
+                <span>To (Estimated)</span>
+              </div>
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <p className="text-3xl font-semibold tracking-tight text-white">
+                  {toAmount}
+                </p>
+                <span
+                  className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold"
+                  style={{ borderColor: BORDER, background: SUBTLE_BG }}
+                >
+                  {isDepositFlow ? (
+                    <Coins size={13} style={{ color: ACCENT }} />
+                  ) : (
+                    <Wallet size={13} style={{ color: ACCENT }} />
+                  )}
+                  {toAsset}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-white/55">
+                Balance: {toAssetBalance}
+              </p>
             </div>
           </div>
 
