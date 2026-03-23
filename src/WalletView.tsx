@@ -460,7 +460,9 @@ export const WalletView: React.FC = () => {
   const withdrawPending = isSubmittingApi || isClaimingTrader || isWaitingClaim;
   const isDepositFlow = activeTab === "deposit";
   const fromAmount = isDepositFlow ? depositAmountStr : withdrawInAppStr;
-  const toAmount = isDepositFlow ? depositInAppEquivalent : withdrawTokenEquivalent;
+  const toAmount = isDepositFlow
+    ? depositInAppEquivalent
+    : withdrawTokenEquivalent;
   const fromAsset = isDepositFlow ? NATIVE_SYMBOL : "APP";
   const toAsset = isDepositFlow ? "APP" : NATIVE_SYMBOL;
   const fromAssetBalance = isDepositFlow
@@ -607,53 +609,6 @@ export const WalletView: React.FC = () => {
                 Wrong network. Please switch to {hederaTestnet.name}.
               </p>
             ) : null}
-          </div>
-
-          <div
-            className="rounded-2xl p-5"
-            style={{
-              background: PANEL_BG,
-              border: `1px solid ${BORDER}`,
-              boxShadow: "0 18px 36px rgba(0, 0, 0, 0.45)",
-            }}
-          >
-            <h3 className="text-lg font-semibold text-white">
-              Transfer Preview
-            </h3>
-            <div className="mt-4 space-y-3 text-sm text-white/72">
-              {activeTab === "deposit" ? (
-                <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center gap-2">
-                    <ArrowUpRight size={14} style={{ color: SUCCESS }} />
-                    Estimated in-app credit
-                  </span>
-                  <span className="font-semibold text-white">
-                    {depositInAppEquivalent}
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center gap-2">
-                    <ArrowDownLeft size={14} style={{ color: SUCCESS }} />
-                    Estimated on-chain receive
-                  </span>
-                  <span className="font-semibold text-white">
-                    {withdrawTokenEquivalent} {NATIVE_SYMBOL}
-                  </span>
-                </div>
-              )}
-              <div className="flex items-center justify-between">
-                <span className="text-white/55">Available on-chain</span>
-                <span>
-                  {formatAmount(nativeBalance?.value, NATIVE_DECIMALS)}{" "}
-                  {NATIVE_SYMBOL}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-white/55">Available in-app</span>
-                <span>{formatCompactNumber(offChainBalance, 0)}</span>
-              </div>
-            </div>
           </div>
         </div>
 
