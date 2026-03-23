@@ -1,30 +1,34 @@
 /* eslint-disable react-refresh/only-export-components */
 import { ExternalLink } from "lucide-react";
 import toast from "react-hot-toast";
-import { POLKADOT_HUB_TESTNET_EXPLORER_BASE_URL } from "../config/chains";
+import { HEDERA_TESTNET_EXPLORER_BASE_URL } from "../config/chains";
 
-export const EXPLORER_BASE_URL = POLKADOT_HUB_TESTNET_EXPLORER_BASE_URL;
+export const EXPLORER_BASE_URL = HEDERA_TESTNET_EXPLORER_BASE_URL;
 
 export function formatTokenSymbol(symbol: string) {
   return symbol === "DEV" ? "$DEV" : symbol;
 }
 
 export function getExplorerTxUrl(hash: string) {
-  return `${EXPLORER_BASE_URL}/tx/${hash}`;
+  return `${EXPLORER_BASE_URL}/transaction/${hash}`;
 }
 
 export function getExplorerAddressUrl(address: string) {
-  return `${EXPLORER_BASE_URL}/address/${address}`;
+  return `${EXPLORER_BASE_URL}/account/${address}`;
 }
 
 export function getExplorerSearchUrl(value: string) {
   return `${EXPLORER_BASE_URL}/search?q=${value}`;
 }
 
+export function getExplorerTopicMessagesUrl(topicId: string) {
+  return `${EXPLORER_BASE_URL}/topic/${topicId}/messages`;
+}
+
 export function showTransactionSubmittedToast({
   hash,
   title,
-  description = "You can track this transaction on Polkadot Hub Blockscout.",
+  description = "You can track this transaction on Hedera Hashscan.",
 }: {
   hash: string;
   title: string;
@@ -48,7 +52,7 @@ export function showTransactionSubmittedToast({
               window.open(explorerUrl, "_blank", "noopener,noreferrer");
               toast.dismiss(t.id);
             }}
-            className="inline-flex items-center gap-2 rounded-xl border border-[#f0b90b]/25 bg-[#f0b90b]/12 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#f0b90b] transition hover:bg-[#f0b90b]/18"
+            className="inline-flex items-center gap-2 rounded-xl border border-[#2D84EB]/25 bg-[#2D84EB]/12 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#2D84EB] transition hover:bg-[#2D84EB]/18"
           >
             Open explorer
             <ExternalLink size={14} />

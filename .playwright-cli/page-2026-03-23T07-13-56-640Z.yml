@@ -1,0 +1,116 @@
+- main [ref=e4]:
+  - generic [ref=e5]:
+    - generic:
+      - generic [ref=e9]:
+        - img "tapl" [ref=e11]
+        - generic [ref=e13]: TAPL
+      - generic [ref=e14]:
+        - generic [ref=e15]: Introducing TAPL Protocol
+        - heading "On-chain Derivatives Powered by Chainlink CRE" [level=1] [ref=e16]:
+          - text: On-chain Derivatives
+          - text: Powered by Chainlink CRE
+        - paragraph [ref=e17]: TAPL brings sub-second market prediction to Web3. Trade without limits, provide liquidity safely, and benefit from lightning-fast Chainlink decentralized oracle networks executing off-chain computations and returning verifiable results on-chain.
+        - link "LAUNCH APP" [ref=e19] [cursor=pointer]:
+          - /url: /trade
+      - generic [ref=e20]:
+        - heading "Powered by CRE" [level=2] [ref=e21]
+        - generic [ref=e22]:
+          - generic [ref=e23]:
+            - button "Price Integrity" [ref=e25]: Price Integrity
+            - button "Proof of Reserve" [ref=e27]
+            - button "Regime Model" [ref=e28]
+            - button "Settlement" [ref=e29]
+          - generic [ref=e30]:
+            - generic [ref=e31]:
+              - generic [ref=e38]: price-integrity-cre-workflow.workflow
+              - generic [ref=e41]: LIVE
+            - img [ref=e44]:
+              - generic [ref=e47]: Price Integrity CRE Workflow
+              - generic [ref=e50]: price input
+              - generic [ref=e53]: sync
+              - generic [ref=e63]:
+                - generic [ref=e65]: Chainlink Price
+                - generic [ref=e66]: stream
+              - generic [ref=e67]:
+                - generic [ref=e69]: Real-time price
+                - generic [ref=e70]: streaming
+              - generic [ref=e73]: In-app price snapshots
+              - generic [ref=e74]:
+                - generic [ref=e76]: 🖥
+                - generic [ref=e77]: Chainlink Price Feed API
+              - generic [ref=e78]:
+                - generic [ref=e81]: ⚙
+                - generic [ref=e82]: Compare prices
+                - generic [ref=e83]: in a window
+              - generic [ref=e84]:
+                - generic [ref=e87]: Price matching
+                - generic [ref=e88]: score
+              - generic [ref=e103]: Blockchain
+      - generic [ref=e104]:
+        - heading "How It Works" [level=2] [ref=e105]
+        - paragraph [ref=e106]: TAPL is a prediction trading app where you connect your wallet, pick a market direction, and let Chainlink-powered infrastructure handle fair pricing, execution, and settlement.
+        - generic [ref=e107]:
+          - generic [ref=e108]:
+            - generic [ref=e109]: STEP 01
+            - heading "Connect Wallet" [level=3] [ref=e110]
+            - paragraph [ref=e111]: Use any EVM-compatible wallet to access TAPL instantly with no account creation.
+          - generic [ref=e112]:
+            - generic [ref=e113]: STEP 02
+            - heading "Place Prediction" [level=3] [ref=e114]
+            - paragraph [ref=e115]: Choose market direction and submit your position with transparent on-chain intent.
+          - generic [ref=e116]:
+            - generic [ref=e117]: STEP 03
+            - heading "CRE Processing" [level=3] [ref=e118]
+            - paragraph [ref=e119]: Chainlink CRE validates market data, computes outcomes, and prepares secure batches.
+          - generic [ref=e120]:
+            - generic [ref=e121]: STEP 04
+            - heading "Settle & Withdraw" [level=3] [ref=e122]
+            - paragraph [ref=e123]: Final results are committed on-chain and eligible winnings can be withdrawn trustlessly.
+      - generic [ref=e124]:
+        - heading "Core Pillars" [level=2] [ref=e125]
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - img [ref=e129]
+            - heading "Permissionless Access" [level=3] [ref=e132]
+            - paragraph [ref=e133]: No KYC, no signups. Connect any EVM-compatible wallet to trade transparently.
+          - generic [ref=e134]:
+            - img [ref=e136]
+            - heading "Instant Execution" [level=3] [ref=e138]
+            - paragraph [ref=e139]: Orders bypass slow blockchain layers thanks to off-chain sequencer networks matching trades in real-time.
+          - generic [ref=e140]:
+            - img [ref=e142]
+            - heading "Self-Custodial" [level=3] [ref=e145]
+            - paragraph [ref=e146]: You retain full control over your funds via thoroughly tested, heavily audited EVM smart contracts.
+      - generic [ref=e150]:
+        - generic [ref=e151]:
+          - heading "How CRE Workflows Drive TAPL" [level=3] [ref=e152]:
+            - img [ref=e153]
+            - text: How CRE Workflows Drive TAPL
+          - paragraph [ref=e158]: Traditional DApps struggle with the blockchain trilemma — managing latency, data cost, and security. By integrating the Chainlink Runtime Environment (CRE), we offload heavy validation and data ingestion processes into scalable worker networks.
+          - paragraph [ref=e159]: This serverless execution layer handles price verification, calculates PnL synchronously, runs pool solvency reports, and compiles Merkle roots of user actions — committing them trustlessly onto the Sepolia blockchain.
+        - generic [ref=e160]:
+          - generic [ref=e161]:
+            - img [ref=e163]
+            - generic [ref=e165]:
+              - heading "Price Integrity via Streams" [level=4] [ref=e166]
+              - paragraph [ref=e167]: High-frequency sub-second BTC/USD market data pulled from Chainlink Data Streams directly to the matching engine.
+          - generic [ref=e168]:
+            - img [ref=e170]
+            - generic [ref=e174]:
+              - heading "Batch Submissions" [level=4] [ref=e175]
+              - paragraph [ref=e176]: Trades, liquidity events, and oracle reports are aggregated off-chain and submitted as verifiable batches to our smart contracts.
+          - generic [ref=e177]:
+            - img [ref=e179]
+            - generic [ref=e183]:
+              - heading "Deterministic Settlement" [level=4] [ref=e184]
+              - paragraph [ref=e185]: Settlement payloads are built off-chain safely and cleanly. Winners withdraw without locking up large on-chain gas fees per tx.
+          - generic [ref=e186]:
+            - img [ref=e188]
+            - generic [ref=e191]:
+              - heading "Continuous Solvency" [level=4] [ref=e192]
+              - paragraph [ref=e193]: Pools are audited constantly by the Chainlink Runtime Environment (CRE). Real-time Proof of Reserve ensures full collateralization.
+          - generic [ref=e194]:
+            - img [ref=e196]
+            - generic [ref=e199]:
+              - heading "LP & Yield Distribution" [level=4] [ref=e200]
+              - paragraph [ref=e201]: Cross-chain logic via CCIP to automatically balance liquidity provider distributions globally, maintaining capital efficiency.

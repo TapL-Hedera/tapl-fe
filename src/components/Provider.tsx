@@ -2,18 +2,15 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { injected } from "wagmi/connectors";
-import {
-  POLKADOT_HUB_TESTNET_RPC_URL,
-  polkadotHubTestnet,
-} from "../config/chains";
+import { HEDERA_TESTNET_RPC_URL, hederaTestnet } from "../config/chains";
 
 const queryClient = new QueryClient();
 
 const config = createConfig({
-  chains: [polkadotHubTestnet],
+  chains: [hederaTestnet],
   connectors: [injected()],
   transports: {
-    [polkadotHubTestnet.id]: http(POLKADOT_HUB_TESTNET_RPC_URL),
+    [hederaTestnet.id]: http(HEDERA_TESTNET_RPC_URL),
   },
 });
 

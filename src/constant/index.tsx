@@ -1,1 +1,1 @@
-export const BACKEND_URL = "https://api-tap-fun-polkadot.nysm.work";
+export const BACKEND_URL = "https://api-tap-fun-hedera.nysm.work";

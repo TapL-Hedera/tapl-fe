@@ -8,11 +8,11 @@ import React, {
 import {
   ArrowDownLeft,
   ArrowUpRight,
+  CircleDollarSign,
   Coins,
-  Landmark,
+  Droplets,
   RefreshCw,
   ShieldCheck,
-  Sparkles,
   Wallet,
 } from "lucide-react";
 import {
@@ -24,7 +24,7 @@ import {
 } from "wagmi";
 import { formatUnits, parseUnits } from "viem";
 import { toast } from "react-hot-toast";
-import { polkadotHubTestnet } from "./config/chains";
+import { hederaTestnet } from "./config/chains";
 import { POOL_RESERVE_ADDRESS, POOL_RESERVE_ABI } from "./contracts/abi";
 import {
   formatTokenSymbol,
@@ -39,16 +39,24 @@ import {
 } from "./services/queries";
 
 const IN_APP_PER_TOKEN = 1_000_000;
-const NATIVE_SYMBOL = formatTokenSymbol(polkadotHubTestnet.nativeCurrency.symbol);
-const NATIVE_DECIMALS = polkadotHubTestnet.nativeCurrency.decimals;
-const ACCENT = "#f0b90b";
-const ACCENT_SOFT = "rgba(240, 185, 11, 0.14)";
-const BORDER = "rgba(255, 255, 255, 0.08)";
+const NATIVE_SYMBOL = formatTokenSymbol(hederaTestnet.nativeCurrency.symbol);
+const NATIVE_DECIMALS = hederaTestnet.nativeCurrency.decimals;
+const ACCENT = "#2D84EB";
+const SECONDARY = "#4F46E5";
+const DEEP = "#00156E";
+const SUCCESS = "#2EBD85";
+const ACCENT_SOFT = "rgba(45, 132, 235, 0.14)";
+const BORDER = "rgba(255, 255, 255, 0.11)";
+const PANEL_BG =
+  "linear-gradient(148deg, rgba(17, 20, 24, 0.94) 0%, rgba(10, 12, 15, 0.98) 100%)";
+const TILE_BG =
+  "linear-gradient(148deg, rgba(15, 18, 23, 0.94) 0%, rgba(9, 11, 14, 0.99) 100%)";
+const SUBTLE_BG = "rgba(255, 255, 255, 0.04)";
+const SOFT_TEXT = "rgba(226, 232, 240, 0.68)";
 
 type TabKey = "deposit" | "withdraw";
 
-interface MetricCardProps {
-  icon: React.ElementType;
+interface StatCardProps {
   label: string;
   value: string;
   sub?: string;
@@ -62,45 +70,30 @@ interface ActionButtonProps {
   idleLabel: string;
 }
 
-function MetricCard({ icon: Icon, label, value, sub }: MetricCardProps) {
+function StatCard({ label, value, sub }: StatCardProps) {
   return (
     <div
-      className="relative overflow-hidden rounded-[22px] p-5"
+      className="relative overflow-hidden rounded-2xl p-5"
       style={{
-        background:
-          "linear-gradient(180deg, rgba(18,18,18,0.98) 0%, rgba(11,11,11,0.96) 100%)",
+        background: TILE_BG,
         border: `1px solid ${BORDER}`,
-        boxShadow: "0 24px 64px rgba(0, 0, 0, 0.34)",
+        boxShadow: "0 12px 28px rgba(0, 0, 0, 0.44)",
       }}
     >
       <div
         className="absolute inset-x-0 top-0 h-px"
         style={{
           background:
-            "linear-gradient(90deg, transparent 0%, rgba(240,185,11,0.4) 50%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(45, 132, 235, 0.36) 50%, transparent 100%)",
         }}
       />
-      <div className="mb-4 flex items-center gap-3">
-        <div
-          className="flex h-11 w-11 items-center justify-center rounded-2xl"
-          style={{
-            background: ACCENT_SOFT,
-            border: "1px solid rgba(240, 185, 11, 0.18)",
-            color: ACCENT,
-          }}
-        >
-          <Icon size={18} />
-        </div>
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
-            {label}
-          </p>
-          {sub ? <p className="mt-1 text-[13px] text-white/70">{sub}</p> : null}
-        </div>
-      </div>
-      <p className="text-[1.85rem] font-bold tracking-[-0.04em] text-white">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/45">
+        {label}
+      </p>
+      <p className="mt-2 text-[1.65rem] font-bold tracking-[-0.04em] text-white">
         {value}
       </p>
+      {sub ? <p className="mt-1.5 text-xs text-white/55">{sub}</p> : null}
     </div>
   );
 }
@@ -117,11 +110,11 @@ function ActionButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-semibold tracking-[0.16em] text-black transition-transform duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50"
+      className="flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-semibold tracking-wide text-white transition duration-200 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-45"
       style={{
         background:
-          "linear-gradient(135deg, rgba(240,185,11,1) 0%, rgba(255,205,52,1) 100%)",
-        boxShadow: "0 18px 40px rgba(240, 185, 11, 0.18)",
+          `linear-gradient(135deg, ${ACCENT} 0%, ${SECONDARY} 58%, ${DEEP} 100%)`,
+        boxShadow: "0 10px 22px rgba(45, 132, 235, 0.28)",
       }}
     >
       {pending && <RefreshCw size={15} className="animate-spin" />}
@@ -161,7 +154,7 @@ function safeParseUnits(value: string, decimals: number) {
 
 export const WalletView: React.FC = () => {
   const { address, isConnected, chain } = useAccount();
-  const { switchChain, isPending: isPendingSwitch } = useSwitchChain();
+  const { switchChainAsync, isPending: isPendingSwitch } = useSwitchChain();
   const [activeTab, setActiveTab] = useState<TabKey>("deposit");
   const [depositAmountStr, setDepositAmountStr] = useState("");
   const [withdrawInAppStr, setWithdrawInAppStr] = useState("");
@@ -170,7 +163,7 @@ export const WalletView: React.FC = () => {
 
   const { data: nativeBalance, refetch: refetchNativeBalance } = useBalance({
     address,
-    chainId: polkadotHubTestnet.id,
+    chainId: hederaTestnet.id,
     query: { enabled: !!address },
   });
 
@@ -219,17 +212,42 @@ export const WalletView: React.FC = () => {
     Number.isFinite(rawWithdrawInApp) && rawWithdrawInApp > 0;
   const withdrawTokenFloat = rawWithdrawInApp / IN_APP_PER_TOKEN;
   const withdrawTokenStr = withdrawTokenFloat.toFixed(18);
-  const withdrawTokenAmountRaw =
-    isValidWithdrawAmount
-      ? parseUnits(withdrawTokenStr, NATIVE_DECIMALS)
-      : 0n;
-  const withdrawTokenEquivalent =
-    isValidWithdrawAmount ? withdrawTokenFloat.toFixed(6) : "0";
+  const withdrawTokenAmountRaw = isValidWithdrawAmount
+    ? parseUnits(withdrawTokenStr, NATIVE_DECIMALS)
+    : 0n;
+  const withdrawTokenEquivalent = isValidWithdrawAmount
+    ? withdrawTokenFloat.toFixed(6)
+    : "0";
 
   const refreshAll = useCallback(() => {
     refetchNativeBalance();
     refetchOffChainBalance();
   }, [refetchNativeBalance, refetchOffChainBalance]);
+
+  const ensureHederaTestnet = useCallback(async () => {
+    if (!isConnected) {
+      toast.error("Connect wallet to continue.");
+      return false;
+    }
+
+    if (chain?.id === hederaTestnet.id) {
+      return true;
+    }
+
+    if (!switchChainAsync) {
+      toast.error(`Switch to ${hederaTestnet.name} to continue.`);
+      return false;
+    }
+
+    try {
+      await switchChainAsync({ chainId: hederaTestnet.id });
+      return true;
+    } catch (error) {
+      console.error("Network switch failed", error);
+      toast.error(`Please switch to ${hederaTestnet.name} before continuing.`);
+      return false;
+    }
+  }, [chain?.id, isConnected, switchChainAsync]);
 
   useEffect(() => {
     if (!depositTxHash) return;
@@ -360,7 +378,10 @@ export const WalletView: React.FC = () => {
     handleFinalizeWithdrawal();
   }, [claimTxHash, isClaimSuccess, refreshAll]);
 
-  const handleDeposit = () => {
+  const handleDeposit = async () => {
+    const onHederaTestnet = await ensureHederaTestnet();
+    if (!onHederaTestnet) return;
+
     if (!depositAmountStr || !isValidDepositAmount) {
       toast.error("Enter a valid amount");
       return;
@@ -382,6 +403,9 @@ export const WalletView: React.FC = () => {
   };
 
   const handleWithdraw = async () => {
+    const onHederaTestnet = await ensureHederaTestnet();
+    if (!onHederaTestnet) return;
+
     if (!withdrawInAppStr || !isValidWithdrawAmount) {
       toast.error("Enter a valid in-app balance amount");
       return;
@@ -428,7 +452,7 @@ export const WalletView: React.FC = () => {
     setWithdrawInAppStr(offChainBalance.toString());
   };
 
-  const chainMismatch = isConnected && chain?.id !== polkadotHubTestnet.id;
+  const chainMismatch = isConnected && chain?.id !== hederaTestnet.id;
   const isInsufficientDeposit =
     depositTokenAmountRaw > (nativeBalance?.value ?? 0n);
   const isInsufficientWithdraw = rawWithdrawInApp > offChainBalance;
@@ -442,418 +466,359 @@ export const WalletView: React.FC = () => {
     [activeTab],
   );
 
+  const shortAddress = address
+    ? `${address.slice(0, 6)}...${address.slice(-4)}`
+    : "Not connected";
+
   return (
-    <div className="relative mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
+    <div className="relative mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 px-4 py-5 sm:px-6 lg:px-10 lg:py-7">
       <div
-        className="absolute left-1/2 top-10 h-[420px] w-[420px] -translate-x-1/2 rounded-full blur-[140px]"
+        className="absolute left-[18%] top-5 h-[260px] w-[260px] rounded-full blur-[130px]"
         style={{
           background:
-            "radial-gradient(circle, rgba(240,185,11,0.16) 0%, transparent 72%)",
+            "radial-gradient(circle, rgba(132,185,255,0.13) 0%, transparent 70%)",
+        }}
+      />
+      <div
+        className="absolute right-[11%] top-[26%] h-[220px] w-[220px] rounded-full blur-[110px]"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(45,132,235,0.1) 0%, transparent 72%)",
         }}
       />
 
-      <section className="relative overflow-hidden rounded-[28px] border border-white/8 bg-[#0b0b0b]/95 px-6 py-6 shadow-[0_36px_90px_rgba(0,0,0,0.38)] lg:px-8">
-        <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
+      <section className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-10 w-10 items-center justify-center rounded-full border"
+            style={{
+              borderColor: "rgba(45,132,235,0.3)",
+              background: ACCENT_SOFT,
+            }}
+          >
+            <Droplets size={18} style={{ color: ACCENT }} />
+          </div>
           <div>
-            <div
-              className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em]"
-              style={{
-                background: ACCENT_SOFT,
-                color: ACCENT,
-                border: "1px solid rgba(240, 185, 11, 0.2)",
-              }}
-            >
-              <Sparkles size={13} />
-              Wallet
-            </div>
-            <h1 className="mt-4 text-3xl font-bold tracking-[-0.05em] text-white md:text-5xl">
-              Balance funding
+            <h1 className="text-[1.72rem] font-bold tracking-[-0.03em] text-white">
+              Wallet Liquidity
             </h1>
+            <p className="text-xs text-white/45">
+              Deposit and withdraw between wallet and in-app balance
+            </p>
           </div>
+        </div>
 
-          <div className="flex shrink-0 items-center gap-3">
-            <div className="rounded-full border border-white/8 bg-white/[0.03] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/65">
-              {polkadotHubTestnet.name}
-            </div>
-            <button
-              type="button"
-              onClick={refreshAll}
-              className="inline-flex items-center gap-2 rounded-full border border-white/8 bg-white/[0.03] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70 transition hover:bg-white/[0.06] hover:text-white"
-            >
-              <RefreshCw size={14} />
-              Refresh
-            </button>
-          </div>
+        <div className="flex items-center gap-2 text-xs text-white/55">
+          <span
+            className="rounded-md border px-2.5 py-1.5"
+            style={{ borderColor: BORDER, background: SUBTLE_BG }}
+          >
+            {hederaTestnet.name}
+          </span>
+          <button
+            type="button"
+            onClick={refreshAll}
+            className="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-white/70 transition hover:text-white"
+            style={{ borderColor: BORDER, background: SUBTLE_BG }}
+          >
+            <RefreshCw size={12} />
+            Refresh
+          </button>
         </div>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <MetricCard
-          icon={Wallet}
-          label="On-Chain"
+      <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <StatCard
+          label="On-Chain Balance"
           value={`${formatAmount(nativeBalance?.value, NATIVE_DECIMALS)} ${NATIVE_SYMBOL}`}
           sub="Native wallet balance"
         />
-        <MetricCard
-          icon={Coins}
+        <StatCard
           label="App Balance"
           value={formatCompactNumber(offChainBalance, 0)}
-          sub="Available for trading"
+          sub="Available in app"
         />
-        <MetricCard
-          icon={Landmark}
+        <StatCard
           label="Conversion"
-          value={`1 ${NATIVE_SYMBOL}`}
-          sub={`${IN_APP_PER_TOKEN.toLocaleString()} in-app units`}
+          value={`1 ${NATIVE_SYMBOL} = ${IN_APP_PER_TOKEN.toLocaleString()} APP`}
+          sub={activeRailLabel}
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.45fr_0.85fr]">
-        <div
-          className="relative overflow-hidden rounded-[28px] p-6 lg:p-7"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(14,14,14,0.98) 0%, rgba(9,9,9,0.98) 100%)",
-            border: `1px solid ${BORDER}`,
-            boxShadow: "0 24px 70px rgba(0, 0, 0, 0.3)",
-          }}
-        >
+      <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+        <div className="space-y-4">
           <div
-            className="absolute right-6 top-6 h-28 w-28 rounded-full blur-3xl"
-            style={{ background: "rgba(240, 185, 11, 0.12)" }}
-          />
-
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
-                Action
-              </p>
-              <h2 className="mt-2 text-2xl font-bold tracking-[-0.04em] text-white">
-                {activeTab === "deposit"
-                  ? `Deposit ${NATIVE_SYMBOL}`
-                  : `Withdraw ${NATIVE_SYMBOL}`}
-              </h2>
-            </div>
-            <div
-              className="inline-flex rounded-full border border-white/8 bg-white/4 p-1"
-              role="tablist"
-              aria-label="Wallet actions"
-            >
-              {(["deposit", "withdraw"] as const).map((tab) => {
-                const active = activeTab === tab;
-
-                return (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => {
-                      setActiveTab(tab);
-                      setDepositAmountStr("");
-                      setWithdrawInAppStr("");
-                    }}
-                    className="rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition"
-                    style={{
-                      background: active ? ACCENT : "transparent",
-                      color: active ? "#050505" : "rgba(255,255,255,0.58)",
-                    }}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="relative z-10 mt-8 space-y-6">
-            {activeTab === "deposit" ? (
-              <>
-                <div>
-                  <div className="mb-3 flex items-end justify-between gap-3">
-                    <label className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
-                      Native amount
-                    </label>
-                    <p className="text-xs text-white/60">
-                      Available{" "}
-                      <span className="font-semibold text-white">
-                        {formatAmount(nativeBalance?.value, NATIVE_DECIMALS)}{" "}
-                        {NATIVE_SYMBOL}
-                      </span>
-                    </p>
-                  </div>
-                  <div
-                    className="flex items-center gap-3 rounded-[24px] px-5 py-4"
-                    style={{
-                      background: "rgba(255,255,255,0.03)",
-                      border: `1px solid ${BORDER}`,
-                    }}
-                  >
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.001"
-                      value={depositAmountStr}
-                      onChange={(event) =>
-                        setDepositAmountStr(event.target.value)
-                      }
-                      placeholder="0.00"
-                      className="min-w-0 flex-1 bg-transparent text-3xl font-bold tracking-[-0.04em] text-white outline-none placeholder:text-white/20"
-                    />
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em]"
-                        style={{
-                          background: ACCENT_SOFT,
-                          color: ACCENT,
-                          border: "1px solid rgba(240, 185, 11, 0.18)",
-                        }}
-                      >
-                        {NATIVE_SYMBOL}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={handleMaxDeposit}
-                        className="rounded-full border border-white/8 bg-white/4 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70 transition hover:bg-white/7 hover:text-white"
-                      >
-                        Max
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {depositTokenAmountRaw > 0n && (
-                  <div
-                    className="flex items-center justify-between rounded-[22px] px-4 py-4"
-                    style={{
-                      background: "rgba(255,255,255,0.03)",
-                      border: "1px solid rgba(240, 185, 11, 0.16)",
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-10 w-10 items-center justify-center rounded-2xl"
-                        style={{
-                          background: ACCENT_SOFT,
-                          color: ACCENT,
-                        }}
-                      >
-                        <ArrowUpRight size={16} />
-                      </div>
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.18em] text-white/45">
-                          Preview
-                        </p>
-                        <p className="mt-1 text-sm text-white/65">
-                          In-app balance credited
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-lg font-semibold text-white">
-                      {depositInAppEquivalent}
-                    </p>
-                  </div>
-                )}
-
-                {isInsufficientDeposit && (
-                  <p className="text-right text-xs text-[#f87171]">
-                    Deposit amount exceeds the connected wallet balance.
-                  </p>
-                )}
-
-                {chainMismatch ? (
-                  <ActionButton
-                    onClick={() =>
-                      switchChain?.({ chainId: polkadotHubTestnet.id })
-                    }
-                    disabled={isPendingSwitch}
-                    pending={isPendingSwitch}
-                    pendingLabel="SWITCHING NETWORK"
-                    idleLabel={`SWITCH TO ${polkadotHubTestnet.name.toUpperCase()}`}
-                  />
-                ) : (
-                  <ActionButton
-                    onClick={handleDeposit}
-                    disabled={
-                      !isConnected ||
-                      depositPending ||
-                      !isValidDepositAmount ||
-                      isInsufficientDeposit
-                    }
-                    pending={depositPending}
-                    pendingLabel="PROCESSING DEPOSIT"
-                    idleLabel={
-                      isConnected
-                        ? `DEPOSIT ${NATIVE_SYMBOL}`
-                        : "CONNECT WALLET TO DEPOSIT"
-                    }
-                  />
-                )}
-              </>
-            ) : (
-              <>
-                <div>
-                  <div className="mb-3 flex items-end justify-between gap-3">
-                    <label className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
-                      In-app amount
-                    </label>
-                    <p className="text-xs text-white/60">
-                      Available{" "}
-                      <span className="font-semibold text-white">
-                        {formatCompactNumber(offChainBalance, 0)}
-                      </span>
-                    </p>
-                  </div>
-                  <div
-                    className="flex items-center gap-3 rounded-[24px] px-5 py-4"
-                    style={{
-                      background: "rgba(255,255,255,0.03)",
-                      border: `1px solid ${BORDER}`,
-                    }}
-                  >
-                    <input
-                      type="number"
-                      min="0"
-                      step="1"
-                      value={withdrawInAppStr}
-                      onChange={(event) =>
-                        setWithdrawInAppStr(event.target.value)
-                      }
-                      placeholder="0"
-                      className="min-w-0 flex-1 bg-transparent text-3xl font-bold tracking-[-0.04em] text-white outline-none placeholder:text-white/20"
-                    />
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={handleMaxWithdraw}
-                        className="rounded-full border border-white/8 bg-white/4 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70 transition hover:bg-white/7 hover:text-white"
-                      >
-                        Max
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {withdrawTokenAmountRaw > 0n && (
-                  <div
-                    className="flex items-center justify-between rounded-[22px] px-4 py-4"
-                    style={{
-                      background: "rgba(255,255,255,0.03)",
-                      border: "1px solid rgba(240, 185, 11, 0.16)",
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-10 w-10 items-center justify-center rounded-2xl"
-                        style={{
-                          background: ACCENT_SOFT,
-                          color: ACCENT,
-                        }}
-                      >
-                        <ArrowDownLeft size={16} />
-                      </div>
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.18em] text-white/45">
-                          Preview
-                        </p>
-                        <p className="mt-1 text-sm text-white/65">
-                          Native amount returned on-chain
-                        </p>
-                      </div>
-                    </div>
-                    <p className="text-lg font-semibold text-white">
-                      {withdrawTokenEquivalent} {NATIVE_SYMBOL}
-                    </p>
-                  </div>
-                )}
-
-                {isInsufficientWithdraw && (
-                  <p className="text-right text-xs text-[#f87171]">
-                    Requested amount exceeds your in-app balance.
-                  </p>
-                )}
-
-                {chainMismatch ? (
-                  <ActionButton
-                    onClick={() =>
-                      switchChain?.({ chainId: polkadotHubTestnet.id })
-                    }
-                    disabled={isPendingSwitch}
-                    pending={isPendingSwitch}
-                    pendingLabel="SWITCHING NETWORK"
-                    idleLabel={`SWITCH TO ${polkadotHubTestnet.name.toUpperCase()}`}
-                  />
-                ) : (
-                  <ActionButton
-                    onClick={handleWithdraw}
-                    disabled={
-                      !isConnected ||
-                      withdrawPending ||
-                      !isValidWithdrawAmount ||
-                      isInsufficientWithdraw
-                    }
-                    pending={withdrawPending}
-                    pendingLabel="PROCESSING WITHDRAWAL"
-                    idleLabel={
-                      isConnected
-                        ? `WITHDRAW ${NATIVE_SYMBOL}`
-                        : "CONNECT WALLET TO WITHDRAW"
-                    }
-                  />
-                )}
-              </>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <div
-            className="rounded-[28px] p-6"
+            className="rounded-2xl p-5"
             style={{
-              background:
-                "linear-gradient(180deg, rgba(16,16,16,0.98) 0%, rgba(10,10,10,0.98) 100%)",
+              background: PANEL_BG,
               border: `1px solid ${BORDER}`,
+              boxShadow: "0 18px 36px rgba(0, 0, 0, 0.45)",
             }}
           >
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
-              Rail
-            </p>
-            <div className="mt-5 space-y-3">
+            <h3 className="text-lg font-semibold text-white">
+              Wallet Overview
+            </h3>
+            <div className="mt-4 space-y-2">
               {[
+                { label: "Wallet", value: shortAddress, icon: Wallet },
                 {
-                  icon: ShieldCheck,
-                  title: "Reserve contract",
+                  label: "Current Network",
+                  value: chain?.name ?? "Unknown",
+                  icon: CircleDollarSign,
+                },
+                {
+                  label: "Reserve Contract",
                   value: `${POOL_RESERVE_ADDRESS.slice(0, 8)}...${POOL_RESERVE_ADDRESS.slice(-6)}`,
+                  icon: ShieldCheck,
                 },
-                {
-                  icon: Wallet,
-                  title: "Current mode",
-                  value: activeRailLabel,
-                },
-                {
-                  icon: Coins,
-                  title: "Convert rate",
-                  value: `1000 APP = 0.001 ${NATIVE_SYMBOL}`,
-                },
-              ].map(({ icon: Icon, title, value }) => (
+                { label: "Current Rail", value: activeRailLabel, icon: Coins },
+              ].map(({ label, value, icon: Icon }) => (
                 <div
-                  key={title}
-                  className="flex items-center justify-between rounded-[22px] border border-white/8 bg-white/[0.03] px-4 py-4"
+                  key={label}
+                  className="flex items-center justify-between gap-3 rounded-lg border px-3 py-2"
+                  style={{ borderColor: BORDER, background: SUBTLE_BG }}
                 >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="flex h-10 w-10 items-center justify-center rounded-2xl"
-                      style={{
-                        background: ACCENT_SOFT,
-                        color: ACCENT,
-                      }}
-                    >
-                      <Icon size={16} />
-                    </div>
-                    <p className="text-sm font-semibold text-white">{title}</p>
-                  </div>
-                  <p className="text-sm text-white/60">{value}</p>
+                  <span className="inline-flex items-center gap-2 text-xs text-white/62">
+                    <Icon size={14} style={{ color: ACCENT }} />
+                    {label}
+                  </span>
+                  <span className="text-xs text-white/80">{value}</span>
                 </div>
               ))}
             </div>
+            {chainMismatch ? (
+              <p className="mt-3 text-xs text-[#ff8ca0]">
+                Wrong network. Please switch to {hederaTestnet.name}.
+              </p>
+            ) : null}
+          </div>
+
+          <div
+            className="rounded-2xl p-5"
+            style={{
+              background: PANEL_BG,
+              border: `1px solid ${BORDER}`,
+              boxShadow: "0 18px 36px rgba(0, 0, 0, 0.45)",
+            }}
+          >
+            <h3 className="text-lg font-semibold text-white">
+              Transfer Preview
+            </h3>
+            <div className="mt-4 space-y-3 text-sm text-white/72">
+              {activeTab === "deposit" ? (
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-2">
+                    <ArrowUpRight size={14} style={{ color: SUCCESS }} />
+                    Estimated in-app credit
+                  </span>
+                  <span className="font-semibold text-white">
+                    {depositInAppEquivalent}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-2">
+                    <ArrowDownLeft size={14} style={{ color: SUCCESS }} />
+                    Estimated on-chain receive
+                  </span>
+                  <span className="font-semibold text-white">
+                    {withdrawTokenEquivalent} {NATIVE_SYMBOL}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <span className="text-white/55">Available on-chain</span>
+                <span>
+                  {formatAmount(nativeBalance?.value, NATIVE_DECIMALS)}{" "}
+                  {NATIVE_SYMBOL}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-white/55">Available in-app</span>
+                <span>{formatCompactNumber(offChainBalance, 0)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className="h-fit rounded-2xl p-5 lg:sticky lg:top-5"
+          style={{
+            background: PANEL_BG,
+            border: `1px solid ${BORDER}`,
+            boxShadow: "0 18px 38px rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-white/45">
+                You Deposit
+              </p>
+              <h2 className="mt-1 text-lg font-semibold text-white">
+                {activeTab === "deposit" ? NATIVE_SYMBOL : "In-App Balance"}
+              </h2>
+            </div>
+            <div
+              className="rounded-md border px-2 py-1 text-xs text-white/70"
+              style={{ borderColor: BORDER, background: SUBTLE_BG }}
+            >
+              {isConnected ? "Connected" : "Offline"}
+            </div>
+          </div>
+
+          <div
+            className="mt-4 inline-flex w-full rounded-xl p-1"
+            style={{
+              border: `1px solid ${BORDER}`,
+              background: SUBTLE_BG,
+            }}
+            role="tablist"
+            aria-label="Wallet actions"
+          >
+            {(["deposit", "withdraw"] as const).map((tab) => {
+              const active = activeTab === tab;
+
+              return (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => {
+                    setActiveTab(tab);
+                    setDepositAmountStr("");
+                    setWithdrawInAppStr("");
+                  }}
+                  className="w-full rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-[0.15em] transition"
+                  style={{
+                    background: active
+                      ? "rgba(45, 132, 235, 0.22)"
+                      : "transparent",
+                    color: active ? "#b7d7ff" : SOFT_TEXT,
+                    boxShadow: active
+                      ? "inset 0 0 0 1px rgba(45, 132, 235, 0.35)"
+                      : "none",
+                  }}
+                >
+                  {tab}
+                </button>
+              );
+            })}
+          </div>
+
+          <div
+            className="mt-4 rounded-xl border p-3"
+            style={{
+              borderColor: BORDER,
+              background: "rgba(255,255,255,0.02)",
+            }}
+          >
+            <div className="flex items-center justify-between text-xs text-white/55">
+              <span>{activeTab === "deposit" ? "Token" : "In-App Unit"}</span>
+              <span>
+                Available{" "}
+                {activeTab === "deposit"
+                  ? `${formatAmount(nativeBalance?.value, NATIVE_DECIMALS)} ${NATIVE_SYMBOL}`
+                  : formatCompactNumber(offChainBalance, 0)}
+              </span>
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <span
+                className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs font-semibold"
+                style={{ borderColor: BORDER, background: SUBTLE_BG }}
+              >
+                {activeTab === "deposit" ? (
+                  <Wallet size={13} style={{ color: ACCENT }} />
+                ) : (
+                  <Coins size={13} style={{ color: ACCENT }} />
+                )}
+                {activeTab === "deposit" ? NATIVE_SYMBOL : "APP"}
+              </span>
+              <input
+                type="number"
+                min="0"
+                step={activeTab === "deposit" ? "0.001" : "1"}
+                value={
+                  activeTab === "deposit" ? depositAmountStr : withdrawInAppStr
+                }
+                onChange={(event) =>
+                  activeTab === "deposit"
+                    ? setDepositAmountStr(event.target.value)
+                    : setWithdrawInAppStr(event.target.value)
+                }
+                placeholder="0"
+                className="min-w-0 flex-1 bg-transparent text-right text-2xl font-semibold tracking-tight text-white outline-none placeholder:text-white/25"
+              />
+            </div>
+            <div className="mt-3 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={
+                  activeTab === "deposit" ? handleMaxDeposit : handleMaxWithdraw
+                }
+                className="rounded-md border px-2 py-1 text-[11px] font-medium text-white/75 transition hover:text-white"
+                style={{ borderColor: BORDER, background: SUBTLE_BG }}
+              >
+                Max
+              </button>
+            </div>
+          </div>
+
+          {activeTab === "deposit" && isInsufficientDeposit ? (
+            <p className="mt-3 text-right text-xs text-[#ff8ca0]">
+              Deposit amount exceeds connected wallet balance.
+            </p>
+          ) : null}
+          {activeTab === "withdraw" && isInsufficientWithdraw ? (
+            <p className="mt-3 text-right text-xs text-[#ff8ca0]">
+              Requested amount exceeds your in-app balance.
+            </p>
+          ) : null}
+
+          <div className="mt-4">
+            {chainMismatch ? (
+              <ActionButton
+                onClick={() =>
+                  void switchChainAsync?.({ chainId: hederaTestnet.id })
+                }
+                disabled={isPendingSwitch}
+                pending={isPendingSwitch}
+                pendingLabel="SWITCHING NETWORK"
+                idleLabel={`SWITCH TO ${hederaTestnet.name.toUpperCase()}`}
+              />
+            ) : activeTab === "deposit" ? (
+              <ActionButton
+                onClick={handleDeposit}
+                disabled={
+                  !isConnected ||
+                  depositPending ||
+                  !isValidDepositAmount ||
+                  isInsufficientDeposit
+                }
+                pending={depositPending}
+                pendingLabel="PROCESSING DEPOSIT"
+                idleLabel={
+                  isConnected
+                    ? `DEPOSIT ${NATIVE_SYMBOL}`
+                    : "CONNECT WALLET TO DEPOSIT"
+                }
+              />
+            ) : (
+              <ActionButton
+                onClick={handleWithdraw}
+                disabled={
+                  !isConnected ||
+                  withdrawPending ||
+                  !isValidWithdrawAmount ||
+                  isInsufficientWithdraw
+                }
+                pending={withdrawPending}
+                pendingLabel="PROCESSING WITHDRAWAL"
+                idleLabel={
+                  isConnected
+                    ? `WITHDRAW ${NATIVE_SYMBOL}`
+                    : "CONNECT WALLET TO WITHDRAW"
+                }
+              />
+            )}
           </div>
         </div>
       </section>

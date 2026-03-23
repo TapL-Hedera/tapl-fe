@@ -1,479 +1,410 @@
 import React from "react";
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  BarChart3,
+  BadgeCheck,
+  Bolt,
+  Clock3,
   Database,
-  Lock,
-  ShieldCheck,
-  Sparkles,
-  Zap,
+  Droplets,
+  Layers,
+  Network,
+  type LucideIcon,
 } from "lucide-react";
+import { Squares } from "./Squares";
+import { HcsAnchorWorkflow } from "./HcsAnchorWorkflow";
 
-const accent = "#f0b90b";
+const ACCENT = "#2D84EB";
+const SECONDARY = "#4F46E5";
+const DEEP = "#00156E";
+const SOFT_BLUE = "#8EC1FF";
+const TEXT_MAIN = "#F8FAFF";
+const TEXT_DIM = "#D0D0D0";
 
-const platformPillars = [
+const EDGE_POINTS: {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  tint: string;
+}[] = [
   {
-    eyebrow: "Storage",
-    title: "Hold positions, balances, and reserve state in one mental model.",
+    icon: Bolt,
+    title: "Realtime Off-chain Engine",
     description:
-      "The homepage now frames wallet balance, trader activity, and LP reserve as one connected system.",
+      "Gameplay logic executes off-chain for instant response and smooth trading.",
+    tint: ACCENT,
+  },
+  {
+    icon: Layers,
+    title: "Merkle Batch Commit",
+    description:
+      "Settled orders are grouped, hashed, and compressed into a single Merkle root.",
+    tint: SECONDARY,
+  },
+  {
+    icon: Network,
+    title: "Hedera Consensus Record",
+    description:
+      "Each batch gets sequence number, consensus timestamp, and running hash.",
+    tint: SOFT_BLUE,
+  },
+  {
     icon: Database,
+    title: "Mirror Node Validation",
+    description:
+      "Anyone can fetch anchor data from mirror nodes and verify public commit history.",
+    tint: "#6EA8FF",
   },
   {
-    eyebrow: "Execution",
-    title: "Move from wallet connect to trade entry with less friction.",
+    icon: BadgeCheck,
+    title: "Order-level Proof",
     description:
-      "Primary actions stay close to the headline and preview panel so the user understands where to click next.",
-    icon: Zap,
-  },
-  {
-    eyebrow: "Trust",
-    title: "Explain settlement clearly before the user ever opens the app.",
-    description:
-      "On-chain wording, reserve context, and round mechanics are simplified into readable cards instead of marketing noise.",
-    icon: ShieldCheck,
+      "Every order can be proven inside an anchored batch with Merkle proof.",
+    tint: "#5F91FF",
   },
 ];
 
-const productSurfaces = [
+const ADVANTAGES: {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  tint: string;
+}[] = [
   {
-    title: "Trade cockpit",
-    href: "/trade",
-    summary:
-      "The fast surface for BTC directional rounds, price timing, entry flow, and quick status feedback.",
-    bullets: ["Open round", "Tap a direction", "Track round state"],
-    stat: "Low-latency entry",
+    title: "Fast UX",
+    description:
+      "No waiting for block confirmations while users are actively trading.",
+    icon: Clock3,
+    tint: ACCENT,
   },
   {
-    title: "Wallet rail",
-    href: "/wallet",
-    summary:
-      "The movement layer for deposits, in-app balances, and withdrawals without making the user decode backend concepts.",
-    bullets: ["Deposit to app", "Watch available balance", "Withdraw cleanly"],
-    stat: "Funding clarity",
+    title: "Transparent Settlement",
+    description:
+      "Important economic outcomes are committed publicly, not hidden in private logs.",
+    icon: Network,
+    tint: SECONDARY,
   },
   {
-    title: "Reserve layer",
-    href: "/lp",
-    summary:
-      "The LP surface for reserve participation, share minting, and understanding how liquidity supports payouts.",
-    bullets: ["Provide liquidity", "Mint LP shares", "Follow reserve health"],
-    stat: "Protocol support",
+    title: "Audit-ready Integrity",
+    description:
+      "Post-settlement edits become detectable because Merkle root and anchor no longer match.",
+    icon: BadgeCheck,
+    tint: SOFT_BLUE,
   },
 ];
 
-const operatingFlow = [
-  {
-    step: "01",
-    title: "Connect and authenticate",
-    description:
-      "Start with a wallet signature so the product is tied directly to your on-chain account from the first session.",
-  },
-  {
-    step: "02",
-    title: "Fund the trading balance",
-    description:
-      "Move funds into the in-app balance layer, where round entry feels immediate and consistent.",
-  },
-  {
-    step: "03",
-    title: "Join live BTC rounds",
-    description:
-      "Choose a direction, monitor the round, and keep the action loop compact and readable.",
-  },
-  {
-    step: "04",
-    title: "Settle or support liquidity",
-    description:
-      "Profits can move back through the wallet rail, while LP capital continues to back reserve activity.",
-  },
-];
+type SectionHeaderProps = {
+  badge: string;
+  title: string;
+  subtitle: string;
+};
+
+const SectionHeader: React.FC<SectionHeaderProps> = ({
+  badge,
+  title,
+  subtitle,
+}) => (
+  <div className="mx-auto max-w-4xl text-center">
+    <div
+      className="inline-flex rounded-full border px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]"
+      style={{
+        color: SOFT_BLUE,
+        borderColor: "rgba(45, 132, 235, 0.36)",
+        background: "rgba(10, 20, 46, 0.85)",
+      }}
+    >
+      {badge}
+    </div>
+    <h2
+      className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl"
+      style={{ textShadow: "0 12px 34px rgba(45, 132, 235, 0.35)" }}
+    >
+      {title}
+    </h2>
+    <p
+      className="mx-auto mt-4 max-w-2xl text-base leading-7"
+      style={{ color: TEXT_DIM }}
+    >
+      {subtitle}
+    </p>
+  </div>
+);
 
 export const IntroView: React.FC = () => {
   return (
-    <div className="relative flex-1 overflow-y-auto overflow-x-hidden bg-[#050505] text-white">
-      <div className="pointer-events-none absolute inset-0">
+    <div className="relative z-0 flex-1 w-full overflow-y-auto">
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <Squares
+          direction="diagonal"
+          speed={0.22}
+          borderColor="rgba(45, 132, 235, 0.16)"
+          hoverFillColor="rgba(79, 70, 229, 0.13)"
+          squareSize={46}
+          className="h-full w-full opacity-[0.78]"
+        />
         <div
-          className="absolute inset-x-0 top-0 h-[480px]"
+          className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(circle at top, rgba(240,185,11,0.16) 0%, transparent 60%)",
+              "radial-gradient(circle at 52% 4%, rgba(45,132,235,0.24) 0%, rgba(79,70,229,0.14) 30%, transparent 62%), linear-gradient(180deg, rgba(1,5,20,0.28) 0%, rgba(1,7,24,0.82) 50%, rgba(1,6,20,0.95) 100%)",
           }}
         />
-        <div
-          className="absolute inset-0 opacity-[0.18]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px)",
-            backgroundSize: "42px 42px",
-            maskImage:
-              "linear-gradient(180deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.5) 42%, transparent 100%)",
-          }}
-        />
-        <div className="absolute left-[-8rem] top-44 h-72 w-72 rounded-full bg-[#f0b90b]/8 blur-3xl" />
-        <div className="absolute right-[-5rem] top-20 h-80 w-80 rounded-full bg-white/5 blur-3xl" />
+        <div className="absolute left-0 top-[18%] h-[2px] w-[42%] bg-gradient-to-r from-transparent via-[#2D84EB]/40 to-transparent" />
+        <div className="absolute right-0 top-[26%] h-[2px] w-[38%] bg-gradient-to-l from-transparent via-[#4F46E5]/36 to-transparent" />
+        <div className="absolute left-1/2 top-0 h-[440px] w-[1px] -translate-x-1/2 bg-gradient-to-b from-[#2D84EB]/34 to-transparent" />
       </div>
 
-      <div className="relative mx-auto flex w-full max-w-7xl flex-col px-4 pb-18 pt-5 sm:px-6 lg:px-8">
-        <motion.header
-          initial={{ opacity: 0, y: -14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          className="sticky top-0 z-30 mb-10"
-        >
-          <div className="rounded-full border border-white/8 bg-[rgba(8,8,8,0.9)] px-4 py-3 shadow-[0_22px_50px_rgba(0,0,0,0.28)] backdrop-blur">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <Link to="/" className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">
-                  <img
-                    src="/polkatap.png"
-                    alt="PolkaTap"
-                    className="h-10 w-10 object-contain"
-                  />
-                </div>
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
-                    PolkaTap
-                  </p>
-                  <p className="text-sm text-white/72">Polkadot Hackathon</p>
-                </div>
-              </Link>
-
-              <div className="hidden items-center gap-6 text-sm text-white/54 md:flex">
-                <a href="#platform" className="transition hover:text-white">
-                  Platform
-                </a>
-                <a href="#surfaces" className="transition hover:text-white">
-                  Surfaces
-                </a>
-                <a href="#process" className="transition hover:text-white">
-                  Process
-                </a>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Link
-                  to="/wallet"
-                  className="hidden rounded-full border border-white/10 px-4 py-2 text-sm font-medium text-white/68 transition hover:border-white/18 hover:text-white sm:inline-flex"
-                >
-                  Wallet
-                </Link>
-                <Link
-                  to="/trade"
-                  className="inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold text-black shadow-[0_18px_42px_rgba(240,185,11,0.18)] transition hover:-translate-y-0.5"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #f0b90b 0%, #ffcf4c 100%)",
-                  }}
-                >
-                  Launch trade
-                  <ArrowRight size={15} />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </motion.header>
-
-        <section className="py-10 md:py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-            className="mx-auto flex max-w-5xl flex-col items-center text-center"
-          >
-            <div
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em]"
+      <div className="relative z-10 mx-auto w-full max-w-[1160px] px-4 pb-24 pt-6 sm:px-6 lg:px-10">
+        <header className="flex items-center">
+          <Link to="/" className="inline-flex items-center gap-3">
+            <span
+              className="flex h-11 w-11 items-center justify-center rounded-xl border"
               style={{
-                background: "rgba(240, 185, 11, 0.08)",
-                border: "1px solid rgba(240, 185, 11, 0.14)",
-                color: accent,
+                borderColor: "rgba(45, 132, 235, 0.56)",
+                background:
+                  "linear-gradient(145deg, rgba(45,132,235,0.95) 0%, rgba(79,70,229,0.88) 64%, rgba(0,21,110,0.9) 100%)",
+                boxShadow: "0 16px 36px rgba(45, 132, 235, 0.5)",
               }}
             >
-              <Sparkles size={12} />
-              Operational trading UI
+              <Droplets size={16} className="text-white" />
+            </span>
+            <span
+              className="text-[33px] font-bold uppercase italic tracking-tight"
+              style={{
+                color: ACCENT,
+                textShadow: "0 10px 24px rgba(45, 132, 235, 0.46)",
+              }}
+            >
+              TAPL
+            </span>
+          </Link>
+        </header>
+
+        <section className="mx-auto mt-12 max-w-5xl text-center sm:mt-16">
+          <div
+            className="relative overflow-hidden rounded-[28px] border px-5 py-10 sm:px-10 sm:py-14"
+            style={{
+              borderColor: "rgba(45, 132, 235, 0.34)",
+              background:
+                "linear-gradient(180deg, rgba(10, 18, 44, 0.9) 0%, rgba(3, 10, 31, 0.95) 100%)",
+              boxShadow:
+                "0 30px 80px rgba(5, 9, 30, 0.72), inset 0 1px 0 rgba(255,255,255,0.08)",
+            }}
+          >
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute left-0 top-0 h-px w-full bg-gradient-to-r from-transparent via-[#2D84EB]/55 to-transparent" />
+              <div className="absolute left-[12%] top-10 h-px w-[76%] bg-gradient-to-r from-transparent via-[#4F46E5]/40 to-transparent" />
             </div>
 
-            <h1 className="mt-8 max-w-5xl text-5xl font-semibold leading-[0.95] tracking-[-0.08em] text-white md:text-7xl lg:text-[92px]">
-              Trading infrastructure
-              <span className="block text-white/58">
-                for BTC rounds on Polkadot
+            <h1 className="mt-7 text-5xl font-semibold leading-[1.03] tracking-tight text-white sm:text-6xl md:text-7xl">
+              Tap. Bet. Capture
+              <span className="block bg-gradient-to-r from-[#FFFFFF] via-[#8EC1FF] to-[#4F46E5] bg-clip-text text-transparent">
+                Every Price Move
               </span>
             </h1>
 
-            <p className="mt-6 max-w-2xl text-base leading-8 text-white/52 md:text-lg">
-              Wallet funding, round execution, and reserve-backed settlement,
-              presented as one clean operating system instead of a noisy promo
-              page.
+            <p
+              className="mx-auto mt-6 max-w-3xl text-base leading-8 sm:text-lg"
+              style={{ color: TEXT_DIM }}
+            >
+              TAPL is built for rapid tap-to-bet execution. Enter positions in
+              seconds, react to live momentum, and manage risk with a fast
+              interface designed for active players.
             </p>
 
-            <div className="mt-9 flex w-full max-w-3xl items-center justify-center gap-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-[#d9a300]/80">
-              <span className="hidden h-px flex-1 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.08))] md:block" />
-              <Link
-                to="/trade"
-                className="inline-flex rounded-full border border-white/8 bg-white/[0.02] p-1 shadow-[0_10px_34px_rgba(0,0,0,0.18)] transition hover:border-white/14"
-              >
+            <div
+              className="mt-8 flex flex-wrap items-center justify-center gap-3 text-[11px] font-semibold uppercase tracking-[0.14em]"
+              style={{ color: SOFT_BLUE }}
+            >
+              {[
+                "Tap To Bet",
+                "Instant Entry",
+                "Live Price Feed",
+                "Real-Time PnL",
+              ].map((tag) => (
                 <span
-                  className="rounded-full px-7 py-3 text-[13px] tracking-normal text-black"
+                  key={tag}
+                  className="rounded-full border px-3 py-1 transition hover:-translate-y-0.5"
                   style={{
-                    background:
-                      "linear-gradient(135deg, #f0b90b 0%, #ffcf4c 100%)",
-                    boxShadow: "0 8px 24px rgba(240, 185, 11, 0.18)",
+                    borderColor: "rgba(45, 132, 235, 0.35)",
+                    background: "rgba(10, 18, 44, 0.9)",
+                    boxShadow: "0 6px 18px rgba(45, 132, 235, 0.2)",
                   }}
                 >
-                  Trading
+                  {tag}
                 </span>
-              </Link>
-              <span className="hidden h-px flex-1 bg-[linear-gradient(90deg,rgba(255,255,255,0.08),transparent)] md:block" />
+              ))}
             </div>
 
-            <div className="mt-12 h-px w-full max-w-5xl bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.12),transparent)]" />
-          </motion.div>
-        </section>
-
-        <motion.section
-          id="platform"
-          initial={{ opacity: 0, y: 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          className="py-12"
-        >
-          <div className="max-w-2xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
-              Platform story
-            </p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.07em] text-white md:text-5xl">
-              A cleaner homepage for a product that already has real moving
-              parts.
-            </h2>
-            <p className="mt-4 text-base leading-8 text-white/56">
-              Instead of treating PolkaTap like a generic crypto promo page, the
-              new layout explains what happens operationally: where money
-              enters, how rounds execute, and how reserve liquidity supports
-              outcomes.
-            </p>
-          </div>
-
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            {platformPillars.map(
-              ({ eyebrow, title, description, icon: Icon }) => (
-                <motion.div
-                  key={title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-80px" }}
-                  transition={{ duration: 0.35 }}
-                  className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,#111111_0%,#0c0c0c_100%)] p-5 shadow-[0_16px_38px_rgba(0,0,0,0.24)]"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
-                      {eyebrow}
-                    </span>
-                    <div
-                      className="flex h-11 w-11 items-center justify-center rounded-2xl"
-                      style={{
-                        background: "rgba(240, 185, 11, 0.1)",
-                        color: accent,
-                        border: "1px solid rgba(240, 185, 11, 0.12)",
-                      }}
-                    >
-                      <Icon size={18} />
-                    </div>
-                  </div>
-                  <h3 className="mt-5 text-2xl font-semibold tracking-[-0.05em] text-white">
-                    {title}
-                  </h3>
-                  <p className="mt-4 text-sm leading-7 text-white/56">
-                    {description}
-                  </p>
-                </motion.div>
-              ),
-            )}
-          </div>
-        </motion.section>
-
-        <section id="surfaces" className="py-8">
-          <div className="rounded-[34px] border border-white/8 bg-[linear-gradient(180deg,#101010_0%,#0b0b0b_100%)] p-5 shadow-[0_30px_80px_rgba(0,0,0,0.3)] sm:p-8">
-            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <div className="max-w-2xl">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
-                  Product surfaces
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-white md:text-5xl">
-                  Three surfaces, one product language.
-                </h2>
-              </div>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
                 to="/trade"
-                className="inline-flex items-center gap-2 self-start text-sm font-medium text-white/68 transition hover:text-white"
+                className="inline-flex min-w-[220px] items-center justify-center gap-2 rounded-xl border px-7 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:-translate-y-0.5 hover:scale-[1.01]"
+                style={{
+                  borderColor: "rgba(45, 132, 235, 0.42)",
+                  background: `linear-gradient(135deg, ${ACCENT} 0%, ${SECONDARY} 58%, ${DEEP} 100%)`,
+                  boxShadow: "0 18px 34px rgba(45, 132, 235, 0.46)",
+                }}
               >
-                Open the app
+                Start Betting Now
                 <ArrowRight size={14} />
               </Link>
             </div>
-
-            <div className="mt-8 grid gap-4 lg:grid-cols-3">
-              {productSurfaces.map((card) => (
-                <Link
-                  key={card.title}
-                  to={card.href}
-                  className="group rounded-[28px] border border-white/8 bg-white/[0.03] p-5 transition hover:border-white/16 hover:bg-white/[0.05]"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/32">
-                      <BarChart3 size={13} style={{ color: accent }} />
-                      Surface
-                    </div>
-                    <span
-                      className="rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]"
-                      style={{
-                        color: accent,
-                        background: "rgba(240, 185, 11, 0.08)",
-                      }}
-                    >
-                      {card.stat}
-                    </span>
-                  </div>
-                  <h3 className="mt-4 text-2xl font-semibold tracking-[-0.05em] text-white">
-                    {card.title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-7 text-white/56">
-                    {card.summary}
-                  </p>
-                  <div className="mt-5 space-y-2">
-                    {card.bullets.map((point) => (
-                      <div
-                        key={point}
-                        className="flex items-center gap-2 text-sm text-white/68"
-                      >
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#f0b90b]" />
-                        {point}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white/74 transition group-hover:text-white">
-                    Explore surface
-                    <ArrowRight size={14} />
-                  </div>
-                </Link>
-              ))}
-            </div>
           </div>
         </section>
 
-        <section id="process" className="py-12">
-          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="max-w-xl">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
-                Operating flow
-              </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.07em] text-white md:text-5xl">
-                Explain the loop before asking for trust.
-              </h2>
-              <p className="mt-4 text-base leading-8 text-white/56">
-                Pixeltable's homepage works because the product flow is visible.
-                This refactor follows that principle for PolkaTap: first show
-                the sequence, then ask the user to enter it.
-              </p>
+        <section className="mx-auto mt-24 max-w-6xl">
+          <SectionHeader
+            badge="Anchor Workflow"
+            title="HCS Anchor Workflow"
+            subtitle="From settled orders to public mirror-node verification and order-level Merkle proof."
+          />
+          <div className="mt-10">
+            <HcsAnchorWorkflow />
+          </div>
+        </section>
 
-              <div className="mt-8 rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,#111111_0%,#0c0c0c_100%)] p-5 shadow-[0_16px_38px_rgba(0,0,0,0.24)]">
-                <div className="flex items-center gap-3">
-                  <div
-                    className="flex h-12 w-12 items-center justify-center rounded-2xl"
-                    style={{
-                      background: "rgba(240, 185, 11, 0.1)",
-                      color: accent,
-                    }}
+        <section className="mx-auto mt-24 max-w-6xl">
+          <SectionHeader
+            badge="Our Edge"
+            title="Where We Excel, Others Fall Behind."
+            subtitle="Fast player experience, low-cost anchoring, and verifiable settlement history in one architecture."
+          />
+
+          <div
+            className="mt-12 rounded-[24px] border px-4 py-6 sm:px-6 sm:py-8"
+            style={{
+              borderColor: "rgba(148, 163, 184, 0.3)",
+              background:
+                "linear-gradient(180deg, rgba(5, 14, 41, 0.78) 0%, rgba(3, 10, 30, 0.93) 100%)",
+              boxShadow: "0 24px 70px rgba(5, 9, 30, 0.6)",
+            }}
+          >
+            <div className="grid gap-4 md:grid-cols-3 md:divide-x md:divide-white/10">
+              {EDGE_POINTS.slice(0, 3).map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article
+                    key={item.title}
+                    className="group rounded-xl px-3 py-4 text-center transition duration-300 hover:-translate-y-1 hover:bg-white/[0.04]"
                   >
-                    <Lock size={20} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white/86">
-                      Demo-first onboarding
-                    </p>
-                    <p className="mt-1 text-sm text-white/56">
-                      Users can understand the shape of the product before they
-                      move real funds.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {operatingFlow.map((item) => (
-                <motion.div
-                  key={item.step}
-                  initial={{ opacity: 0, x: 18 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
-                  className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,#111111_0%,#0c0c0c_100%)] p-5 shadow-[0_16px_38px_rgba(0,0,0,0.24)]"
-                >
-                  <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-                    <div
-                      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-sm font-semibold"
+                    <span
+                      className="mx-auto inline-flex h-16 w-16 items-center justify-center rounded-xl border transition group-hover:scale-110"
                       style={{
-                        background: "rgba(240, 185, 11, 0.1)",
-                        color: accent,
-                        border: "1px solid rgba(240, 185, 11, 0.14)",
+                        borderColor: `${item.tint}77`,
+                        background:
+                          "linear-gradient(160deg, rgba(9, 20, 52, 0.92) 0%, rgba(11, 28, 68, 0.7) 100%)",
+                        boxShadow: `0 10px 24px ${item.tint}30`,
                       }}
                     >
-                      {item.step}
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-semibold tracking-[-0.05em] text-white">
-                        {item.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-7 text-white/56">
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+                      <Icon size={21} style={{ color: item.tint }} />
+                    </span>
+                    <h3 className="mt-5 text-xl font-semibold text-white sm:text-[22px]">
+                      {item.title}
+                    </h3>
+                    <p
+                      className="mx-auto mt-2 max-w-xs text-sm leading-6"
+                      style={{ color: TEXT_DIM }}
+                    >
+                      {item.description}
+                    </p>
+                  </article>
+                );
+              })}
+            </div>
+
+            <div className="my-4 h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+            <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-2 md:divide-x md:divide-white/10">
+              {EDGE_POINTS.slice(3).map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article
+                    key={item.title}
+                    className="group rounded-xl px-3 py-4 text-center transition duration-300 hover:-translate-y-1 hover:bg-white/[0.04]"
+                  >
+                    <span
+                      className="mx-auto inline-flex h-16 w-16 items-center justify-center rounded-xl border transition group-hover:scale-110"
+                      style={{
+                        borderColor: `${item.tint}77`,
+                        background:
+                          "linear-gradient(160deg, rgba(9, 20, 52, 0.92) 0%, rgba(11, 28, 68, 0.7) 100%)",
+                        boxShadow: `0 10px 24px ${item.tint}30`,
+                      }}
+                    >
+                      <Icon size={21} style={{ color: item.tint }} />
+                    </span>
+                    <h3 className="mt-5 text-xl font-semibold text-white sm:text-[22px]">
+                      {item.title}
+                    </h3>
+                    <p
+                      className="mx-auto mt-2 max-w-xs text-sm leading-6"
+                      style={{ color: TEXT_DIM }}
+                    >
+                      {item.description}
+                    </p>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        <section className="pb-12 pt-4">
-          <div className="rounded-[34px] border border-white/8 bg-[linear-gradient(180deg,#111111_0%,#0d0d0d_100%)] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.32)] sm:p-8">
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <div className="max-w-2xl">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/34">
-                  Next step
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold tracking-[-0.06em] text-white md:text-5xl">
-                  The homepage now feels like the front door of a product, not a
-                  placeholder promo screen.
-                </h2>
-                <p className="mt-4 text-base leading-8 text-white/56">
-                  Users can choose the trading loop, the wallet rail, or the LP
-                  side with much less cognitive load, while the rest of the app
-                  keeps its current routes and functionality.
-                </p>
-              </div>
+        <section className="mx-auto mt-24 max-w-6xl">
+          <SectionHeader
+            badge="Our Advantages"
+            title="Leading The Revolution, Setting New Standards."
+            subtitle="A concise architecture: fast where users need it, verifiable where trust matters."
+          />
 
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  to="/trade"
-                  className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-black transition hover:-translate-y-0.5"
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {ADVANTAGES.map((item) => {
+              const Icon = item.icon;
+              return (
+                <article
+                  key={item.title}
+                  className="group relative overflow-hidden rounded-[24px] border p-6 transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_46px_rgba(16,24,56,0.62)]"
                   style={{
+                    borderColor: "rgba(148, 163, 184, 0.28)",
                     background:
-                      "linear-gradient(135deg, #f0b90b 0%, #ffcf4c 100%)",
+                      "linear-gradient(180deg, rgba(8, 18, 49, 0.84) 0%, rgba(3, 10, 29, 0.97) 100%)",
                   }}
                 >
-                  Start trading
-                  <ArrowRight size={15} />
-                </Link>
-                <Link
-                  to="/wallet"
-                  className="inline-flex items-center rounded-full border border-white/10 px-5 py-3 text-sm font-medium text-white/72 transition hover:border-white/18 hover:text-white"
-                >
-                  Open wallet
-                </Link>
-              </div>
-            </div>
+                  <div className="absolute right-0 top-0 h-[3px] w-[62%] bg-gradient-to-l from-transparent via-white/25 to-transparent" />
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+                  <div
+                    className="absolute inset-0 opacity-20"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)",
+                      backgroundSize: "28px 28px",
+                    }}
+                  />
+                  <div
+                    className="relative inline-flex h-16 w-16 items-center justify-center rounded-xl border transition group-hover:scale-110"
+                    style={{
+                      borderColor: `${item.tint}80`,
+                      color: item.tint,
+                      background:
+                        "linear-gradient(160deg, rgba(9, 20, 52, 0.92) 0%, rgba(11, 28, 68, 0.72) 100%)",
+                      boxShadow: `0 10px 24px ${item.tint}30`,
+                    }}
+                  >
+                    <Icon size={22} />
+                  </div>
+
+                  <h3 className="relative mt-6 text-3xl font-semibold text-white sm:text-[34px]">
+                    {item.title}
+                  </h3>
+                  <p
+                    className="relative mt-3 text-base leading-7"
+                    style={{ color: TEXT_DIM }}
+                  >
+                    {item.description}
+                  </p>
+                </article>
+              );
+            })}
           </div>
         </section>
       </div>

@@ -24,7 +24,7 @@ const features = [
     icon: Shield,
     title: "On-chain Security",
     highlight: "Security",
-    desc: "Every deposit and withdrawal is trustlessly settled via audited smart contracts on Polkadot Hub TestNet.",
+    desc: "Every deposit and withdrawal is trustlessly settled via audited smart contracts on Hedera Testnet.",
   },
   {
     icon: Zap,
@@ -84,7 +84,7 @@ export const LandingPage: React.FC = () => {
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] opacity-20 pointer-events-none rounded-full blur-[120px]"
         style={{
-          background: "radial-gradient(circle, #0847F7 0%, transparent 70%)",
+          background: "radial-gradient(circle, #2D84EB 0%, transparent 70%)",
         }}
       />
       {/* ── Navigation ── */}
@@ -104,8 +104,8 @@ export const LandingPage: React.FC = () => {
             <div
               className="w-9 h-9 rounded-lg flex items-center justify-center relative overflow-hidden group"
               style={{
-                background: "linear-gradient(135deg, #0847F7 0%, #002280 100%)",
-                boxShadow: "0 4px 12px rgba(8, 71, 247, 0.4)",
+                background: "linear-gradient(135deg, #2D84EB 0%, #00156E 100%)",
+                boxShadow: "0 4px 12px rgba(45, 132, 235, 0.4)",
               }}
             >
               <img
@@ -119,7 +119,7 @@ export const LandingPage: React.FC = () => {
               <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <span className="text-lg font-black tracking-tighter uppercase italic text-white">
-              PolkaTap<span style={{ color: "#0847F7" }}>.</span>
+              PolkaTap<span style={{ color: "#2D84EB" }}>.</span>
             </span>
           </Link>
 
@@ -155,7 +155,7 @@ export const LandingPage: React.FC = () => {
               className="hidden md:flex items-center text-sm font-medium transition-colors duration-150"
               style={{ color: "#ffffff" }}
               onMouseEnter={(e) =>
-                ((e.currentTarget as HTMLElement).style.color = "#0847F7")
+                ((e.currentTarget as HTMLElement).style.color = "#2D84EB")
               }
               onMouseLeave={(e) =>
                 ((e.currentTarget as HTMLElement).style.color = "#ffffff")
@@ -237,7 +237,7 @@ export const LandingPage: React.FC = () => {
             style={{ color: "#ffffff" }}
           >
             Trade BTC/USD with{" "}
-            <span style={{ color: "#0847F7" }}>On-chain</span>
+            <span style={{ color: "#2D84EB" }}>On-chain</span>
             <br />
             Price Precision
           </h1>
@@ -320,7 +320,7 @@ export const LandingPage: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-6">
           {[
-            { label: "Days on the market", val: "1839", color: "#0847F7" },
+            { label: "Days on the market", val: "1839", color: "#2D84EB" },
             { label: "Members", val: "5812", color: "#f6ad55" },
             { label: "Arbitrage pools", val: "$374 103", color: "#2ebd85" },
             { label: "Total paid", val: "$100 812", color: "#63b3ed" },
@@ -392,7 +392,7 @@ export const LandingPage: React.FC = () => {
               style={{ color: "#ffffff" }}
             >
               Crypto Trading{" "}
-              <span style={{ color: "#0847F7" }}>Made Accessible</span>
+              <span style={{ color: "#2D84EB" }}>Made Accessible</span>
             </h2>
             <p
               className="max-w-xl mx-auto text-sm"
@@ -418,37 +418,37 @@ export const LandingPage: React.FC = () => {
                   <div
                     className="absolute top-4 left-4 w-[10px] h-[10px] rounded-full border-2"
                     style={{
-                      borderColor: "#0847F7",
-                      boxShadow: "0 0 10px #0847F7",
+                      borderColor: "#2D84EB",
+                      boxShadow: "0 0 10px #2D84EB",
                     }}
                   />
                   <div className="absolute top-9 left-[1.15rem] flex flex-col gap-[3px]">
                     <div
                       className="w-[3px] h-[3px] rounded-full opacity-80"
-                      style={{ background: "#0847F7" }}
+                      style={{ background: "#2D84EB" }}
                     />
                     <div
                       className="w-[3px] h-[3px] rounded-full opacity-50"
-                      style={{ background: "#0847F7" }}
+                      style={{ background: "#2D84EB" }}
                     />
                     <div
                       className="w-[3px] h-[3px] rounded-full opacity-20"
-                      style={{ background: "#0847F7" }}
+                      style={{ background: "#2D84EB" }}
                     />
                   </div>
                   <div
                     className="absolute top-4 right-4 w-[10px] h-[10px] rounded-full border-2"
                     style={{
-                      borderColor: "#0847F7",
-                      boxShadow: "0 0 10px #0847F7",
+                      borderColor: "#2D84EB",
+                      boxShadow: "0 0 10px #2D84EB",
                     }}
                   />
 
                   <div
-                    className="w-12 h-12 rounded mt-3 mb-5 flex items-center justify-center bg-[#0847F7]/10"
-                    style={{ border: "1px solid rgba(8, 71, 247, 0.2)" }}
+                    className="w-12 h-12 rounded mt-3 mb-5 flex items-center justify-center bg-[#2D84EB]/10"
+                    style={{ border: "1px solid rgba(45, 132, 235, 0.2)" }}
                   >
-                    <Icon size={24} style={{ color: "#0847F7" }} />
+                    <Icon size={24} style={{ color: "#2D84EB" }} />
                   </div>
                   <h3
                     className="text-xl font-bold mb-2 ml-1"
@@ -487,7 +487,7 @@ export const LandingPage: React.FC = () => {
               style={{ color: "#ffffff" }}
             >
               Start Trading in{" "}
-              <span style={{ color: "#0847F7" }}>3 Simple</span> Steps
+              <span style={{ color: "#2D84EB" }}>3 Simple</span> Steps
             </h2>
 
             <div className="space-y-6">
@@ -512,9 +512,9 @@ export const LandingPage: React.FC = () => {
                   <div
                     className="shrink-0 w-10 h-10 rounded flex items-center justify-center font-bold font-mono text-xs"
                     style={{
-                      background: "rgba(8, 71, 247,0.06)",
-                      border: "1px solid rgba(8, 71, 247,0.15)",
-                      color: "#0847F7",
+                      background: "rgba(45, 132, 235,0.06)",
+                      border: "1px solid rgba(45, 132, 235,0.15)",
+                      color: "#2D84EB",
                     }}
                   >
                     {item.step}
@@ -552,7 +552,7 @@ export const LandingPage: React.FC = () => {
             >
               <p
                 className="text-xs font-semibold uppercase tracking-widest mb-6"
-                style={{ color: "#0847F7" }}
+                style={{ color: "#2D84EB" }}
               >
                 Platform Stats · Live
               </p>
@@ -575,7 +575,7 @@ export const LandingPage: React.FC = () => {
                   >
                     <div
                       className="text-2xl font-bold font-mono mb-1"
-                      style={{ color: "#0847F7" }}
+                      style={{ color: "#2D84EB" }}
                     >
                       {item.val}
                     </div>
@@ -604,7 +604,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div
                   className="h-full rounded-full"
-                  style={{ width: "72%", background: "#0847F7" }}
+                  style={{ width: "72%", background: "#2D84EB" }}
                 />
               </div>
               <div
@@ -639,7 +639,7 @@ export const LandingPage: React.FC = () => {
             style={{ color: "#ffffff" }}
           >
             Ready to trade the{" "}
-            <span style={{ color: "#0847F7" }}>smarter way</span>?
+            <span style={{ color: "#2D84EB" }}>smarter way</span>?
           </h2>
           <p className="mb-10 text-sm" style={{ color: "#d0d0d0" }}>
             Join thousands of traders experiencing the future of on-chain
@@ -662,7 +662,7 @@ export const LandingPage: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5">
-            <span className="text-sm font-bold" style={{ color: "#0847F7" }}>
+            <span className="text-sm font-bold" style={{ color: "#2D84EB" }}>
               PolkaTap
             </span>
             <span className="text-xs" style={{ color: "#a0a0a0" }}>

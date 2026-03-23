@@ -1,12 +1,17 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Navigate,
+  Route,
+  Routes,
+} from "react-router-dom";
 import { TradingView } from "./TradingView";
 import { HistoryView } from "./HistoryView";
 import { WalletView } from "./WalletView";
-import { LPView } from "./LPView";
 import { IntroView } from "./IntroView";
 import { Toaster } from "react-hot-toast";
 
 import { Layout } from "./Layout";
+import { HcsAnchorView } from "./HcsAnchorView";
 
 function App() {
   return (
@@ -18,7 +23,8 @@ function App() {
           <Route path="/trade" element={<TradingView />} />
           <Route path="/history" element={<HistoryView />} />
           <Route path="/wallet" element={<WalletView />} />
-          <Route path="/lp" element={<LPView />} />
+          <Route path="/hcs-anchor" element={<HcsAnchorView />} />
+          <Route path="/lp" element={<Navigate to="/hcs-anchor" replace />} />
         </Route>
       </Routes>
     </Router>

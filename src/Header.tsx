@@ -14,7 +14,7 @@ import {
 } from "wagmi";
 import { ChevronDown } from "lucide-react";
 import { BACKEND_URL } from "./constant";
-import { polkadotHubTestnet } from "./config/chains";
+import { hederaTestnet } from "./config/chains";
 import {
   authControllerGetChallenge,
   authControllerGetWssKey,
@@ -29,8 +29,12 @@ const NAV_ITEMS = [
   { label: "Trade", path: "/trade" },
   { label: "History", path: "/history" },
   { label: "Wallet", path: "/wallet" },
-  { label: "Liquidity", path: "/lp" },
+  { label: "HCS Anchor", path: "/hcs-anchor" },
 ] as const;
+
+const ACCENT = "#2D84EB";
+const SECONDARY = "#4F46E5";
+const DEEP = "#00156E";
 
 function HeaderButton({
   label,
@@ -51,16 +55,16 @@ function HeaderButton({
       style={{
         background:
           variant === "primary"
-            ? "#f0b90b"
-            : "linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.02) 100%)",
-        color: variant === "primary" ? "#050505" : "#f5f5f5",
+            ? "linear-gradient(135deg, rgba(45,132,235,1) 0%, rgba(79,70,229,1) 58%, rgba(0,21,110,1) 100%)"
+            : "linear-gradient(180deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.015) 100%)",
+        color: variant === "primary" ? "#ffffff" : "#f5f5f5",
         border:
           variant === "primary"
-            ? "1px solid rgba(240, 185, 11, 0.34)"
+            ? "1px solid rgba(45, 132, 235, 0.42)"
             : "1px solid rgba(255,255,255,0.08)",
         boxShadow:
           variant === "primary"
-            ? "0 10px 24px rgba(240, 185, 11, 0.18)"
+            ? "0 12px 28px rgba(45, 132, 235, 0.22)"
             : "none",
       }}
     >
@@ -300,17 +304,17 @@ export const Header: React.FC = () => {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b border-white/8 bg-[#090909]/94 backdrop-blur-xl"
+      className="sticky top-0 z-40 border-b border-white/8 bg-[#070a12]/94 backdrop-blur-xl"
       style={{
         fontFamily: "'Space Grotesk', sans-serif",
-        borderTop: "1px solid rgba(240, 185, 11, 0.82)",
+        borderTop: "1px solid rgba(45, 132, 235, 0.5)",
       }}
     >
       <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center gap-3 lg:flex-nowrap">
           <div className="flex min-w-0 items-center gap-4">
             <Link to="/" className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-[#111111] shadow-[0_10px_30px_rgba(0,0,0,0.28)]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/12 bg-[linear-gradient(145deg,rgba(19,29,55,0.92)_0%,rgba(9,12,22,0.96)_100%)] shadow-[0_10px_30px_rgba(0,0,0,0.32)]">
                 <img
                   src="/polkatap.png"
                   alt="PolkaTap"
@@ -321,14 +325,14 @@ export const Header: React.FC = () => {
                 <p className="text-[1.65rem] font-semibold tracking-[-0.06em] text-white">
                   PolkaTap
                 </p>
-                <span className="hidden rounded-md border border-white/8 bg-white/[0.03] px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-white/48 lg:inline-flex">
+            <span className="hidden rounded-md border border-white/12 bg-[rgba(45,132,235,0.12)] px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#9bcbff] lg:inline-flex">
                   Beta
                 </span>
               </div>
             </Link>
           </div>
 
-          <nav className="hidden items-center gap-1 rounded-2xl border border-white/8 bg-white/[0.02] p-1 lg:flex lg:ml-4">
+          <nav className="hidden items-center gap-1 rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.02)] p-1 lg:ml-4 lg:flex">
             {NAV_ITEMS.map((item) => {
               const isActive = location.pathname === item.path;
 
@@ -339,12 +343,15 @@ export const Header: React.FC = () => {
                   className="rounded-xl px-4 py-2 text-sm font-medium transition"
                   style={{
                     background: isActive
-                      ? "rgba(255,255,255,0.06)"
+                      ? "linear-gradient(135deg, rgba(45,132,235,0.18) 0%, rgba(79,70,229,0.16) 100%)"
                       : "transparent",
                     color: isActive ? "#ffffff" : "rgba(255,255,255,0.62)",
                     border: isActive
-                      ? "1px solid rgba(255,255,255,0.08)"
+                      ? "1px solid rgba(45,132,235,0.34)"
                       : "1px solid transparent",
+                    boxShadow: isActive
+                      ? "inset 0 -1px 0 rgba(45,132,235,0.85)"
+                      : "none",
                   }}
                 >
                   {item.label}
@@ -360,10 +367,10 @@ export const Header: React.FC = () => {
                 onClick={() => connect({ connector: connectors[0] })}
                 variant="primary"
               />
-            ) : chain?.id !== polkadotHubTestnet.id ? (
+            ) : chain?.id !== hederaTestnet.id ? (
               <HeaderButton
                 label={isPendingSwitch ? "Switching" : "Switch network"}
-                onClick={() => switchChain?.({ chainId: polkadotHubTestnet.id })}
+                onClick={() => switchChain?.({ chainId: hederaTestnet.id })}
                 variant="primary"
               />
             ) : !token ? (
@@ -385,7 +392,7 @@ export const Header: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setWalletMenuOpen((value) => !value)}
-                    className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/8 bg-white/[0.03] px-4 text-sm font-medium text-white transition hover:bg-white/[0.06]"
+                    className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-[rgba(255,255,255,0.03)] px-4 text-sm font-medium text-white transition hover:bg-[rgba(45,132,235,0.12)]"
                   >
                     <span className="font-mono text-[13px]">
                       {address?.slice(0, 6)}...{address?.slice(-4)}
@@ -394,8 +401,8 @@ export const Header: React.FC = () => {
                   </button>
 
                   {walletMenuOpen && (
-                    <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-64 overflow-hidden rounded-2xl border border-white/8 bg-[#101010] shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
-                      <div className="border-b border-white/8 px-4 py-3">
+                    <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-64 overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(165deg,rgba(14,21,42,0.98)_0%,rgba(8,11,21,0.98)_100%)] shadow-[0_30px_80px_rgba(0,0,0,0.45)]">
+                      <div className="border-b border-white/10 px-4 py-3">
                         <p className="text-[11px] font-medium text-white/42">
                           Connected wallet
                         </p>
@@ -403,10 +410,10 @@ export const Header: React.FC = () => {
                           {address?.slice(0, 6)}...{address?.slice(-4)}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 border-b border-white/8 px-4 py-3">
+                      <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
                         <button
                           type="button"
-                          className="rounded-xl border border-white/8 bg-white/4 px-3 py-2 text-xs font-medium text-white/75 transition hover:bg-white/[0.06] hover:text-white"
+                          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-white/75 transition hover:bg-[rgba(45,132,235,0.12)] hover:text-white"
                           onClick={() => {
                             if (address) {
                               navigator.clipboard.writeText(address);
@@ -420,7 +427,7 @@ export const Header: React.FC = () => {
                           href={getExplorerAddressUrl(address ?? "")}
                           target="_blank"
                           rel="noreferrer"
-                          className="rounded-xl border border-white/8 bg-white/4 px-3 py-2 text-xs font-medium text-white/75 transition hover:bg-white/[0.06] hover:text-white"
+                          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-white/75 transition hover:bg-[rgba(45,132,235,0.12)] hover:text-white"
                         >
                           Explorer
                         </a>
@@ -451,10 +458,12 @@ export const Header: React.FC = () => {
                 className="shrink-0 rounded-xl px-4 py-2 text-sm font-medium transition"
                 style={{
                   background: isActive
-                    ? "rgba(255,255,255,0.06)"
+                    ? "linear-gradient(135deg, rgba(45,132,235,0.2) 0%, rgba(79,70,229,0.18) 100%)"
                     : "rgba(255,255,255,0.03)",
                   color: isActive ? "#ffffff" : "rgba(255,255,255,0.68)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  border: isActive
+                    ? "1px solid rgba(45,132,235,0.36)"
+                    : "1px solid rgba(255,255,255,0.08)",
                 }}
               >
                 {item.label}
@@ -474,7 +483,7 @@ export const Header: React.FC = () => {
           aria-hidden="true"
         />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <DialogPanel className="relative mx-4 w-full max-w-md rounded-2xl border border-white/8 bg-[#101010] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+          <DialogPanel className="relative mx-4 w-full max-w-md rounded-2xl border border-white/10 bg-[linear-gradient(160deg,rgba(14,21,42,0.98)_0%,rgba(8,11,21,0.98)_100%)] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
             <button
               type="button"
               onClick={() => setIsFundModalOpen(false)}
@@ -532,7 +541,11 @@ export const Header: React.FC = () => {
                     }
                   }}
                   disabled={isFunding}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f0b90b] px-5 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-black transition disabled:opacity-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-semibold uppercase tracking-[0.16em] text-white transition disabled:opacity-50"
+                  style={{
+                    background: `linear-gradient(135deg, ${ACCENT} 0%, ${SECONDARY} 58%, ${DEEP} 100%)`,
+                    boxShadow: "0 16px 34px rgba(45,132,235,0.24)",
+                  }}
                 >
                   {isFunding ? "Funding..." : "Fund $100 now"}
                 </button>

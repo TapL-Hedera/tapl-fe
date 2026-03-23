@@ -22,6 +22,8 @@ interface WorkflowSectionProps {
 }
 
 const NOW_SECONDS = Math.floor(Date.now() / 1000);
+const ACCENT = "#2D84EB";
+const SECONDARY = "#4F46E5";
 const SAMPLE_POLKADOT_HUB_TX_HASHES = [
   "0xd1a6cc31adff06b33b1fe7049118d813d285a2f19a8fed84678127b7479665d5",
   "0xf27e0dc75e6b89ea5e86f108776374294f3ab018baa2334c72ef9248037f72cb",
@@ -120,7 +122,7 @@ function renderTxLink(hash: string | undefined) {
       target="_blank"
       rel="noreferrer"
       className="font-mono text-[10px] hover:underline"
-      style={{ color: "#3B82F6" }}
+      style={{ color: ACCENT }}
       title={hash}
     >
       {shortHash(hash)}
@@ -137,7 +139,7 @@ function renderAddressLink(address: string | undefined) {
       target="_blank"
       rel="noreferrer"
       className="font-mono text-[10px] hover:underline"
-      style={{ color: "#3B82F6" }}
+      style={{ color: ACCENT }}
       title={address}
     >
       {shortHash(address)}
@@ -154,7 +156,7 @@ function renderSearchLink(value: string | undefined) {
       target="_blank"
       rel="noreferrer"
       className="font-mono text-[10px] hover:underline"
-      style={{ color: "#3B82F6" }}
+      style={{ color: ACCENT }}
       title={value}
     >
       {shortHash(value)}
@@ -232,32 +234,32 @@ export function PriceIntegrityChecksSection({
       icon={<Zap size={15} />}
       title="Price Integrity Checks"
       subtitle="BatchSubmitted events · Authoritative pass/fail results"
-      accentColor="#A78BFA"
+      accentColor={SECONDARY}
       defaultOpen
       badge={
         <PillBadge
           real={rows.length}
           shown={displayRows.length}
-          color="#A78BFA"
-          background="rgba(167,139,250,0.1)"
+          color={SECONDARY}
+          background="rgba(79,70,229,0.14)"
         />
       }
     >
       {isLoading ? (
-        <Loader color="#A78BFA" />
+        <Loader color={SECONDARY} />
       ) : displayRows.length === 0 ? (
         <Empty />
       ) : (
         <>
           <DataTable
-            accentColor="#A78BFA"
+            accentColor={SECONDARY}
             columns={[
               { key: "epochId", label: "Epoch ID" },
               {
                 key: "scoreBps",
                 label: "Score",
                 render: (row) => (
-                  <span style={{ color: "#A78BFA" }}>
+                  <span style={{ color: SECONDARY }}>
                     {bpsToPercent(Number(row.scoreBps ?? 0))}
                   </span>
                 ),
@@ -346,25 +348,25 @@ export function CommittedSettlementsSection({
       icon={<Layers size={16} />}
       title="Committed Settlements"
       subtitle="SettlementBatchCommitted events · Committed payouts"
-      accentColor="#34D399"
+      accentColor={ACCENT}
       defaultOpen={false}
       badge={
         <PillBadge
           real={rows.length}
           shown={displayRows.length}
-          color="#34D399"
-          background="rgba(52,211,153,0.12)"
+          color={ACCENT}
+          background="rgba(45,132,235,0.12)"
         />
       }
     >
       {isLoading ? (
-        <Loader color="#34D399" />
+        <Loader color={ACCENT} />
       ) : displayRows.length === 0 ? (
         <Empty />
       ) : (
         <>
           <DataTable
-            accentColor="#34D399"
+            accentColor={ACCENT}
             columns={[
               {
                 key: "batchId",
@@ -372,7 +374,7 @@ export function CommittedSettlementsSection({
                 render: (row) => (
                   <span
                     className="font-mono text-[10px]"
-                    style={{ color: "#34D399" }}
+                    style={{ color: ACCENT }}
                     title={String(row.batchId ?? "")}
                   >
                     {shortHash(row.batchId as string)}
@@ -463,32 +465,32 @@ export function PoolSolvencySection({
       icon={<BarChart3 size={16} />}
       title="Pool Solvency Report"
       subtitle="SolvencyReported events · Pool PoR snapshots"
-      accentColor="#63B3ED"
+      accentColor={SECONDARY}
       defaultOpen={false}
       badge={
         <PillBadge
           real={rows.length}
           shown={displayRows.length}
-          color="#63B3ED"
-          background="rgba(99,179,237,0.12)"
+          color={SECONDARY}
+          background="rgba(79,70,229,0.12)"
         />
       }
     >
       {isLoading ? (
-        <Loader color="#63B3ED" />
+        <Loader color={SECONDARY} />
       ) : displayRows.length === 0 ? (
         <Empty />
       ) : (
         <>
           <DataTable
-            accentColor="#63B3ED"
+            accentColor={SECONDARY}
             columns={[
               { key: "epochId", label: "Epoch ID" },
               {
                 key: "poolBalance",
                 label: "Pool Balance",
                 render: (row) => (
-                  <span style={{ color: "#63B3ED" }}>
+                  <span style={{ color: ACCENT }}>
                     {toLinkDisplay(Number(row.poolBalance ?? 0))}
                   </span>
                 ),
@@ -507,7 +509,7 @@ export function PoolSolvencySection({
                     utilizationPct > 80
                       ? "#f87171"
                       : utilizationPct > 60
-                        ? "#f0b90b"
+                        ? "#2D84EB"
                         : "#45ab84";
                   return (
                     <span style={{ color }}>{utilizationPct.toFixed(2)}%</span>
@@ -587,25 +589,25 @@ export function VolatilityRegimeSection({
       icon={<TrendingUp size={16} />}
       title="Volatility Regime Changes"
       subtitle="Non-constant model params (near Notion defaults)"
-      accentColor="#F687B3"
+      accentColor={SECONDARY}
       defaultOpen={false}
       badge={
         <PillBadge
           real={rows.length}
           shown={displayRows.length}
-          color="#F687B3"
-          background="rgba(246,135,179,0.12)"
+          color={SECONDARY}
+          background="rgba(79,70,229,0.12)"
         />
       }
     >
       {isLoading ? (
-        <Loader color="#F687B3" />
+        <Loader color={SECONDARY} />
       ) : displayRows.length === 0 ? (
         <Empty />
       ) : (
         <>
           <DataTable
-            accentColor="#F687B3"
+            accentColor={SECONDARY}
             columns={[
               { key: "regimeId", label: "Regime ID" },
               { key: "bandWidth", label: "ΔP (BTC Band Width)" },

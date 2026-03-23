@@ -1,7 +1,7 @@
-import Axios, { AxiosError } from "axios";
+import Axios, { AxiosError, type AxiosRequestConfig } from "axios";
 
 export const AXIOS_INSTANCE = Axios.create({
-  baseURL: "https://api-tap-fun-polkadot.nysm.work/",
+  baseURL: "https://api-tap-fun-hedera.nysm.work/",
 });
 
 AXIOS_INSTANCE.interceptors.request.use((config) => {
@@ -42,21 +42,39 @@ AXIOS_INSTANCE.interceptors.response.use(
   },
 );
 
+type CustomClientConfig = AxiosRequestConfig & {
+  body?: unknown;
+};
+type CancellablePromise<T> = Promise<T> & { cancel?: () => void };
+
+const mapRequestBodyToData = (
+  config?: CustomClientConfig,
+): AxiosRequestConfig | undefined => {
+  if (!config) return undefined;
+
+  const { body, ...restConfig } = config;
+
+  return body !== undefined ? { ...restConfig, data: body } : restConfig;
+};
+
 export const customClient = <T>(
-  url: string,
-  options?: RequestInit,
+  config: CustomClientConfig,
+  options?: CustomClientConfig,
 ): Promise<T> => {
   const source = Axios.CancelToken.source();
-  const promise = AXIOS_INSTANCE({
-    url,
-    method: options?.method,
-    headers: options?.headers as any,
-    data: options?.body,
-    signal: options?.signal as any,
-    cancelToken: source.token,
-  }).then(({ data }) => data);
+  const requestConfig = mapRequestBodyToData(config);
+  const requestOptions = mapRequestBodyToData(options);
 
-  // @ts-expect-error - promise cancel
+  const promise = AXIOS_INSTANCE({
+    ...requestConfig,
+    ...requestOptions,
+    headers: {
+      ...(requestConfig?.headers ?? {}),
+      ...(requestOptions?.headers ?? {}),
+    },
+    cancelToken: source.token,
+  }).then(({ data }) => data) as CancellablePromise<T>;
+
   promise.cancel = () => {
     source.cancel("Query was cancelled");
   };
