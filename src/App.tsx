@@ -1,6 +1,5 @@
 import {
   BrowserRouter as Router,
-  Navigate,
   Route,
   Routes,
 } from "react-router-dom";
@@ -12,6 +11,7 @@ import { Toaster } from "react-hot-toast";
 
 import { Layout } from "./Layout";
 import { HcsAnchorView } from "./HcsAnchorView";
+import { LPView } from "./LPView";
 
 function App() {
   return (
@@ -24,7 +24,7 @@ function App() {
           <Route path="/history" element={<HistoryView />} />
           <Route path="/wallet" element={<WalletView />} />
           <Route path="/hcs-anchor" element={<HcsAnchorView />} />
-          <Route path="/lp" element={<Navigate to="/hcs-anchor" replace />} />
+          <Route path="/lp" element={<LPView />} />
         </Route>
       </Routes>
     </Router>

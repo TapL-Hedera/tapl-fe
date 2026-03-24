@@ -39,7 +39,7 @@ export const HowItWorksModal: React.FC = () => {
 
   const steps = [
     {
-      title: "Welcome to PolkaTap",
+      title: "Welcome to Tapl",
       description:
         "Experience the fastest grid-based trading game. Let's walk through how to play and win.",
       icon: <Rocket className="w-10 h-10" style={{ color: ACCENT }} />,

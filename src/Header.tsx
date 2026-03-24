@@ -29,6 +29,7 @@ const NAV_ITEMS = [
   { label: "Trade", path: "/trade" },
   { label: "History", path: "/history" },
   { label: "Wallet", path: "/wallet" },
+  { label: "LP", path: "/lp" },
   { label: "HCS Anchor", path: "/hcs-anchor" },
 ] as const;
 
@@ -316,14 +317,14 @@ export const Header: React.FC = () => {
             <Link to="/" className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/12 bg-[linear-gradient(145deg,rgba(19,29,55,0.92)_0%,rgba(9,12,22,0.96)_100%)] shadow-[0_10px_30px_rgba(0,0,0,0.32)]">
                 <img
-                  src="/polkatap.png"
-                  alt="PolkaTap"
+                  src="/tapl.png"
+                  alt="Tapl"
                   className="h-10 w-10 object-contain"
                 />
               </div>
               <div className="flex items-center gap-2">
                 <p className="text-[1.65rem] font-semibold tracking-[-0.06em] text-white">
-                  PolkaTap
+                  Tapl
                 </p>
             <span className="hidden rounded-md border border-white/12 bg-[rgba(45,132,235,0.12)] px-2 py-1 text-[10px] font-medium uppercase tracking-[0.12em] text-[#9bcbff] lg:inline-flex">
                   Beta

@@ -1,73 +1,84 @@
-# React + TypeScript + Vite
+# Tapl Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Tapl frontend is a React + TypeScript + Vite application for the Tapl trading game on **Hedera Testnet**.
 
-Currently, two official plugins are available:
+## What This App Includes
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Intro dashboard and workflow entry
+- Trading interface
+- Wallet deposit/withdraw flow
+- Trade history view
+- HCS Anchor view
+- LP page shell (coming soon, currently unavailable)
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- wagmi + viem
+- TanStack Query
+- react-router-dom
 
-## Expanding the ESLint configuration
+## Network
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Chain: Hedera Testnet (`id: 296`)
+- Native asset: `HBAR`
+- RPC: `https://testnet.hashio.io/api`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## API
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Frontend currently calls:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `https://api-tap-fun-hedera.nysm.work`
+
+(defined in `src/constant/index.tsx`)
+
+## Routes
+
+- `/` - Intro
+- `/trade` - Trading
+- `/history` - History
+- `/wallet` - Wallet
+- `/hcs-anchor` - HCS Anchor
+- `/lp` - LP (coming soon)
+
+## Getting Started
+
+### 1. Install dependencies
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Start dev server
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+### 3. Build for production
+
+```bash
+npm run build
+```
+
+### 4. Preview production build
+
+```bash
+npm run preview
+```
+
+## Scripts
+
+- `npm run dev` - Start Vite dev server
+- `npm run build` - Type-check and build
+- `npm run preview` - Preview built app
+- `npm run lint` - Run ESLint
+- `npm run generate:api` - Regenerate API client with Orval
+
+## Notes
+
+- The LP feature is intentionally disabled for now and marked as coming soon in the UI.
+- Wallet connection/sign-in is required for most app actions.

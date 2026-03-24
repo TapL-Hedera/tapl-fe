@@ -6,9 +6,7 @@ import React, {
   useState,
 } from "react";
 import {
-  ArrowDownLeft,
   ArrowDownUp,
-  ArrowUpRight,
   CircleDollarSign,
   Coins,
   Droplets,
@@ -45,7 +43,6 @@ const NATIVE_DECIMALS = hederaTestnet.nativeCurrency.decimals;
 const ACCENT = "#2D84EB";
 const SECONDARY = "#4F46E5";
 const DEEP = "#00156E";
-const SUCCESS = "#2EBD85";
 const ACCENT_SOFT = "rgba(45, 132, 235, 0.14)";
 const BORDER = "rgba(255, 255, 255, 0.11)";
 const PANEL_BG =
